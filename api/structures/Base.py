@@ -7,5 +7,5 @@ class Base(ABC):
         return
 
     @abstractmethod
-    def to_json(self):
+    def __iter__(self):
         return
