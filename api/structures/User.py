@@ -1,25 +1,74 @@
+from enum import Enum, auto
 from Base import Base
 
 
+# TODO: create validators and errors to handle bad data
+
+class PlanKind(Enum):
+    # TODO: use actual subscription plans
+    Bronze = auto()
+    Silver = auto()
+    Gold = auto()
+
+
+class Duration(Base):
+    __start: int
+    __end: int
+    __length: int
+
+    def __init__(self, data):
+        self.__patch(data)
+
+    def __patch(self, data):
+        if data is None:
+            return
+
+        self.__start = data.start
+        self.__end = data.end
+        self.__length = data.length
+
+    def __iter__(self):
+        yield 'start', self.__start
+        yield 'end', self.__end
+        yield 'length', self.__length
+
+    def get_start(self):
+        return self.__start
+
+    def get_end(self):
+        return self.__end
+
+    def get_length(self):
+        return self.__length
+
+
+class Subscription(Base):
+    __plan: PlanKind
+    __duration: Duration
+
+    def __init__(self, data):
+        self.__patch(data)
+
+    def __patch(self, data):
+        if data is None:
+            return
+
+        self.__plan = PlanKind[data.plan]
+        self.__duration = Duration(data.duration)
+
+    def __iter__(self):
+        yield 'plan', self.__plan.name
+        yield 'duration', dict(self.__duration)
+
+
 class User(Base):
-    """
-    User structure:
-    User {
-      id: str(uuid),
-      name: str,
-      email: str,
-      password: Hash(str),
-      address: Address { ... },
-      subscription: {
-        plan: PlanType,
-        duration: {
-          start: time,
-          end: time,
-          length: time,
-        }
-      }
-    }
-    """
+    __name: str
+    __password: str  # TODO: make this hashed
+    __id: str
+    __email: str
+    __address: str
+    __subscription: Subscription
+
     def __init__(self, data):
         self.__patch(data)
 
