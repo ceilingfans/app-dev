@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from Base import Base
+from structures.Base import Base
 
 
 # TODO: create validators and errors to handle bad data
