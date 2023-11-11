@@ -1,3 +1,4 @@
 pymongo
 Flask 
 flask-cors
+python-dotenv
