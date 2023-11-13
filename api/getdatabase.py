@@ -8,7 +8,7 @@ load_dotenv(find_dotenv())
 
 password = os.environ.get("MONGODB_PWD")
 
-CONNECTION_STRING=f"YOUR_MONGO_STRING + f{password}"
+CONNECTION_STRING=f"YOUR_MONGO_STRING + {password}"
 
 def get_userdatabase():
     
