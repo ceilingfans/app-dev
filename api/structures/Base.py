@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 
 
 class Base(ABC):
-    @abstractmethod
-    def __patch(self, data):
-        return
+    """
+    Provides an abstract method that allows for dict() to be used to convert the instance to a dict (JSON).
+    """
 
     @abstractmethod
     def __iter__(self):

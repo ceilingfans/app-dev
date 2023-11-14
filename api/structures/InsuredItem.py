@@ -2,15 +2,12 @@ from Base import Base
 
 
 class Damage(Base):
-    __description: str
-    __date: int
+    __description: str = None
+    __date: int = None
 
-    def __init__(self, data):
-        self.__patch(data)
-
-    def __patch(self, data):
-        self.__description = data.description
-        self.__date = data.date
+    def __init__(self, data: dict):
+        self.__description = data.get("description", None)
+        self.__date = data.get("date", None)
 
     def __iter__(self):
         yield 'description', self.__description
@@ -19,10 +16,7 @@ class Damage(Base):
 
 # TODO: find out what to put in each repair report
 class Repair(Base):
-    def __init__(self):
-        pass
-
-    def __patch(self, data):
+    def __init__(self, data):
         pass
 
     def __iter__(self):
@@ -30,15 +24,12 @@ class Repair(Base):
 
 
 class RepairStatus(Base):
-    __past_repairs: list[Repair]
-    __current: Repair
+    __past_repairs: list[Repair] = []
+    __current: Repair = None
 
-    def __init__(self, data):
-        self.__patch(data)
-
-    def __patch(self, data):
-        self.__past_repairs = data.past_repairs
-        self.__current = data.current
+    def __init__(self, data: dict):
+        self.__past_repairs = list(map(lambda x: Repair(x), data.get("past_repairs", [])))
+        self.__current = data.get("current", None)
 
     def __iter__(self):
         yield 'past_repairs', self.__past_repairs
@@ -48,9 +39,6 @@ class RepairStatus(Base):
 # TODO: find out what location data to save
 class Location(Base):
     def __init__(self, data):
-        self.__patch(data)
-
-    def __patch(self, data):
         pass
 
     def __iter__(self):
@@ -58,17 +46,14 @@ class Location(Base):
 
 
 class ItemStatus(Base):
-    __damage: Damage
-    __repair_status: RepairStatus
-    __location: Location
+    __damage: Damage = None
+    __repair_status: RepairStatus = None
+    __location: Location = None
 
-    def __init__(self, data):
-        self.__patch(data)
-
-    def __patch(self, data):
-        self.__damage = data.damage
-        self.__repair_status = data.repair_status
-        self.__location = data.location
+    def __init__(self, data: dict):
+        self.__damage = data.get("damage", None)
+        self.__repair_status = data.get("repair_status", None)
+        self.__location = data.get("location", None)
 
     def __iter__(self):
         yield 'damage', self.__damage
@@ -77,17 +62,14 @@ class ItemStatus(Base):
 
 
 class InsuredItem(Base):
-    __owner_id: str
-    __item_id: str
-    __status: ItemStatus
+    __owner_id: str = None
+    __item_id: str = None
+    __status: ItemStatus = None
 
-    def __init__(self, data):
-        self.__patch(data)
-
-    def __patch(self, data):
-        self.__owner_id = data.owner_id
-        self.__item_id = data.item_id
-        self.__status = data.status
+    def __init__(self, data: dict):
+        self.__owner_id = data.get("owner_id", None)
+        self.__item_id = data.get("item_id", None)
+        self.__status = data.get("status", None)
 
     def __iter__(self):
         yield 'owner_id', self.__owner_id

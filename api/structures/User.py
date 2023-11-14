@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from structures.Base import Base
+from Base import Base
 
 
 # TODO: create validators and errors to handle bad data
@@ -12,20 +12,14 @@ class PlanKind(Enum):
 
 
 class Duration(Base):
-    __start: int
-    __end: int
-    __length: int
+    __start: int = None
+    __end: int = None
+    __length: int = None
 
-    def __init__(self, data):
-        self.__patch(data)
-
-    def __patch(self, data):
-        if data is None:
-            return
-
-        self.__start = data.start
-        self.__end = data.end
-        self.__length = data.length
+    def __init__(self, data: dict):
+        self.__start = data.get("start", None)
+        self.__end = data.get("end", None)
+        self.__length = data.get("length", None)
 
     def __iter__(self):
         yield 'start', self.__start
@@ -43,18 +37,12 @@ class Duration(Base):
 
 
 class Subscription(Base):
-    __plan: PlanKind
-    __duration: Duration
+    __plan: PlanKind = None
+    __duration: Duration = None
 
-    def __init__(self, data):
-        self.__patch(data)
-
-    def __patch(self, data):
-        if data is None:
-            return
-
-        self.__plan = PlanKind[data.plan]
-        self.__duration = Duration(data.duration)
+    def __init__(self, data: dict):
+        self.__plan = PlanKind[data.get("plan", None)]
+        self.__duration = Duration(data.get("duration", None))
 
     def __iter__(self):
         yield 'plan', self.__plan.name
@@ -62,28 +50,20 @@ class Subscription(Base):
 
 
 class User(Base):
-    __name: str
-    __password: str  # TODO: make this hashed
-    __id: str
-    __email: str
-    __address: str
-    __subscription: Subscription
+    __name: str = None
+    __password: str = None  # TODO: make this hashed
+    __id: str = None
+    __email: str = None
+    __address: str = None
+    __subscription: Subscription = None
 
-    def __init__(self, data):
-        self.__patch(data)
-
-    def __patch(self, data):
-        if data is None:
-            return
-
-        self.__name = data.name
-        self.__password = data.password
-        self.__id = data.id
-        self.__email = data.email
-        self.__address = data.address
-        self.__subscription = data.subscription
-
-        return self
+    def __init__(self, data: dict):
+        self.__name = data.get("name", None)
+        self.__password = data.get("password", None)
+        self.__id = data.get("id", None)
+        self.__email = data.get("email", None)
+        self.__address = data.get("address", None)
+        self.__subscription = data.get("subscription", None)
 
     # use dict(<User>) to get the JSON
     def __iter__(self):
