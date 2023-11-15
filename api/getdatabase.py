@@ -10,7 +10,7 @@ password = os.environ.get("MONGODB_PWD")
 CONNECTION_STRING=f"CONNECTION_STRING + {password}"
 
 class Database:
-    def __init__(self,dbname: str):
+    def __init__(self, dbname: str):
         MONGO_URL = CONNECTION_STRING
         try:
             mongo_client = MongoClient(MONGO_URL)
