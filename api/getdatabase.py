@@ -23,7 +23,7 @@ class Database:
         self.dbname = dbname
 
 class DatabaseCollection(Database):
-    def __init__(self,dbname,dbcol):
+    def __init__(self, dbname, dbcol):
         super().__init__(dbname)
         self.dbcol = dbcol
     def get_database(self):
