@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.config.update(dict(SECRET_KEY='yoursecretkey'))
 
 dbcol = DatabaseCollection("Database","Users")
-db = dbcol.get_Database()
+db = dbcol.get_database()
 
 @app.route("/<name>")
 def index(name):
