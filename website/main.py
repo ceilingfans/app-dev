@@ -14,7 +14,7 @@ db = dbcol.get_database()
 
 @app.route("/<name>")
 def index(name):
-    return render_template("home.html",name = name)
+    return render_template("home.html", name = name)
 
 
 def createUser(form):
