@@ -26,7 +26,7 @@ class DatabaseCollection(Database):
     def __init__(self,dbname,dbcol):
         super().__init__(dbname)
         self.dbcol = dbcol
-    def get_Database(self):
+    def get_database(self):
         db = self.client[self.dbname]
         collection = db[f"{self.dbcol}"]
         return collection
