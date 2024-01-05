@@ -1,7 +1,4 @@
-from Base import Base
-
-
-class Damage(Base):
+class Damage:
     __description: str = None
     __date: int = None
 
@@ -15,7 +12,7 @@ class Damage(Base):
 
 
 # TODO: find out what to put in each repair report
-class Repair(Base):
+class Repair:
     def __init__(self, data):
         pass
 
@@ -23,7 +20,7 @@ class Repair(Base):
         pass
 
 
-class RepairStatus(Base):
+class RepairStatus:
     __past_repairs: list[Repair] = []
     __current: Repair = None
 
@@ -37,7 +34,7 @@ class RepairStatus(Base):
 
 
 # TODO: find out what location data to save
-class Location(Base):
+class Location:
     def __init__(self, data):
         pass
 
@@ -45,7 +42,7 @@ class Location(Base):
         pass
 
 
-class ItemStatus(Base):
+class ItemStatus:
     __damage: Damage = None
     __repair_status: RepairStatus = None
     __location: Location = None
@@ -61,7 +58,7 @@ class ItemStatus(Base):
         yield 'location', self.__location
 
 
-class InsuredItem(Base):
+class InsuredItem:
     __owner_id: str = None
     __item_id: str = None
     __status: ItemStatus = None

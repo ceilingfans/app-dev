@@ -1,5 +1,4 @@
 from enum import Enum, auto
-from Base import Base
 
 
 # TODO: create validators and errors to handle bad data
@@ -11,7 +10,7 @@ class PlanKind(Enum):
     Gold = auto()
 
 
-class Duration(Base):
+class Duration:
     __start: int = None
     __end: int = None
     __length: int = None
@@ -36,7 +35,7 @@ class Duration(Base):
         return self.__length
 
 
-class Subscription(Base):
+class Subscription:
     __plan: PlanKind = None
     __duration: Duration = None
 
@@ -49,7 +48,7 @@ class Subscription(Base):
         yield 'duration', dict(self.__duration)
 
 
-class User(Base):
+class User:
     __name: str = None
     __password: str = None  # TODO: make this hashed
     __id: str = None
