@@ -1,4 +1,4 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 from pymongo.errors import OperationFailure
 from pymongo.database import Database
 from pymongo.server_api import ServerApi
@@ -6,6 +6,7 @@ from dotenv import load_dotenv, find_dotenv
 import os
 
 from api.structures.User import User
+from api.structures.Promo import Promo
 
 # load env vars to our system
 load_dotenv(find_dotenv())
@@ -27,6 +28,7 @@ class Driver:
         self.__create_client()
         self.__get_db(dev)
 
+    # User CRUD
     def create_user(self, user: User):
         existing = self.get_user_by_id(user.get_id())
         if existing:
@@ -39,6 +41,7 @@ class Driver:
         except OperationFailure:
             print("error: OperationFailure from create_user")
 
+    # returns a user if `user_id` is provided and is found, else returns entire `users` collection in a list
     def get_user_by_id(self, user_id: str = None):  # TODO: accept id or email, change name to get_user
         if user_id is None:
             return list(self.db["users"].find())
@@ -51,17 +54,16 @@ class Driver:
 
     def update_user(self, new_user: User):
         try:
-            result = self.db["users"].find_one_and_update({"id": new_user.get_id()}, {"$set": dict(new_user)})
+            result = self.db["users"].find_one_and_update({"id": new_user.get_id()}, {"$set": dict(new_user)}, return_document=ReturnDocument.AFTER)
             if result is None:
                 print(f"error: user with id {new_user.get_id()} not found")
                 return
 
-            else:
-                print(f"info: update user with id {new_user.get_id()}")
-                return result
+            print(f"info: update user with id {new_user.get_id()}")
+            return result
 
         except OperationFailure:
-            print("error: OperationFailure from update_user_by_id")
+            print("error: OperationFailure from update_user")
 
     def delete_user_by_id(self, user_id: str):
         try:
@@ -76,6 +78,59 @@ class Driver:
 
         except OperationFailure:
             print("error: OperationFailure from delete_user_by_id")
+
+    # END of User CRUD
+    # Promo CRUD
+    def create_promo(self, promo: Promo):
+        existing = self.find_promo_by_id(promo.get_id())
+        if existing:
+            print(f"error: promo with id {promo} already exists")
+            return
+
+        try:
+            self.db["promos"].insert_one(dict(promo))
+            print(f"info: promo with id {promo.get_id()} created")
+        except OperationFailure:
+            print("error: OperationFailure in create_promo")
+
+    # returns a promo if `promo_id` is provided and found, else returns the entire `promos` collection in a list
+    def find_promo_by_id(self, promo_id: str = None):
+        if promo_id is None:
+            return list(self.db["promos"].find())
+
+        result = self.db["promos"].find_one({"id": promo_id})
+        if result:
+            return result
+
+        print(f"info: promo with id {promo_id} not found")
+
+    def update_promo(self, new_promo: Promo):
+        try:
+            result = self.db["promos"].find_one_and_update({"id": new_promo.get_id()}, {"$set": dict(new_promo)}, return_document=ReturnDocument.AFTER)
+            if result is None:
+                print(f"error: promo with id {new_promo.get_id()} not found")
+                return
+
+            print(f"info: update promo with id {new_promo.get_id()}")
+            return result
+
+        except OperationFailure:
+            print("error: OperationFailure from update_promo_by_id")
+
+    def delete_promo_by_id(self, promo_id: str):
+        try:
+            result = self.db["promos"].delete_one({"id": promo_id})
+
+            if result.deleted_count == 0:
+                print(f"error: promo with id {promo_id} not found")
+            else:
+                print(f"info: deleted promo with id {promo_id}")
+
+            return bool(result.deleted_count)
+
+        except OperationFailure:
+            print("error: OperationFailure from delete_promo_by_id")
+    # END of Promo CRUD
 
     def __create_client(self):
         global ALREADY_RUNNING
@@ -179,6 +234,44 @@ if __name__ == "__main__":
     passed += 1
     print("------------------------------------------------------------\n\n")
 
+    print("test: create a promo")
+    total += 1
+    promo = Promo({
+        "id": "XMAS20",
+        "type": "Percentage",
+        "value": 20
+    })
+    db.create_promo(promo)
+    passed += 1
+    print("------------------------------------------------------------\n\n")
+
+    print("test: find a promo by id")
+    total += 1
+    p = db.find_promo_by_id("XMAS20")
+    if p is not None:
+        print(p)
+        passed += 1
+    print("------------------------------------------------------------\n\n")
+
+    print("test: update a promo")
+    total += 1
+    new_promo = Promo({
+        "id": "XMAS20",
+        "type": "Value",
+        "value": 20
+    })
+    updated = db.update_promo(new_promo)
+    if updated is not None:
+        print(updated)
+        passed += 1
+    print("------------------------------------------------------------\n\n")
+
+    print("test: delete promo")
+    total += 1
+    if db.delete_promo_by_id("XMAS20"):
+        passed += 1
+    print("------------------------------------------------------------\n\n")
+
     # write tests above this
-    print(f"Total tests: {total}\nPassed: {passed}\nFailed: {total-passed}\nIf there are no errors then the tests "
+    print(f"Total tests: {total}\nPassed: {passed}\nFailed: {total - passed}\nIf there are no errors then the tests "
           f"should have all passed yippie")
