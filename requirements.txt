@@ -1,4 +1,4 @@
-pymongo
+pymongo[srv]
 flask 
 flask-cors
 python-dotenv
