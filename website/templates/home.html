@@ -2,39 +2,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="../css/home.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../static/home.css">
     <title>Home</title>
 </head>
 <body>
 <!--Navigation Bar-->
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">CP(cellphone)HELP</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav" type="sticky">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
-          <a class="nav-link" href="#">Features</a>
-          <a class="nav-link" href="#">Pricing</a>
-          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-        </div>
-      </div>
-    </div>
-  </nav>
-  <h3>Hello Welcome to CP(cellphone)Help,{{name}}</h3>
+<header>
+    <img class="phonylogo" src="../../images/phonylogo.png">
+    <nav>
+        <ul class="nav-container">
+            <li><a href="home.html">Home - {{name}}</a></li>
+            <li><a href="repair.html">Repair</a></li>
+            <li><a href="shop.html">Buy a Phone</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="locations.html">Locations</a></li>
+            <li><a href="cart.html"><img class="cartlogo" src="../../images/cartlogo.svg"></a></li> 
+        </ul>
+    </nav>
+</header>
 <!--Navigation Bar End-->
 
+<div class="title">
+    <h1>ONE-OF-A-KIND</h1>
+    <h1>INSURANCE</h1>
+</div>
 
+<div>
+    <table class="insurance">
+        <tr class="ranks">
+            <td><img src="../../images/diamond.jpeg"></td>
+            <td><img src="../../images/plat.jpeg"></td>
+            <td><img src="../../images/gold.jpeg"></td>
+        </tr>
+        <tr>
+            <td>Diamond Insurance</td>
+            <td>Platinum Insurance</td>
+            <td>Gold Insurance</td>
+        </tr>
+        <tr class="prices">
+            <td>$100</td>
+            <td>$75</td>
+            <td>$50</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="shopbutton">
+                <button>SHOP</button>
+            </td>
+        </tr>
+    </table>
+</div>
 
+<div class="newsletter">
+    <h1>Subscribe Form</h1>
+    <input type="text" placeholder = "eg. email@example.com">
+    <p><button>Join</button></p>
+    <p>Thanks for subscribing!</p>
+</div>
 
+<div class="about">
+    <h1>WHAT WE'RE ALL ABOUT</h1>
+    <h5>Made for everyone</h5>
+    <p>We founded Phony Insurance with one goal in mind: providing high-quality insurance for your electronics.</p>
+    <p>Our passion for excellence has driven us from the beginning and continues to propel us going forward.</p>
+    <p>We know that every device counts, and strive to make your insurance plan as comprehensive as it can be.</p>
+    <p>Don't settle for anything but the best—check us out for yourself.</p>
+</div>
 
+<div class="award">
+    
+    <img class="guy" src="../../images/guy.png">
 
+    <h2>AWARD-WINNING</h2>
+    <h5>Outstanding Quality</h5>
+    <p>
+        Phony Insurance won the Singapore Best Insurance Company 2023 Award, <br>clear of strong competitors 
+        like FWD Singapore, AIA, and HSBC Insurance.
+    </p>
+    <p>
+        We are proud to serve over a million customers in Singapore and millions more globally,<br> 
+        protecting your valuable devices with our excellent plans & policies.
+    </p>
+</div>
 
+<div class="bottom">
+    <p>Phony Insurance</p>
+    <p>&#169;2024 by PhonyInsurance.</p>
+</div>
 
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
