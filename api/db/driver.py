@@ -7,6 +7,7 @@ import os
 
 from api.structures.User import User
 from api.structures.Promo import Promo
+from api.structures.InsuredItem import InsuredItem
 
 # load env vars to our system
 load_dotenv(find_dotenv())
@@ -54,7 +55,8 @@ class Driver:
 
     def update_user(self, new_user: User):
         try:
-            result = self.db["users"].find_one_and_update({"id": new_user.get_id()}, {"$set": dict(new_user)}, return_document=ReturnDocument.AFTER)
+            result = self.db["users"].find_one_and_update({"id": new_user.get_id()}, {"$set": dict(new_user)},
+                                                          return_document=ReturnDocument.AFTER)
             if result is None:
                 print(f"error: user with id {new_user.get_id()} not found")
                 return
@@ -106,7 +108,8 @@ class Driver:
 
     def update_promo(self, new_promo: Promo):
         try:
-            result = self.db["promos"].find_one_and_update({"id": new_promo.get_id()}, {"$set": dict(new_promo)}, return_document=ReturnDocument.AFTER)
+            result = self.db["promos"].find_one_and_update({"id": new_promo.get_id()}, {"$set": dict(new_promo)},
+                                                           return_document=ReturnDocument.AFTER)
             if result is None:
                 print(f"error: promo with id {new_promo.get_id()} not found")
                 return
@@ -130,7 +133,62 @@ class Driver:
 
         except OperationFailure:
             print("error: OperationFailure from delete_promo_by_id")
+
     # END of Promo CRUD
+    # InsuredItem CRUD
+    def create_insured_item(self, insured_item: InsuredItem):
+        existing = self.find_insured_item(item_id=insured_item.get_item_id())
+        if existing:
+            print(f"error: item with id {insured_item.get_item_id()} already exists")
+            return
+
+        try:
+            self.db["insured_items"].insert_one(dict(insured_item))
+            print(f"info: item with id {insured_item.get_item_id()} created")
+        except OperationFailure:
+            print("error: OperationFailure in create_insured_item")
+
+    def find_insured_item(self, item_id: str = None, owner_id: str = None):
+        if item_id is not None:
+            query = {"item_id": item_id}
+        elif owner_id is not None:
+            query = {"owner_id": owner_id}
+        else:
+            print("error: either item_id or owner_id is required")
+            return
+
+        return self.db["insured_items"].find_one(query)
+
+    def update_insured_item(self, new_insured_item: InsuredItem):
+        try:
+            result = self.db["insured_items"].find_one_and_update({"item_id": new_insured_item.get_item_id()},
+                                                                  {"$set": dict(new_insured_item)},
+                                                                  return_document=ReturnDocument.AFTER)
+
+            if result is None:
+                print(f"error: item with id {new_insured_item.get_item_id()} does not exist")
+                return
+
+            print(f"info: update insured item with id {new_insured_item.get_item_id()}")
+            return result
+
+        except OperationFailure:
+            print("error: OperationFailure in update_insured_item")
+            return
+
+    def delete_insured_item_by_id(self, item_id: str):
+        try:
+            result = self.db["insured_items"].delete_one({"item_id": item_id})
+
+            if result.deleted_count == 0:
+                print(f"error: item with id {item_id} not found")
+            else:
+                print(f"info: deleted item with id {item_id}")
+
+            return bool(result.deleted_count)
+
+        except OperationFailure:
+            print("error: OperationFailure from delete_insured_item_by_id")
 
     def __create_client(self):
         global ALREADY_RUNNING
@@ -193,14 +251,6 @@ if __name__ == "__main__":
         "id": "d8ed0e07-54b9-4205-ac64-d9e16b152f82",
         "email": "jane_doe@gmail.com",
         "address": "1913 Rosebud Dr, Maryville, Tennessee(TN), 37803",
-        "subscription": {
-            "plan": "Bronze",
-            "duration": {
-                "start": 1704464537925,
-                "end": 1712353937925,
-                "length": 7889400000
-            }
-        }
     })
     print(dict(user))
     db.create_user(user)
@@ -215,14 +265,6 @@ if __name__ == "__main__":
         "id": "d8ed0e07-54b9-4205-ac64-d9e16b152f82",
         "email": "jane_doe@gmail.com",
         "address": "38042 28th Ave, Gobles, Michigan(MI), 49055",  # address change
-        "subscription": {
-            "plan": "Bronze",
-            "duration": {
-                "start": 1704464537925,
-                "end": 1712353937925,
-                "length": 7889400000
-            }
-        }
     })
     db.update_user(new_user)
     passed += 1
@@ -269,6 +311,88 @@ if __name__ == "__main__":
     print("test: delete promo")
     total += 1
     if db.delete_promo_by_id("XMAS20"):
+        passed += 1
+    print("------------------------------------------------------------\n\n")
+
+    print("test: create insured item")
+    total += 1
+    item = InsuredItem({
+        "owner_id": "3d1919bb-4d0b-497e-822f-1bba586d54c2",
+        "item_id": "fda25a81-b823-4d9a-a526-94781e301a20",
+        "status": {
+            "damage": {
+                "description": "Phone has a crack on the bottom left front screen",
+                "date": 1704537866402
+            },
+            "repair_status": {
+                "past_repairs": [],
+                "current": {
+                    "description": "Sent to our specialists for repair",
+                    "start_date": 1704538866402,
+                    "end_date": None
+                }
+            },
+            "address": "1117 Willow St, Eden, North Carolina(NC), 27288"
+        },
+        "subscription": {
+            "plan": "Bronze",
+            "duration": {
+                "start": 1704464537925,
+                "end": 1712353937925,
+                "length": 7889400000
+            }
+        }
+    })
+    db.create_insured_item(item)
+    passed += 1
+    print("------------------------------------------------------------\n\n")
+
+    print("test: find item by id")
+    total += 1
+    i = db.find_insured_item(item_id="fda25a81-b823-4d9a-a526-94781e301a20")
+    if i is not None:
+        print(i)
+        passed += 1
+    print("------------------------------------------------------------\n\n")
+
+    print("test: update item")
+    total += 1
+    new_item = InsuredItem({
+        "owner_id": "3d1919bb-4d0b-497e-822f-1bba586d54c2",
+        "item_id": "fda25a81-b823-4d9a-a526-94781e301a20",
+        "status": {
+            "damage": {
+                "description": "Phone has a crack on the bottom left front screen",
+                "date": 1704537866402
+            },
+            "repair_status": {
+                "past_repairs": [],
+                "current": {
+                    "description": "Started repairs, ETA: 1 week",
+                    "start_date": 1704538866402,
+                    "end_date": None
+                }
+            },
+            "address": "1117 Willow St, Eden, North Carolina(NC), 27288"
+        },
+        "subscription": {
+            "plan": "Bronze",
+            "duration": {
+                "start": 1704464537925,
+                "end": 1712353937925,
+                "length": 7889400000
+            }
+        }
+    })
+    updated = db.update_insured_item(new_item)
+    if updated is not None:
+        print(updated)
+        passed += 1
+    print("------------------------------------------------------------\n\n")
+
+    print("test: delete item")
+    total += 1
+    if db.delete_insured_item_by_id("fda25a81-b823-4d9a-a526-94781e301a20"):
         passed += 1
     print("------------------------------------------------------------\n\n")
 
