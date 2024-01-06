@@ -7,7 +7,8 @@ import os
 
 from api.structures.User import User
 from api.structures.Promo import Promo
-from api.structures.InsuredItem import InsuredItem
+from api.structures.InsuredItem import InsuredItem, PlanKind
+from api.structures.PlanDescription import PlanDescription
 
 # load env vars to our system
 load_dotenv(find_dotenv())
@@ -189,6 +190,62 @@ class Driver:
 
         except OperationFailure:
             print("error: OperationFailure from delete_insured_item_by_id")
+
+    # END of InsuredItem CRUD
+    # PlanDescription CRUD
+    def create_plan(self, plan: PlanDescription):
+        existing = self.find_plan_by_type(plan.get_plan_type().name)
+        if existing:
+            print(f"error: plan with name {plan.get_plan_type().name} already exists")
+            return
+
+        try:
+            self.db["plan_descriptions"].insert_one(dict(plan))
+            print(f"info: plan with id {plan.get_plan_type().name} created")
+        except OperationFailure:
+            print("error: OperationFailure in create_plan")
+
+    def find_plan_by_type(self, plan_type: PlanKind = None):
+        if plan_type is None:
+            return self.db["plan_descriptions"].find()
+
+        result = self.db["plan_descriptions"].find_one({"plan_type": plan_type.name})
+        if result:
+            return result
+
+        print(f"info: plan with type {plan_type.name} not found")
+
+    def update_plan(self, new_plan: PlanDescription):
+        try:
+            result = self.db["plan_descriptions"].find_one_and_update({"plan_type": new_plan.get_plan_type().name},
+                                                                  {"$set": dict(new_plan)},
+                                                                  return_document=ReturnDocument.AFTER)
+
+            if result is None:
+                print(f"error: plan with type {new_plan.get_plan_type().name} does not exist")
+                return
+
+            print(f"info: update plan with type {new_plan.get_plan_type().name}")
+            return result
+
+        except OperationFailure:
+            print("error: OperationFailure in update_plan")
+            return
+
+    # do not use this unless it is really needed
+    def delete_plan_by_type(self, plan_type: PlanKind):
+        try:
+            result = self.db["plan_description"].delete_one({"plan_type": plan_type.name})
+
+            if result.deleted_count == 0:
+                print(f"error: plan with type {plan_type.name} not found")
+            else:
+                print(f"info: deleted plan with type {plan_type.name}")
+
+            return bool(result.deleted_count)
+
+        except OperationFailure:
+            print("error: OperationFailure from delete_plan_by_type")
 
     def __create_client(self):
         global ALREADY_RUNNING
