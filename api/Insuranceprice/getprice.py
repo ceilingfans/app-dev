@@ -15,4 +15,3 @@ def getprice(data,price):
     factor -= 6.48 
     return price * factor
 
-print(getprice([18,'Male',1,1,'High school diploma or equivalent',0,0],150))
