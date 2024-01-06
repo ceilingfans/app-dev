@@ -13,7 +13,7 @@ class Promo:
     # if type is Value, interpret value as the amount deducted from the final price
     __value: int = None
 
-    def __init__(self, data: dict):
+    def __init__(self, data):
         self.__id = data.get("id")
         self.__type = PromoType[data.get("type")]
         self.__value = int(data.get("value"))
