@@ -536,7 +536,7 @@ if __name__ == "__main__":
     print("------------------------------------------------------------\n\n")
     print("test: get bill by id")
     total += 1
-    i = db.get_bill_id("7070")
+    i = db.get_bill_by_id("7070")
     if i is not None:
         print(i)
         passed += 1
