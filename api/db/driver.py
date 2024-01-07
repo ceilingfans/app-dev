@@ -4,11 +4,14 @@ from pymongo.database import Database
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv, find_dotenv
 import os
-
-from api.structures.User import User
-from api.structures.Promo import Promo
-from api.structures.InsuredItem import InsuredItem, PlanKind
-from api.structures.PlanDescription import PlanDescription
+# Shit doesnt work for me without manually setting path ~ Isaac
+#import sys
+#sys.path.insert(1, "G://app-dev//app-dev//api")
+from structures.User import User
+from structures.Promo import Promo
+from structures.InsuredItem import InsuredItem, PlanKind
+from structures.PlanDescription import PlanDescription
+from structures.billinghistory import Billinghistory
 
 # load env vars to our system
 load_dotenv(find_dotenv())
@@ -246,7 +249,65 @@ class Driver:
 
         except OperationFailure:
             print("error: OperationFailure from delete_plan_by_type")
+            
+    #End of PlanDescription CRUD
+    #Billinghistory CRUD
+    def create_bill(self,bill: Billinghistory):
+        existing = self.get_bill_by_id(bill.get_billid())
+        if existing:
+            print(f"error: user with id {bill.get_billid()} already exists")
+            return
+        try:
+            self.db["billinghistory"].insert_one(dict(bill))
+            print(f"info: created bill with id {bill.get_billid()}")
+        except OperationFailure:
+            print("error: OperationFailure from create_bill")
+        return
+    
+    def get_bill_by_id(self, bill_id: str = None): 
+        if bill_id is None:
+            return list(self.db["billinghistory"].find())
 
+        result = self.db["billinghistory"].find_one({"billid": bill_id})
+        if result:
+            return result
+    
+    # USE TO UPDATE PAYMENT STATUS
+    def update_bill(self, new_bill: Billinghistory):
+        try:
+            result = self.db["billinghistory"].find_one_and_update({"billid": new_bill.get_billid()}, {"$set": dict(new_bill)},
+                                                          return_document=ReturnDocument.AFTER)
+            if result is None:
+                print(f"error: bill with id {new_bill.get_billid()} not found")
+                return
+
+            print(f"info: update bill with id {new_bill.get_billid()}")
+            return result
+
+        except OperationFailure:
+            print("error: OperationFailure from update_bill")
+        
+        return
+    
+    def delete_bill_by_id(self, bill_id: str):
+        try:
+            result = self.db["billinghistory"].delete_one({"billid": bill_id})
+
+            if result.deleted_count == 0:
+                print(f"error: bill with id {bill_id} not found")
+            else:
+                print(f"info: deleted bill with id {bill_id}")
+
+            return bool(result.deleted_count)
+
+        except OperationFailure:
+            print("error: OperationFailure from delete_bill_by_id")
+    
+    def get_bill_info(self,bill:Billinghistory): #TODO get Bill details from other DBs.
+        return
+    
+    #End of Billing CRUD
+    
     def __create_client(self):
         global ALREADY_RUNNING
 
@@ -271,6 +332,7 @@ class Driver:
             self.db = self.client.dev
         else:
             self.db = self.client.master
+    
 
 
 # test code, ignore pls
@@ -452,7 +514,45 @@ if __name__ == "__main__":
     if db.delete_insured_item_by_id("fda25a81-b823-4d9a-a526-94781e301a20"):
         passed += 1
     print("------------------------------------------------------------\n\n")
+    
+    print("test: create a bill")
+    total += 1
+    bill = Billinghistory({
+        "customerid": "d8ed0e07-54b9-4205-ac64-d9e16b152f82",
+        "billid": "7070",
+        "status": False,
+    })
+    print(dict(bill))
+    db.create_bill(bill)
+    passed += 1
+    print("------------------------------------------------------------\n\n")
+    print("test: update a bill")
+    total += 1
+    new_bill = Billinghistory({
+        "customerid": "d8ed0e07-54b9-4205-ac64-d9e16b152f82",
+        "billid": "7070",
+        "status": True,
+    })
+    print("------------------------------------------------------------\n\n")
+    print("test: get bill by id")
+    total += 1
+    i = db.get_bill_by_id("7070")
+    if i is not None:
+        print(i)
+        passed += 1
+    print("------------------------------------------------------------\n\n")
+    updated = db.update_bill(new_bill)
+    if updated is not None:
+        passed += 1
+    print("------------------------------------------------------------\n\n")
 
+    print("test: delete a bill")
+    total += 1
+    if db.delete_bill_by_id("7070"):
+        passed += 1
+    print("------------------------------------------------------------\n\n")
+    
+    
     # write tests above this
     print(f"Total tests: {total}\nPassed: {passed}\nFailed: {total - passed}\nIf there are no errors then the tests "
           f"should have all passed yippie")
