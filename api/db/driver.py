@@ -259,9 +259,9 @@ class Driver:
             return
         try:
             self.db["billinghistory"].insert_one(dict(bill))
-            print(f"info: created user with id {bill.get_billid()}")
+            print(f"info: created bill with id {bill.get_billid()}")
         except OperationFailure:
-            print("error: OperationFailure from create_user")
+            print("error: OperationFailure from create_bill")
         return
     
     def get_bill_by_id(self, bill_id: str = None): 
@@ -294,14 +294,14 @@ class Driver:
             result = self.db["billinghistory"].delete_one({"billid": bill_id})
 
             if result.deleted_count == 0:
-                print(f"error: user with id {bill_id} not found")
+                print(f"error: bill with id {bill_id} not found")
             else:
-                print(f"info: deleted user with id {bill_id}")
+                print(f"info: deleted bill with id {bill_id}")
 
             return bool(result.deleted_count)
 
         except OperationFailure:
-            print("error: OperationFailure from delete_user_by_id")
+            print("error: OperationFailure from delete_bill_by_id")
     
     def get_bill_info(self,bill:Billinghistory): #TODO get Bill details from other DBs.
         return
@@ -533,6 +533,14 @@ if __name__ == "__main__":
         "billid": "7070",
         "status": True,
     })
+    print("------------------------------------------------------------\n\n")
+    print("test: get bill by id")
+    total += 1
+    i = db.get_bill_id("7070")
+    if i is not None:
+        print(i)
+        passed += 1
+    print("------------------------------------------------------------\n\n")
     updated = db.update_bill(new_bill)
     if updated is not None:
         passed += 1
