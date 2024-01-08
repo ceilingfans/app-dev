@@ -6,6 +6,7 @@ from dotenv import load_dotenv, find_dotenv
 import os
 # Shit doesnt work for me without manually setting path ~ Isaac
 #import sys
+import uuid
 #sys.path.insert(1, "G://app-dev//app-dev//api")
 from structures.User import User
 from structures.Promo import Promo
@@ -32,6 +33,9 @@ class Driver:
 
         self.__create_client()
         self.__get_db(dev)
+        
+    def generate_id():
+        return str(uuid.uuid4())
 
     # User CRUD
     def create_user(self, user: User):
