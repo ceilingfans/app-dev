@@ -7,3 +7,5 @@ numpy
 pandas
 matplotlib
 seaborn
+wtforms
+flask-wtf
