@@ -34,7 +34,7 @@ class Driver:
         self.__create_client()
         self.__get_db(dev)
         
-    def generate_id():
+    def generate_id(self):
         return str(uuid.uuid4())
 
     # User CRUD
