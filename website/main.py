@@ -104,6 +104,13 @@ def billing_crud():
 
     else:
         return render_template(html)
+    
+
+@app.route("/crudtestplan:", methods=["GET", "POST"])
+def crudplan():
+    return render_template("crudtestplan.html")
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
