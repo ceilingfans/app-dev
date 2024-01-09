@@ -2,11 +2,11 @@ import sys
 from flask import Flask, render_template, redirect , request
 from pymongo import MongoClient
 #set up actually good PYTHONPATH
-#sys.path.insert(1, "G://app-dev//app-dev")
-from api.structures.User import User
+sys.path.insert(1, "C://Users//mdame//OneDrive//Desktop//School//Sem 2//AppDevelopment//app-dev")
+from api.structures.InsuredItem import InsuredItem
 from api.db.driver import Driver
 db = Driver()
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/static")
 app.config.update(dict(SECRET_KEY='yoursecretkey'))
 
 @app.route("/")
@@ -18,34 +18,74 @@ def page():
     return render_template("contact.html")
 
 
-@app.route("/CRUDTEST",methods=['GET','POST'])
+@app.route("/CRUDTESTItem",methods=['GET','POST'])
 def crudtest():
     if request.method == "POST":
-        if request.form['submit'] == 'CreateUser':
-            user = User({
-            "name": request.form['name'],
-            "password": request.form['password'],
-            "id": Driver.generate_id(),
-            "email": request.form['email'],
-            "address": request.form['address'],
-            })  
-            db.create_user(user)
-            return render_template("CRUDTEST.html")
-        if request.form['submit'] == 'GetUser':
-            return render_template("CRUDTEST.html",Userdata = db.get_user_by_id(request.form['id']))
-        if request.form['submit'] == 'UpdateUser':
-            new_user = User({
-            "name": request.form['upname'],
-            "password": request.form['uppassword'],
-            "id": request.form['upid'],
-            "email": request.form['upemail'],
-            "address": request.form['upaddress'],
+        if request.form['submit'] == 'CreateItem':
+            item = InsuredItem({
+                "owner_id": request.form['Owner ID'],
+                "item_id": db.generate_id(),
+                "status": {
+                    "damage": {
+                        "description": request.form['dmgstatus'],
+                        "date": 1704537866402
+                    },
+                    "repair_status": {
+                        "past_repairs": [],
+                        "current": {
+                            "description": "Sent to our specialists for repair",
+                            "start_date": 1704538866402,
+                            "end_date": None
+                        }
+                    },
+                    "address": request.form['address']
+                },
+                "subscription": {
+                    "plan": "Bronze",
+                    "duration": {
+                        "start": 1704464537925,
+                        "end": 1712353937925,
+                        "length": 7889400000
+                    }
+                }
             })
-            return render_template("CRUDTEST.html",Updated = db.update_user(new_user))
-        if request.form['submit'] == 'DelUser':
-            return render_template("CRUDTEST.html",Deleted = db.delete_user_by_id(request.form['delid']))
+            db.create_insured_item(item)
+            return render_template("CRUDTESTItem.html")
+        if request.form['submit'] == 'GetItem':
+            return render_template("CRUDTESTItem.html",Userdata = db.find_insured_item(item_id=request.form['id']))
+        if request.form['submit'] == 'UpdateItem':
+            item = InsuredItem({
+                "owner_id": "3d1919bb-4d0b-497e-822f-1bba586d54c2",
+                "item_id": "fda25a81-b823-4d9a-a526-94781e301a20",
+                "status": {
+                    "damage": {
+                        "description": request.form['upstatus'],
+                        "date": 1704537866402
+                    },
+                    "repair_status": {
+                        "past_repairs": [],
+                        "current": {
+                            "description": request.form['uprepairstatus'],
+                            "start_date": 1704538866402,
+                            "end_date": None
+                        }
+                    },
+                    "address": request.form['upaddress']
+                },
+                "subscription": {
+                    "plan": "Bronze",
+                    "duration": {
+                        "start": 1704464537925,
+                        "end": 1712353937925,
+                        "length": 7889400000
+                    }
+                }
+            })
+            return render_template("CRUDTESTItem.html",Updated = db.update_insured_item(item))
+        if request.form['submit'] == 'DelItem':
+            return render_template("CRUDTESTItem.html",Deleted = db.delete_insured_item_by_id(request.form['delid']))
     else:
-        return render_template("CRUDTEST.html")
+        return render_template("CRUDTESTItem.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

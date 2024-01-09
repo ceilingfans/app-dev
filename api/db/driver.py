@@ -5,14 +5,14 @@ from pymongo.server_api import ServerApi
 from dotenv import load_dotenv, find_dotenv
 import os
 # Shit doesnt work for me without manually setting path ~ Isaac
-#import sys
+import sys
 import uuid
-#sys.path.insert(1, "G://app-dev//app-dev//api")
-from structures.User import User
-from structures.Promo import Promo
-from structures.InsuredItem import InsuredItem, PlanKind
-from structures.PlanDescription import PlanDescription
-from structures.billinghistory import Billinghistory
+# sys.path.insert(1, "C://Users//mdame//OneDrive//Desktop//School//Sem 2//AppDevelopment//app-dev//api")
+from api.structures.User import User
+from api.structures.Promo import Promo
+from api.structures.InsuredItem import InsuredItem, PlanKind
+from api.structures.PlanDescription import PlanDescription
+from api.structures.billinghistory import Billinghistory
 
 # load env vars to our system
 load_dotenv(find_dotenv())
@@ -34,7 +34,7 @@ class Driver:
         self.__create_client()
         self.__get_db(dev)
         
-    def generate_id():
+    def generate_id(self):
         return str(uuid.uuid4())
 
     # User CRUD
