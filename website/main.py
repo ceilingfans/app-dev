@@ -2,7 +2,7 @@ import sys
 from flask import Flask, render_template, redirect , request
 from pymongo import MongoClient
 #set up actually good PYTHONPATH
-#sys.path.insert(1, "G://app-dev//app-dev")
+sys.path.insert(1, "C://Users//josht//OneDrive//Desktop//app-dev")
 from api.structures.User import User
 from api.structures.billinghistory import Billinghistory
 from api.db.driver import Driver
