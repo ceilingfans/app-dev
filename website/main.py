@@ -7,6 +7,7 @@ from api.structures.User import User
 from api.structures.billinghistory import Billinghistory
 from api.db.driver import Driver
 from api.structures.datavalidation import UserForm
+from api.structures.PlanDescription import PlanDescription
 
 
 
@@ -117,33 +118,32 @@ def plan_crud():
 
         match request.form["submit"]:
             case "Create":
-                plan_instance = request.form["plan_type"]
-                new_plan = PlanDescription({"plan_type": plan_type})
-                # Perform create operation here using the new_plan
-                # Assuming 'create_plan' method handles the creation operation
-                create_result = plan_instance.create_plan(new_plan)
-                return render_template(html, created_plan=f"Plan '{plan_type}' created" if create_result else f"Plan '{plan_type}' already exists")
+                plan = PlanDescription({
+                'plan_type': request.form['plan_type']
+                })
+                db.create_plan(plan)
+                return render_template(html, CreatePlan=f"{dict(plan)}")
 
             case "Find":
-                plan_instance = request.form["plan_type"]
-                # Perform find operation here using the plan_type
-                found_plan = plan_instance.find_plan_by_type(plan_type)
-                return render_template(html, found_plan=f"Found plan '{plan_type}'" if found_plan else f"No plan '{plan_type}' found")
+                plan = PlanDescription({
+                'plan_type': request.form['plan_type']
+                })
+                db.find_plan_by_type(plan)
+                return render_template(html, FindPlan=f"{dict(plan)}")
 
             case "Update":
-                plan_instance = request.form["plan_type"]
-                updated_plan = PlanDescription({"plan_type": plan_type})
-                # Perform update operation here using the updated_plan
-                # Assuming 'update_plan' method handles the update operation
-                update_result = plan_instance.update_plan(updated_plan)
-                return render_template(html, updated_plan=f"Updated plan '{plan_type}'" if update_result else f"Plan '{plan_type}' does not exist")
+                plan = PlanDescription({
+                'plan_type': request.form['plan_type']
+                })
+                db.update_plan(plan)
+                return render_template(html, UpdatePlan=f"{dict(plan)}")
 
             case "Delete":
-                plan_instance = request.form["plan_type"]
-                # Perform delete operation here using the plan_type
-                # Assuming 'delete_plan_by_type' method handles the deletion operation
-                delete_result = plan_instance.delete_plan_by_type(plan_type)
-                return render_template(html, deleted_plan=f"Deleted plan '{plan_type}'" if delete_result else f"No plan '{plan_type}' found")
+                plan = PlanDescription({
+                'plan_type': request.form['plan_type']
+                })
+                db.delete_plan_by_type(plan)
+                return render_template(html, DeletePlan=f"{dict(plan)}")
 
             case _:
                 return "<body>Invalid submit button pressed</body>"
