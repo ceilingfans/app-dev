@@ -2,7 +2,7 @@ import sys
 from flask import Flask, render_template, redirect , request
 from pymongo import MongoClient
 #set up actually good PYTHONPATH
-sys.path.insert(1, "C://Users//josht//OneDrive//Desktop//app-dev")
+sys.path.insert(1, "C://Users//josht//OneDrive//Documents//GitHub//app-dev")
 from api.structures.User import User
 from api.structures.billinghistory import Billinghistory
 from api.db.driver import Driver
@@ -106,7 +106,7 @@ def billing_crud():
         return render_template(html)
     
 
-from your_module_or_file import PlanDescription  # Import your PlanDescription class
+from api.structures.PlanDescription import PlanDescription  # Import your PlanDescription class
 
 @app.route("/plan_crud", methods=["GET", "POST"])
 def plan_crud():
