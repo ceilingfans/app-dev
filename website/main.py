@@ -117,7 +117,7 @@ def plan_crud():
 
         match request.form["submit"]:
             case "Create":
-                plan_type = request.form["plan_type"]
+                plan_instance = request.form["plan_type"]
                 new_plan = PlanDescription({"plan_type": plan_type})
                 # Perform create operation here using the new_plan
                 # Assuming 'create_plan' method handles the creation operation
@@ -125,13 +125,13 @@ def plan_crud():
                 return render_template(html, created_plan=f"Plan '{plan_type}' created" if create_result else f"Plan '{plan_type}' already exists")
 
             case "Find":
-                plan_type = request.form["plan_type"]
+                plan_instance = request.form["plan_type"]
                 # Perform find operation here using the plan_type
                 found_plan = plan_instance.find_plan_by_type(plan_type)
                 return render_template(html, found_plan=f"Found plan '{plan_type}'" if found_plan else f"No plan '{plan_type}' found")
 
             case "Update":
-                plan_type = request.form["plan_type"]
+                plan_instance = request.form["plan_type"]
                 updated_plan = PlanDescription({"plan_type": plan_type})
                 # Perform update operation here using the updated_plan
                 # Assuming 'update_plan' method handles the update operation
@@ -139,7 +139,7 @@ def plan_crud():
                 return render_template(html, updated_plan=f"Updated plan '{plan_type}'" if update_result else f"Plan '{plan_type}' does not exist")
 
             case "Delete":
-                plan_type = request.form["plan_type"]
+                plan_instance = request.form["plan_type"]
                 # Perform delete operation here using the plan_type
                 # Assuming 'delete_plan_by_type' method handles the deletion operation
                 delete_result = plan_instance.delete_plan_by_type(plan_type)
