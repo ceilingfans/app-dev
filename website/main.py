@@ -120,32 +120,27 @@ def plan_crud():
             case "Create":
                 plan = PlanDescription({
                 'plan_type': request.form['plan_type'],
-                'description': "hello",
-                'mean_cost': 10
+                'description': request.form['plan_description'],
+                'mean_cost': request.form['plan_cost']
                 })
                 db.create_plan(plan)
                 return render_template(html, CreatePlan=f"{dict(plan)}")
 
             case "Find":
-                plan = PlanDescription({
-                'plan_type': request.form['plan_type']
-                })
-                db.find_plan_by_type(plan)
+                plan=db.find_plan_by_type(request.form['plan_type'])
                 return render_template(html, FindPlan=f"{dict(plan)}")
 
             case "Update":
                 plan = PlanDescription({
-                'plan_type': request.form['plan_type']
+                'plan_type': request.form['plan_type'],
+                'description': request.form['plan_description'],
+                'mean_cost': request.form['plan_cost']
                 })
                 db.update_plan(plan)
                 return render_template(html, UpdatePlan=f"{dict(plan)}")
 
             case "Delete":
-                plan = PlanDescription({
-                'plan_type': request.form['plan_type']
-                })
-                db.delete_plan_by_type(plan)
-                return render_template(html, DeletePlan=f"{dict(plan)}")
+                return render_template(html, DeletePlan=db.delete_plan_by_type(request.form['plan_type']))
 
             case _:
                 return "<body>Invalid submit button pressed</body>"

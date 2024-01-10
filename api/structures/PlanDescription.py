@@ -12,7 +12,7 @@ class PlanDescription:
         self.__mean_cost = data.get("mean_cost")
 
     def __iter__(self):
-        yield "plan_type", self.__plan_type
+        yield "plan_type", self.__plan_type.name
         yield "description", self.__description
         yield "mean_cost", self.__mean_cost
 
