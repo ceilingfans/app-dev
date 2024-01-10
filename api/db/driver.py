@@ -201,10 +201,6 @@ class Driver:
     # END of InsuredItem CRUD
     # PlanDescription CRUD
     def create_plan(self, plan: PlanDescription):
-        existing = self.find_plan_by_type(plan.get_plan_type().name)
-        if existing:
-            print(f"error: plan with name {plan.get_plan_type().name} already exists")
-            return
 
         try:
             self.db["plan_descriptions"].insert_one(dict(plan))
@@ -229,7 +225,8 @@ class Driver:
                                                                   return_document=ReturnDocument.AFTER)
 
             if result is None:
-                print(f"error: plan with type {new_plan.get_plan_type().name} does not exist")
+                print(f"error: plan with type {new_plan.
+                                               _type().name} does not exist")
                 return
 
             print(f"info: update plan with type {new_plan.get_plan_type().name}")

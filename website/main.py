@@ -119,7 +119,9 @@ def plan_crud():
         match request.form["submit"]:
             case "Create":
                 plan = PlanDescription({
-                'plan_type': request.form['plan_type']
+                'plan_type': request.form['plan_type'],
+                'description': "hello",
+                'mean_cost': 10
                 })
                 db.create_plan(plan)
                 return render_template(html, CreatePlan=f"{dict(plan)}")
@@ -150,7 +152,6 @@ def plan_crud():
 
     else:
         return render_template(html)
-
 
 
 
