@@ -7,7 +7,11 @@ import os
 # Shit doesnt work for me without manually setting path ~ Isaac
 import sys
 import uuid
+<<<<<<< HEAD
 # sys.path.insert(1, "C://Users//mdame//OneDrive//Desktop//School//Sem 2//AppDevelopment//app-dev//api")
+=======
+#sys.path.insert(1, "G://app-dev//app-dev//api")
+>>>>>>> 636784a4329575b92953127ad209d9ef48887e2e
 from api.structures.User import User
 from api.structures.Promo import Promo
 from api.structures.InsuredItem import InsuredItem, PlanKind
