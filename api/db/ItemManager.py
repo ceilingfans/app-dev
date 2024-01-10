@@ -20,6 +20,19 @@ class ItemManager:
             | Success - ("SUCCESS", InsuredItem)
             | Error - ("ERROR", Error)
         """
+        ret_code, exists = self.find(item_id=item.get_item_id())
+        if ret_code == "ERROR":
+            return ret_code, exists
+
+        if exists:
+            return "ITEMEXISTS", exists
+
+        try:
+            self.col.insert_one(dict(item))
+            return "SUCCESS", item
+
+        except Exception as e:
+            return "ERROR", e
 
     def find(self, owner_id: str = None, item_id: str = None):
         """Finds an insured by item id, all items belonging to an owner or all items in the collection
@@ -34,11 +47,23 @@ class ItemManager:
             if owner_id is None and item_id is None:
                 return "ALL", self.col.find()
 
-            if owner_id is not None:
-                return "OWNERITEMS", InsuredItem(self.col.find_({"owner_id": owner_id}))
+            query = {}
+            owner_flag = False
 
-            if item_id is not None:
-                return "SUCCESS", InsuredItem(self.col.find_one({"item_id": item_id}))
+            if owner_id is not None:
+                query = {"owner_id": owner_id}
+                owner_flag = True
+            elif item_id is not None:
+                query = {"item_id": item_id}
+
+            result = list(self.col.find(query))
+            if len(result) == 0:
+                return "ITEMNOTFOUND", None
+
+            if not owner_flag:
+                return "SUCCESS", InsuredItem(result[0])
+
+            return "OWNERITEMS", [InsuredItem(item) for item in result]
 
         except Exception as e:
             return "ERROR", e
@@ -71,7 +96,7 @@ class ItemManager:
             | Error: ("ERROR", Error)
         """
         try:
-            result = self.col.delete_one({"_id": item_id})
+            result = self.col.delete_one({"item_id": item_id})
             if result.deleted_count == 0:
                 return "ITEMNOTFOUND", None
 

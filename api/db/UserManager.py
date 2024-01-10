@@ -48,11 +48,17 @@ class UserManager:
             if user_id is None and email is None:
                 return "ALL", self.col.find()
 
+            query = {}
             if user_id is not None:
-                return "SUCCESS", User(self.col.find_one({"id": user_id}))
+                query = {"id": user_id}
+            elif email is not None:
+                query = {"email": email}
 
-            if email is not None:
-                return "SUCCESS", User(self.col.find_one({"email": email}))
+            result = self.col.find_one(query)
+            if result is None:
+                return "USERNOTFOUND", None
+
+            return "SUCCESS", User(result)
 
         except Exception as e:
             return "ERROR", e

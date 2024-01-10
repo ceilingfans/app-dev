@@ -46,7 +46,11 @@ class PlanManager:
             if plan_type is None:
                 return "ALL", self.col.find()
 
-            return "SUCCESS", PlanDescription(self.col.find_one({"plan_type": plan_type}))
+            result = self.col.find_one({"plan_type": plan_type})
+            if result is None:
+                return "PLANNOTFOUND", None
+
+            return "SUCCESS", PlanDescription(result)
 
         except Exception as e:
             return "ERROR", e

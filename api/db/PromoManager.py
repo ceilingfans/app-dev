@@ -29,6 +29,7 @@ class PromoManager:
 
         try:
             self.col.insert_one(dict(promo))
+            return "SUCCESS", promo
 
         except Exception as e:
             return "ERROR", e
@@ -46,7 +47,11 @@ class PromoManager:
             if promo_id is None:
                 return "ALL", self.col.find()
 
-            return "SUCCESS", self.col.find_one({"id": promo_id})
+            result = self.col.find_one({"id": promo_id})
+            if result is None:
+                return "PROMONOTFOUND", None
+
+            return "SUCCESS", Promo(result)
 
         except Exception as e:
             return "ERROR", e
