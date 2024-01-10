@@ -55,8 +55,8 @@ def crudtest():
             return render_template("CRUDTESTItem.html",Userdata = db.find_insured_item(item_id=request.form['id']))
         if request.form['submit'] == 'UpdateItem':
             item = InsuredItem({
-                "owner_id": "3d1919bb-4d0b-497e-822f-1bba586d54c2",
-                "item_id": "fda25a81-b823-4d9a-a526-94781e301a20",
+                "owner_id": request.form["upOwnerID"],
+                "item_id": request.form["itemID"],
                 "status": {
                     "damage": {
                         "description": request.form['upstatus'],
