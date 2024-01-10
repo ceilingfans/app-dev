@@ -47,6 +47,12 @@ class Subscription:
         yield 'plan', self.__plan.name
         yield 'duration', dict(self.__duration)
 
+    def get_plan(self):
+        return self.__plan
+
+    def get_duration(self):
+        return self.__duration
+
 
 class Damage:
     __description: str = None
@@ -59,6 +65,12 @@ class Damage:
     def __iter__(self):
         yield 'description', self.__description
         yield 'date', self.__date
+
+    def get_description(self):
+        return self.__description
+
+    def get_date(self):
+        return self.__date
 
 
 # TODO: find out what to put in each repair report
@@ -78,18 +90,33 @@ class Repair:
         yield 'start_date', self.__start_date
         yield 'end_date', self.__end_date
 
+    def get_description(self):
+        return self.__description
+
+    def get_start_date(self):
+        return self.__start_date
+
+    def get_end_date(self):
+        return self.__end_date
+
 
 class RepairStatus:
     __past_repairs: list[Repair] = []
     __current: Repair = None
 
     def __init__(self, data):
-        self.__past_repairs = list(map(lambda x: Repair(x), data.get("past_repairs", [])))
+        self.__past_repairs = [Repair(i) for i in data.get("past_repairs")]
         self.__current = Repair(data.get("current", None))
 
     def __iter__(self):
-        yield 'past_repairs', self.__past_repairs
-        yield 'current', self.__current
+        yield 'past_repairs', [dict(i) for i in self.__past_repairs]
+        yield 'current', dict(self.__current)
+
+    def get_past_repairs(self):
+        return self.__past_repairs
+
+    def get_current(self):
+        return self.__current
 
 
 class ItemStatus:
@@ -103,9 +130,18 @@ class ItemStatus:
         self.__address = data.get("address", None)
 
     def __iter__(self):
-        yield 'damage', self.__damage
-        yield 'repair_status', self.__repair_status
+        yield 'damage', dict(self.__damage)
+        yield 'repair_status', dict(self.__repair_status)
         yield 'address', self.__address
+
+    def get_damage(self):
+        return self.__damage
+
+    def get_repair_status(self):
+        return self.__repair_status
+
+    def get_address(self):
+        return self.__address
 
 
 class InsuredItem:
@@ -117,13 +153,13 @@ class InsuredItem:
     def __init__(self, data):
         self.__owner_id = data.get("owner_id", None)
         self.__item_id = data.get("item_id", None)
-        self.__status = data.get("status", None)
+        self.__status = ItemStatus(data.get("status", None))
         self.__subscription = Subscription(data.get("subscription", None))
 
     def __iter__(self):
         yield 'owner_id', self.__owner_id
         yield 'item_id', self.__item_id
-        yield 'status', self.__status
+        yield 'status', dict(self.__status)
         yield 'subscription', dict(self.__subscription)
 
     def get_owner_id(self):
