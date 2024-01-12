@@ -1,22 +1,17 @@
-from pymongo import MongoClient, ReturnDocument
-from pymongo.errors import OperationFailure
+from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv, find_dotenv
 import os
-# Shit doesnt work for me without manually setting path ~ Isaac
-import sys
 import uuid
 
-# sys.path.insert(1, "C://Users//mdame//OneDrive//Desktop//School//Sem 2//AppDevelopment//app-dev//api")
+# TODO: fix pathing issue, (please do not commit any hotfixes)
 
-#sys.path.insert(1, "G://app-dev//app-dev//api")
-
-from api.structures.User import User
-from api.structures.Promo import Promo
-from api.structures.InsuredItem import InsuredItem, PlanKind
-from api.structures.PlanDescription import PlanDescription
-from api.structures.billinghistory import Billinghistory
+from UserManager import UserManager
+from PromoManager import PromoManager
+from ItemManager import ItemManager
+from PlanManager import PlanManager
+from BillManager import BillManager
 
 # load env vars to our system
 load_dotenv(find_dotenv())
@@ -26,296 +21,35 @@ ALREADY_RUNNING = False
 
 
 # TODO: proper error handling
+def generate_id():
+    return str(uuid.uuid4())
+
+
 class Driver:
     client: MongoClient
     db: Database
+    users: UserManager
+    promos: PromoManager
+    items: ItemManager
+    plans: PlanManager
+    bills: BillManager
 
     def __init__(self, dev: bool = True):
         if ALREADY_RUNNING:
             print("error: db driver class has already been initiated")  # TODO: logging
             exit(1)
 
+        # generate essentials
         self.__create_client()
         self.__get_db(dev)
-        
-    def generate_id(self):
-        return str(uuid.uuid4())
 
-    # User CRUD
-    def create_user(self, user: User):
-        existing = self.get_user_by_id(user.get_id())
-        if existing:
-            print(f"error: user with id {user.get_id()} already exists")
-            return
+        # managers
+        self.users = UserManager(self.client, self.db["users"])
+        self.promos = PromoManager(self.client, self.db["promos"])
+        self.items = ItemManager(self.client, self.db["insured_items"])
+        self.plans = PlanManager(self.client, self.db["plan_descriptions"])
+        self.bills = BillManager(self.client, self.db["bills"])
 
-        try:
-            self.db["users"].insert_one(dict(user))
-            print(f"info: created user with id {user.get_id()}")
-        except OperationFailure:
-            print("error: OperationFailure from create_user")
-
-    # returns a user if `user_id` is provided and is found, else returns entire `users` collection in a list
-    def get_user_by_id(self, user_id: str = None):  # TODO: accept id or email, change name to get_user
-        if user_id is None:
-            return list(self.db["users"].find())
-
-        result = self.db["users"].find_one({"id": user_id})
-        if result:
-            return result
-
-        print("info: user not found")
-
-    def update_user(self, new_user: User):
-        try:
-            result = self.db["users"].find_one_and_update({"id": new_user.get_id()}, {"$set": dict(new_user)},
-                                                          return_document=ReturnDocument.AFTER)
-            if result is None:
-                print(f"error: user with id {new_user.get_id()} not found")
-                return
-
-            print(f"info: update user with id {new_user.get_id()}")
-            return result
-
-        except OperationFailure:
-            print("error: OperationFailure from update_user")
-
-    def delete_user_by_id(self, user_id: str):
-        try:
-            result = self.db["users"].delete_one({"id": user_id})
-
-            if result.deleted_count == 0:
-                print(f"error: user with id {user_id} not found")
-            else:
-                print(f"info: deleted user with id {user_id}")
-
-            return bool(result.deleted_count)
-
-        except OperationFailure:
-            print("error: OperationFailure from delete_user_by_id")
-
-    # END of User CRUD
-    # Promo CRUD
-    def create_promo(self, promo: Promo):
-        existing = self.find_promo_by_id(promo.get_id())
-        if existing:
-            print(f"error: promo with id {promo} already exists")
-            return
-
-        try:
-            self.db["promos"].insert_one(dict(promo))
-            print(f"info: promo with id {promo.get_id()} created")
-        except OperationFailure:
-            print("error: OperationFailure in create_promo")
-
-    # returns a promo if `promo_id` is provided and found, else returns the entire `promos` collection in a list
-    def find_promo_by_id(self, promo_id: str = None):
-        if promo_id is None:
-            return list(self.db["promos"].find())
-
-        result = self.db["promos"].find_one({"id": promo_id})
-        if result:
-            return result
-
-        print(f"info: promo with id {promo_id} not found")
-
-    def update_promo(self, new_promo: Promo):
-        try:
-            result = self.db["promos"].find_one_and_update({"id": new_promo.get_id()}, {"$set": dict(new_promo)},
-                                                           return_document=ReturnDocument.AFTER)
-            if result is None:
-                print(f"error: promo with id {new_promo.get_id()} not found")
-                return
-
-            print(f"info: update promo with id {new_promo.get_id()}")
-            return result
-
-        except OperationFailure:
-            print("error: OperationFailure from update_promo_by_id")
-
-    def delete_promo_by_id(self, promo_id: str):
-        try:
-            result = self.db["promos"].delete_one({"id": promo_id})
-
-            if result.deleted_count == 0:
-                print(f"error: promo with id {promo_id} not found")
-            else:
-                print(f"info: deleted promo with id {promo_id}")
-
-            return bool(result.deleted_count)
-
-        except OperationFailure:
-            print("error: OperationFailure from delete_promo_by_id")
-
-    # END of Promo CRUD
-    # InsuredItem CRUD
-    def create_insured_item(self, insured_item: InsuredItem):
-        existing = self.find_insured_item(item_id=insured_item.get_item_id())
-        if existing:
-            print(f"error: item with id {insured_item.get_item_id()} already exists")
-            return
-
-        try:
-            self.db["insured_items"].insert_one(dict(insured_item))
-            print(f"info: item with id {insured_item.get_item_id()} created")
-        except OperationFailure:
-            print("error: OperationFailure in create_insured_item")
-
-    def find_insured_item(self, item_id: str = None, owner_id: str = None):
-        if item_id is not None:
-            query = {"item_id": item_id}
-        elif owner_id is not None:
-            query = {"owner_id": owner_id}
-        else:
-            print("error: either item_id or owner_id is required")
-            return
-
-        return self.db["insured_items"].find_one(query)
-
-    def update_insured_item(self, new_insured_item: InsuredItem):
-        try:
-            result = self.db["insured_items"].find_one_and_update({"item_id": new_insured_item.get_item_id()},
-                                                                  {"$set": dict(new_insured_item)},
-                                                                  return_document=ReturnDocument.AFTER)
-
-            if result is None:
-                print(f"error: item with id {new_insured_item.get_item_id()} does not exist")
-                return
-
-            print(f"info: update insured item with id {new_insured_item.get_item_id()}")
-            return result
-
-        except OperationFailure:
-            print("error: OperationFailure in update_insured_item")
-            return
-
-    def delete_insured_item_by_id(self, item_id: str):
-        try:
-            result = self.db["insured_items"].delete_one({"item_id": item_id})
-
-            if result.deleted_count == 0:
-                print(f"error: item with id {item_id} not found")
-            else:
-                print(f"info: deleted item with id {item_id}")
-
-            return bool(result.deleted_count)
-
-        except OperationFailure:
-            print("error: OperationFailure from delete_insured_item_by_id")
-
-    # END of InsuredItem CRUD
-    # PlanDescription CRUD
-    def create_plan(self, plan: PlanDescription):
-        existing = self.find_plan_by_type(plan.get_plan_type().name)
-        if existing:
-            print(f"error: plan with name {plan.get_plan_type().name} already exists")
-            return
-
-        try:
-            self.db["plan_descriptions"].insert_one(dict(plan))
-            print(f"info: plan with id {plan.get_plan_type().name} created")
-        except OperationFailure:
-            print("error: OperationFailure in create_plan")
-
-    def find_plan_by_type(self, plan_type: PlanKind = None):
-        if plan_type is None:
-            return self.db["plan_descriptions"].find()
-
-        result = self.db["plan_descriptions"].find_one({"plan_type": plan_type.name})
-        if result:
-            return result
-
-        print(f"info: plan with type {plan_type.name} not found")
-
-    def update_plan(self, new_plan: PlanDescription):
-        try:
-            result = self.db["plan_descriptions"].find_one_and_update({"plan_type": new_plan.get_plan_type().name},
-                                                                  {"$set": dict(new_plan)},
-                                                                  return_document=ReturnDocument.AFTER)
-
-            if result is None:
-                print(f"error: plan with type {new_plan.get_plan_type().name} does not exist")
-                return
-
-            print(f"info: update plan with type {new_plan.get_plan_type().name}")
-            return result
-
-        except OperationFailure:
-            print("error: OperationFailure in update_plan")
-            return
-
-    # do not use this unless it is really needed
-    def delete_plan_by_type(self, plan_type: PlanKind):
-        try:
-            result = self.db["plan_description"].delete_one({"plan_type": plan_type.name})
-
-            if result.deleted_count == 0:
-                print(f"error: plan with type {plan_type.name} not found")
-            else:
-                print(f"info: deleted plan with type {plan_type.name}")
-
-            return bool(result.deleted_count)
-
-        except OperationFailure:
-            print("error: OperationFailure from delete_plan_by_type")
-            
-    #End of PlanDescription CRUD
-    #Billinghistory CRUD
-    def create_bill(self,bill: Billinghistory):
-        existing = self.get_bill_by_id(bill.get_billid())
-        if existing:
-            print(f"error: user with id {bill.get_billid()} already exists")
-            return
-        try:
-            self.db["billinghistory"].insert_one(dict(bill))
-            print(f"info: created bill with id {bill.get_billid()}")
-        except OperationFailure:
-            print("error: OperationFailure from create_bill")
-        return
-    
-    def get_bill_by_id(self, bill_id: str = None): 
-        if bill_id is None:
-            return list(self.db["billinghistory"].find())
-
-        result = self.db["billinghistory"].find_one({"billid": bill_id})
-        if result:
-            return result
-    
-    # USE TO UPDATE PAYMENT STATUS
-    def update_bill(self, new_bill: Billinghistory):
-        try:
-            result = self.db["billinghistory"].find_one_and_update({"billid": new_bill.get_billid()}, {"$set": dict(new_bill)},
-                                                          return_document=ReturnDocument.AFTER)
-            if result is None:
-                print(f"error: bill with id {new_bill.get_billid()} not found")
-                return
-
-            print(f"info: update bill with id {new_bill.get_billid()}")
-            return result
-
-        except OperationFailure:
-            print("error: OperationFailure from update_bill")
-        
-        return
-    
-    def delete_bill_by_id(self, bill_id: str):
-        try:
-            result = self.db["billinghistory"].delete_one({"billid": bill_id})
-
-            if result.deleted_count == 0:
-                print(f"error: bill with id {bill_id} not found")
-            else:
-                print(f"info: deleted bill with id {bill_id}")
-
-            return bool(result.deleted_count)
-
-        except OperationFailure:
-            print("error: OperationFailure from delete_bill_by_id")
-    
-    def get_bill_info(self,bill:Billinghistory): #TODO get Bill details from other DBs.
-        return
-    
-    #End of Billing CRUD
-    
     def __create_client(self):
         global ALREADY_RUNNING
 
@@ -340,227 +74,258 @@ class Driver:
             self.db = self.client.dev
         else:
             self.db = self.client.master
-    
 
 
-# test code, ignore pls
+# test code, please ignore
 if __name__ == "__main__":
-    total = 0
-    passed = 0
+    import datetime
+    from api.structures.User import User
+    from api.structures.Promo import Promo
+    from api.structures.PlanDescription import PlanDescription
+    from api.structures.InsuredItem import InsuredItem
+    from api.structures.Bill import Bill
 
-    print("test: connect to db")
-    total += 1
     db = Driver()
-    passed += 1
-    print("------------------------------------------------------------\n\n")
+    current = datetime.datetime.now()
 
-    # print("test: try double instance of Driver")
-    # Driver()
-    # print("------------------------------------------------------------\n\n")
+    def _test(desc):
+        global current
 
-    print("test: find user by id")
-    total += 1
-    print(db.get_user_by_id("3d1919bb-4d0b-497e-822f-1bba586d54c2"))
-    passed += 1
-    print("------------------------------------------------------------\n\n")
+        print(f"test: {desc}")
+        current = datetime.datetime.now()
 
-    print("test: find all users")
-    total += 1
-    print(db.get_user_by_id())
-    passed += 1
-    print("------------------------------------------------------------\n\n")
 
-    print("test: create a user")
-    total += 1
+    def _pass():
+        print(f"passed in {(datetime.datetime.now() - current).total_seconds()}s\n")
+
+
+    # user vars
+    user_id = "e3e7234f-3933-483d-8a8d-7b7a9eb33b80-TEST-DO-NOT-USE"
+
+    """
+    User Tests
+    """
+    # create user
+    _test("create user")
     user = User({
-        "name": "Jane Doe",
-        "password": "9cd9ec4c865145c4fa2ea654bbccb7ee",
-        "id": "d8ed0e07-54b9-4205-ac64-d9e16b152f82",
-        "email": "jane_doe@gmail.com",
-        "address": "1913 Rosebud Dr, Maryville, Tennessee(TN), 37803",
+        "name": "John Doe",
+        "password": "password",
+        "id": user_id,
+        "email": "test@test.com",
+        "address": "1234 Test St",
     })
-    print(dict(user))
-    db.create_user(user)
-    passed += 1
-    print("------------------------------------------------------------\n\n")
+    ret_code, user = db.users.create(user)
 
-    print("test: update a user")
-    total += 1
-    new_user = User({
-        "name": "Jane Doe",
-        "password": "9cd9ec4c865145c4fa2ea654bbccb7ee",
-        "id": "d8ed0e07-54b9-4205-ac64-d9e16b152f82",
-        "email": "jane_doe@gmail.com",
-        "address": "38042 28th Ave, Gobles, Michigan(MI), 49055",  # address change
-    })
-    db.update_user(new_user)
-    passed += 1
-    print("------------------------------------------------------------\n\n")
+    assert ret_code == "SUCCESS", f"expected to create a user, got {ret_code} with error {str(user)}"
+    _pass()
 
-    print("test: delete a user")
-    total += 1
-    db.delete_user_by_id("d8ed0e07-54b9-4205-ac64-d9e16b152f82")
-    passed += 1
-    print("------------------------------------------------------------\n\n")
+    # find user
+    _test("find user")
+    ret_code, user = db.users.find(user_id)
 
-    print("test: create a promo")
-    total += 1
+    assert ret_code == "SUCCESS", f"expected to find a user, got {ret_code} with error {str(user)}"
+    _pass()
+
+    # update user
+    _test("update user")
+    ret_code, user = db.users.update({"id": user_id}, {"name": "Jane Doe"})
+
+    assert ret_code == "SUCCESS", f"expected to update a user, got {ret_code} with error {str(user)}"
+    assert user.get_name() == "Jane Doe", f"expected user name to be Jane Doe, got {user.get_name()}"
+    _pass()
+
+    # delete user
+    _test("delete user")
+    ret_code, err = db.users.delete(user_id)
+
+    assert ret_code == "SUCCESS", f"expected to delete a user, got {ret_code} with error {str(err)}"
+    _pass()
+
+    """
+    Promo Tests
+    """
+    # promo vars
+    promo_id = "XMAS10-TEST-DO-NOT-USE"
+
+    # create promo
+    _test("create promo")
     promo = Promo({
-        "id": "XMAS20",
+        "id": promo_id,
         "type": "Percentage",
-        "value": 20
+        "value": 10,
+        "expire": 1704889739058
     })
-    db.create_promo(promo)
-    passed += 1
-    print("------------------------------------------------------------\n\n")
+    ret_code, promo = db.promos.create(promo)
 
-    print("test: find a promo by id")
-    total += 1
-    p = db.find_promo_by_id("XMAS20")
-    if p is not None:
-        print(p)
-        passed += 1
-    print("------------------------------------------------------------\n\n")
+    assert ret_code == "SUCCESS", f"expected to create a promo, got {ret_code} with error {str(promo)}"
+    _pass()
 
-    print("test: update a promo")
-    total += 1
-    new_promo = Promo({
-        "id": "XMAS20",
-        "type": "Value",
-        "value": 20
+    # find promo
+    _test("find promo")
+    ret_code, promo = db.promos.find(promo_id)
+
+    assert ret_code == "SUCCESS", f"expected to find a promo, got {ret_code} with error {str(promo)}"
+    _pass()
+
+    # update promo
+    _test("update promo")
+    ret_code, promo = db.promos.update(promo_id, {"type": "Value"})
+
+    assert ret_code == "SUCCESS", f"expected to update a promo, got {ret_code} with error {str(promo)}"
+    assert promo.get_type().name == "Value", f"expected promo type to be Value, got {promo.get_type()}"
+    _pass()
+
+    # delete promo
+    _test("delete promo")
+    ret_code, err = db.promos.delete(promo_id)
+
+    assert ret_code == "SUCCESS", f"expected to delete a promo, got {ret_code} with error {str(err)}"
+    _pass()
+
+    """
+    Plan Tests
+    """
+    # plan vars
+    plan_type = "Bronze"  # TODO: use actual plan types
+
+    # create plan
+    _test("create plan")
+    plan = PlanDescription({
+        "plan_type": plan_type,
+        "description": "Bronze covers the basics",
+        "mean_cost": 25.75
     })
-    updated = db.update_promo(new_promo)
-    if updated is not None:
-        print(updated)
-        passed += 1
-    print("------------------------------------------------------------\n\n")
+    ret_code, plan = db.plans.create(plan)
 
-    print("test: delete promo")
-    total += 1
-    if db.delete_promo_by_id("XMAS20"):
-        passed += 1
-    print("------------------------------------------------------------\n\n")
+    assert ret_code == "SUCCESS", f"expected to create a plan, got {ret_code} with error {str(plan)}"
+    _pass()
 
-    print("test: create insured item")
-    total += 1
+    # find plan
+    _test("find plan")
+    ret_code, plan = db.plans.find(plan_type)
+
+    assert ret_code == "SUCCESS", f"expected to find a plan, got {ret_code} with error {str(plan)}"
+    _pass()
+
+    # update plan
+    _test("update plan")
+    ret_code, plan = db.plans.update(plan_type, {"description": "Bronze covers the basics and more"})
+
+    assert ret_code == "SUCCESS", f"expected to update a plan, got {ret_code} with error {str(plan)}"
+    assert plan.get_description() == "Bronze covers the basics and more", f"expected plan description to be Bronze covers the basics and more, got {plan.get_description()}"
+    _pass()
+
+    # delete plan
+    _test("delete plan")
+    ret_code, err = db.plans.delete(plan_type)
+
+    assert ret_code == "SUCCESS", f"expected to delete a plan, got {ret_code} with error {str(err)}"
+    _pass()
+
+    """
+    Item Tests
+    """
+    # item vars
+    item_id = "202a334f-f5a9-464b-813e-2c94c4e83906-TEST-DO-NOT-USE"
+
+    # create item
+    _test("create item")
     item = InsuredItem({
-        "owner_id": "3d1919bb-4d0b-497e-822f-1bba586d54c2",
-        "item_id": "fda25a81-b823-4d9a-a526-94781e301a20",
+        "owner_id": user_id,
+        "item_id": item_id,
         "status": {
             "damage": {
-                "description": "Phone has a crack on the bottom left front screen",
-                "date": 1704537866402
+                "description": "I dropped my phone :cat_cry:",
+                "date": 1704889739058
             },
             "repair_status": {
-                "past_repairs": [],
+                "past_repairs": [
+                    {
+                        "description": "Replaced the battery",
+                        "start_date": 1704889739058,
+                        "end_date": 1704889739058
+                    }
+                ],
                 "current": {
-                    "description": "Sent to our specialists for repair",
-                    "start_date": 1704538866402,
+                    "description": "Replace the screen",
+                    "start_date": 1704889739058,
                     "end_date": None
                 }
             },
-            "address": "1117 Willow St, Eden, North Carolina(NC), 27288"
+            "address": "1234 Test St"
         },
         "subscription": {
             "plan": "Bronze",
             "duration": {
-                "start": 1704464537925,
-                "end": 1712353937925,
-                "length": 7889400000
+                "start_date": 1704889739058,
+                "end_date": 1704889839058,
+                "length": 100000
             }
         }
     })
-    db.create_insured_item(item)
-    passed += 1
-    print("------------------------------------------------------------\n\n")
+    ret_code, item = db.items.create(item)
 
-    print("test: find item by id")
-    total += 1
-    i = db.find_insured_item(item_id="fda25a81-b823-4d9a-a526-94781e301a20")
-    if i is not None:
-        print(i)
-        passed += 1
-    print("------------------------------------------------------------\n\n")
+    assert ret_code == "SUCCESS", f"expected to create an item, got {ret_code} with error {str(item)}"
+    _pass()
 
-    print("test: update item")
-    total += 1
-    new_item = InsuredItem({
-        "owner_id": "3d1919bb-4d0b-497e-822f-1bba586d54c2",
-        "item_id": "fda25a81-b823-4d9a-a526-94781e301a20",
-        "status": {
-            "damage": {
-                "description": "Phone has a crack on the bottom left front screen",
-                "date": 1704537866402
-            },
-            "repair_status": {
-                "past_repairs": [],
-                "current": {
-                    "description": "Started repairs, ETA: 1 week",
-                    "start_date": 1704538866402,
-                    "end_date": None
-                }
-            },
-            "address": "1117 Willow St, Eden, North Carolina(NC), 27288"
-        },
-        "subscription": {
-            "plan": "Bronze",
-            "duration": {
-                "start": 1704464537925,
-                "end": 1712353937925,
-                "length": 7889400000
-            }
-        }
+    # find item
+    _test("find item")
+    ret_code, item = db.items.find(item_id=item_id)
+
+    assert ret_code == "SUCCESS", f"expected to find an item, got {ret_code} with error {str(item)}"
+    _pass()
+
+    # update item
+    _test("update item")
+    ret_code, item = db.items.update({"item_id": item_id}, {"status.address": "12345 Test St"})
+
+    assert ret_code == "SUCCESS", f"expected to update an item, got {ret_code} with error {str(item)}"
+    assert item.get_status().get_address() == "12345 Test St", f"expected item address to be 12345 Test St, got {item.get_status().get_address()}"
+    _pass()
+
+    # delete item
+    _test("delete item")
+    ret_code, err = db.items.delete(item_id)
+
+    assert ret_code == "SUCCESS", f"expected to delete an item, got {ret_code} with error {str(err)}"
+    _pass()
+
+    """
+    Bill Tests
+    """
+    # bill vars
+    bill_id = "29b7d25c-aa87-4ead-9be2-f8d0646d21c2-TEST-DO-NOT-USE"
+
+    # create bill
+    _test("create bill")
+    bill = Bill({
+        "customer_id": user_id,
+        "bill_id": bill_id,
+        "status": False
     })
-    updated = db.update_insured_item(new_item)
-    if updated is not None:
-        print(updated)
-        passed += 1
-    print("------------------------------------------------------------\n\n")
+    ret_code, bill = db.bills.create(bill)
 
-    print("test: delete item")
-    total += 1
-    if db.delete_insured_item_by_id("fda25a81-b823-4d9a-a526-94781e301a20"):
-        passed += 1
-    print("------------------------------------------------------------\n\n")
-    
-    print("test: create a bill")
-    total += 1
-    bill = Billinghistory({
-        "customerid": "d8ed0e07-54b9-4205-ac64-d9e16b152f82",
-        "billid": "7070",
-        "status": False,
-    })
-    print(dict(bill))
-    db.create_bill(bill)
-    passed += 1
-    print("------------------------------------------------------------\n\n")
-    print("test: update a bill")
-    total += 1
-    new_bill = Billinghistory({
-        "customerid": "d8ed0e07-54b9-4205-ac64-d9e16b152f82",
-        "billid": "7070",
-        "status": True,
-    })
-    print("------------------------------------------------------------\n\n")
-    print("test: get bill by id")
-    total += 1
-    i = db.get_bill_by_id("7070")
-    if i is not None:
-        print(i)
-        passed += 1
-    print("------------------------------------------------------------\n\n")
-    updated = db.update_bill(new_bill)
-    if updated is not None:
-        passed += 1
-    print("------------------------------------------------------------\n\n")
+    assert ret_code == "SUCCESS", f"expected to create a bill, got {ret_code} with error {str(bill)}"
+    _pass()
 
-    print("test: delete a bill")
-    total += 1
-    if db.delete_bill_by_id("7070"):
-        passed += 1
-    print("------------------------------------------------------------\n\n")
-    
-    
-    # write tests above this
-    print(f"Total tests: {total}\nPassed: {passed}\nFailed: {total - passed}\nIf there are no errors then the tests "
-          f"should have all passed yippie")
+    # find bill
+    _test("find bill")
+    ret_code, bill = db.bills.find(bill_id=bill_id)
+
+    assert ret_code == "SUCCESS", f"expected to find a bill, got {ret_code} with error {str(bill)}"
+    _pass()
+
+    # update bill
+    _test("update bill")
+    ret_code, bill = db.bills.update(bill_id, {"status": True})
+
+    assert ret_code == "SUCCESS", f"expected to update a bill, got {ret_code} with error {str(bill)}"
+    assert bill.get_status(), f"expected bill status to be True, got {bill.get_status()}"
+    _pass()
+
+    # delete bill
+    _test("delete bill")
+    ret_code, err = db.bills.delete(bill_id)
+
+    assert ret_code == "SUCCESS", f"expected to delete a bill, got {ret_code} with error {str(err)}"
+    _pass()
