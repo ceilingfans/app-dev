@@ -1,5 +1,5 @@
 from wtforms import StringField, SubmitField , IntegerField, RadioField, FloatField , DateField 
-from wtforms.validators import DataRequired, Length, Email , NumberRange , Optional, DataRequired
+from wtforms.validators import DataRequired, Length, Email , NumberRange , Optional
 from flask_wtf import FlaskForm
 
 '''
@@ -21,7 +21,7 @@ class UserCreationForm(FlaskForm):
     
 class UserGetbyIdForm(FlaskForm):
     id_get = StringField('id', validators=[DataRequired(), Length(min=36, max=36)])
-    submit__user_get = SubmitField('Get User')
+    submit_user_get = SubmitField('Get User')
 
 class UserDeletebyIdForm(FlaskForm):
     id_delete = StringField('id', validators=[DataRequired(),Length(min=36, max=36)])
@@ -104,17 +104,17 @@ class ItemCreationForm(FlaskForm):
     item_id_create = StringField('item_id', validators=[DataRequired(), Length(min=36, max=36)])
     owner_id_create = StringField('owner_id', validators=[DataRequired(), Length(min=36, max=36)])
     item_status_description_create = StringField('item_price', validators=[DataRequired(),Length(min=2, max=200)])
-    item_status_date_create = DateField('item_description', validators=[DateRequired()])
+    item_status_date_create = DateField('item_description', validators=[DataRequired()])
     item_past_repair_status_description_create = StringField('past_repair', validators=[DataRequired(),Length(min=2, max=200)])
-    item_past_repair_status_start_date_create = DateField('past_repair_date', validators=[DateRequired()])
-    item_past_repair_status_end_date_create = DateField('past_repair_end_date', validators=[DateRequired()])
+    item_past_repair_status_start_date_create = DateField('past_repair_date', validators=[DataRequired()])
+    item_past_repair_status_end_date_create = DateField('past_repair_end_date', validators=[DataRequired()])
     item_current_repair_status_description_create = StringField('current_repair', validators=[DataRequired(),Length(min=2, max=200)])
-    item_current_repair_status_start_date_create = DateField('current_repair_date', validators=[DateRequired()])
-    item_current_repair_status_end_date_create = DateField('current_repair_end_date', validators=[DateRequired()])
+    item_current_repair_status_start_date_create = DateField('current_repair_date', validators=[DataRequired()])
+    item_current_repair_status_end_date_create = DateField('current_repair_end_date', validators=[DataRequired()])
     item_address_create = StringField('item_address', validators=[DataRequired(),Length(min=2, max=200)])
     item_subscription_create = StringField('plan_type', validators=[DataRequired(),Length(min=2, max=200)])
-    item_subscription_start_date_create = DateField('subscription_start_date', validators=[DateRequired()])
-    item_subscription_end_date_create = DateField('subscription_end_date', validators=[DateRequired()])
+    item_subscription_start_date_create = DateField('subscription_start_date', validators=[DataRequired()])
+    item_subscription_end_date_create = DateField('subscription_end_date', validators=[DataRequired()])
     submit_item_create = SubmitField('Submit')
 
 class ItemGetbyIdForm(FlaskForm):
@@ -130,13 +130,13 @@ class ItemUpdateForm(FlaskForm):
     item_id_update = StringField('item_id', validators=[Optional(),Length(min=36, max=36)])
     owner_id_update = StringField('owner_id', validators=[Optional(),Length(min=36, max=36)])
     item_status_description_update = StringField('item_price', validators=[Optional(),Length(min=2, max=200)])
-    item_status_date_update = DateField('item_description', validators=[Optional(),DateRequired()])
+    item_status_date_update = DateField('item_description', validators=[Optional(),DataRequired()])
     item_past_repair_status_description_update = StringField('past_repair', validators=[Optional(),Length(min=2, max=200)])
-    item_past_repair_status_start_date_update = DateField('past_repair_date', validators=[Optional(),DateRequired()])
-    item_past_repair_status_end_date_update = DateField('past_repair_end_date', validators=[Optional(),DateRequired()])
+    item_past_repair_status_start_date_update = DateField('past_repair_date', validators=[Optional(),DataRequired()])
+    item_past_repair_status_end_date_update = DateField('past_repair_end_date', validators=[Optional(),DataRequired()])
     item_current_repair_status_description_update = StringField('current_repair', validators=[Optional(),Length(min=2, max=200)])
-    item_current_repair_status_start_date_update = DateField('current_repair_date', validators=[Optional(),DateRequired()])
-    item_current_repair_status_end_date_update = DateField('current_repair_end_date', validators=[Optional(),DateRequired()])
+    item_current_repair_status_start_date_update = DateField('current_repair_date', validators=[Optional(),DataRequired()])
+    item_current_repair_status_end_date_update = DateField('current_repair_end_date', validators=[Optional(),DataRequired()])
     item_address_update = StringField('item_address', validators=[Optional(),Length(min=2, max=200)])
     item_subscription_update = StringField('plan_type', validators=[Optional(),Length(min=2, max=200)])
     item_subscription_start_date_update = DateField('subscription_start_date', validators=[Optional()])
