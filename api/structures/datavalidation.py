@@ -28,6 +28,7 @@ class UserDeletebyIdForm(FlaskForm):
     submit_user_delete = SubmitField('Submit')
     
 class UserUpdateForm(FlaskForm):
+    user_id_update = StringField('id', validators=[DataRequired(),Length(min=36, max=36)])
     name_update = StringField('name', validators=[Optional() ,Length(min=2, max=20)])
     email_update = StringField('email', validators=[Optional() ,Email()])
     password_update = StringField('password', validators=[Optional() ,Length(min=8,max=20)])
@@ -51,7 +52,7 @@ class PromoDeletebyIdForm(FlaskForm):
     submit_promo_delete = SubmitField('Submit')
     
 class PromoUpdateForm(FlaskForm):
-    promo_update = StringField('promo_ID', validators=[Optional(), Length(min=0, max=20)])
+    promo_update = StringField('promo_ID', validators=[DataRequired(), Length(min=0, max=20)])
     type_update = RadioField('type', choices=[('value','Value'),('percentage','Percentage')], default='percentage')
     value_update = IntegerField('discount', validators=[Optional(), NumberRange(min=0, max=100)])
     submit_promo_update = SubmitField('Submit')
@@ -73,7 +74,7 @@ class PlanDeletebyTypeForm(FlaskForm):
     submit_plan_delete = SubmitField('Submit')
     
 class PlanUpdateForm(FlaskForm):
-    plan_type_update = StringField('plan_type', validators=[Optional(),Length(min=2, max=20)])
+    plan_type_update = StringField('plan_type', validators=[DataRequired(),Length(min=2, max=20)])
     mean_cost_update = FloatField('mean_cost', validators=[Optional()])
     plan_description_update = StringField('description', validators=[Optional(),Length(min=2, max=200)])
     submit_plan_update = SubmitField('Submit')
@@ -94,7 +95,7 @@ class BillDeletebyIdForm(FlaskForm):
     submit_bill_delete = SubmitField('Submit')
 
 class BillUpdateForm(FlaskForm):
-    bill_id_update = StringField('bill_id', validators=[Optional(),Length(min=2, max=20)])
+    bill_id_update = StringField('bill_id', validators=[DataRequired(),Length(min=2, max=20)])
     bill_status_update = RadioField('type', choices=[('True','Paid'),('False','Unpaid')], default='False')
     bill_customer_id_update = StringField('bill_date', validators=[Optional()])
     submit_bill_update = SubmitField('Submit')
@@ -127,6 +128,7 @@ class ItemDeletebyIdForm(FlaskForm):
     submit_item_delete = SubmitField('Submit')
     
 class ItemUpdateForm(FlaskForm):
+    item_update_by = RadioField('type', choices=[('item_id','Item_id'),('owner_id','owner_id')], default='item_id')
     item_id_update = StringField('item_id', validators=[Optional(),Length(min=36, max=36)])
     owner_id_update = StringField('owner_id', validators=[Optional(),Length(min=36, max=36)])
     item_status_description_update = StringField('item_price', validators=[Optional(),Length(min=2, max=200)])
