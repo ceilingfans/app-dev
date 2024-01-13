@@ -1,11 +1,144 @@
-from wtforms import StringField, SubmitField , IntegerField
-from wtforms.validators import DataRequired, Length, Email , NumberRange
+from wtforms import StringField, SubmitField , IntegerField, RadioField, FloatField , DateField 
+from wtforms.validators import DataRequired, Length, Email , NumberRange , Optional, DataRequired
 from flask_wtf import FlaskForm
 
-class UserForm(FlaskForm):
-    name = StringField('name', validators=[DataRequired(), Length(min=2, max=20)], description="name")
-    email = StringField('email', validators=[DataRequired(),Email()])
-    password = StringField('password', validators=[DataRequired(),Length(min=8,max=20)])
-    age = IntegerField('age',  validators=[DataRequired(),NumberRange(min=18, max=100)])
-    address = StringField('address', validators=[DataRequired()])
-    submit = SubmitField('CreateUser')
+'''
+How to use:
+import classes from this file and use them in the main.py file
+use flask to add the forms to the html file like this {{ object_name.object_attribute)placeholder ="Words in the box") }}.
+if you have mulitple forms on 1 page use if form_name.submit_name.data and form_name.validate(): 
+to check if the form is submitted and validated.Instead of the builtin method submit_and_validate()
+'''
+
+# USER FORMS
+class UserCreationForm(FlaskForm):
+    name_create = StringField('name', validators=[DataRequired(), Length(min=2, max=20)])
+    email_create = StringField('email', validators=[DataRequired(),Email()])
+    password_create = StringField('password', validators=[DataRequired(),Length(min=8,max=20)])
+    age_create = IntegerField('age', validators=[DataRequired(),NumberRange(min=18, max=100)])
+    address_create = StringField('address', validators=[DataRequired()])
+    submit_user_create = SubmitField('Submit')
+    
+class UserGetbyIdForm(FlaskForm):
+    id_get = StringField('id', validators=[DataRequired(), Length(min=36, max=36)])
+    submit__user_get = SubmitField('Get User')
+
+class UserDeletebyIdForm(FlaskForm):
+    id_delete = StringField('id', validators=[DataRequired(),Length(min=36, max=36)])
+    submit_user_delete = SubmitField('Submit')
+    
+class UserUpdateForm(FlaskForm):
+    name_update = StringField('name', validators=[Optional() ,Length(min=2, max=20)])
+    email_update = StringField('email', validators=[Optional() ,Email()])
+    password_update = StringField('password', validators=[Optional() ,Length(min=8,max=20)])
+    age_update = IntegerField('age', validators=[Optional() ,NumberRange(min=18, max=100)])
+    address_update = StringField('address', validators=[Optional()])
+    submit_user_update = SubmitField('Submit')
+
+# PROMO FORMS
+class PromoCreationForm(FlaskForm):
+    promo_create = StringField('promo_ID', validators=[DataRequired(), Length(min=2, max=20)])
+    type_create = RadioField('type', choices=[('value','Value'),('percentage','Percentage')], default='percentage')
+    value_create = IntegerField('discount', validators=[DataRequired(), NumberRange(min=0, max=100)])
+    submit_promo_create = SubmitField('Submit')
+    
+class PromoGetbyIdForm(FlaskForm):
+    promo_get = StringField('promo_ID', validators=[DataRequired(), Length(min=2, max=20)])
+    submit_promo_get = SubmitField('Get Promo')
+
+class PromoDeletebyIdForm(FlaskForm):
+    promo_delete = StringField('promo_ID', validators=[DataRequired(), Length(min=2, max=20)])
+    submit_promo_delete = SubmitField('Submit')
+    
+class PromoUpdateForm(FlaskForm):
+    promo_update = StringField('promo_ID', validators=[Optional(), Length(min=0, max=20)])
+    type_update = RadioField('type', choices=[('value','Value'),('percentage','Percentage')], default='percentage')
+    value_update = IntegerField('discount', validators=[Optional(), NumberRange(min=0, max=100)])
+    submit_promo_update = SubmitField('Submit')
+    
+#PLAN FORMS
+class PlanCreationForm(FlaskForm):
+    # Maybe make this radio buttons
+    plan_type_create = StringField('plan_type', validators=[DataRequired(), Length(min=2, max=20)])
+    mean_cost_create = FloatField('mean_cost', validators=[DataRequired()])
+    plan_description_create = StringField('description', validators=[DataRequired()])
+    submit_plan_create = SubmitField('Submit')
+
+class PlanGetbyTypeForm(FlaskForm):
+    plan__type_get = StringField('plan_type', validators=[DataRequired(), Length(min=2, max=20)])
+    submit_plan_get = SubmitField('Submit')
+
+class PlanDeletebyTypeForm(FlaskForm):
+    plan_type_delete = StringField('plan_type', validators=[DataRequired(), Length(min=2, max=20)])
+    submit_plan_delete = SubmitField('Submit')
+    
+class PlanUpdateForm(FlaskForm):
+    plan_type_update = StringField('plan_type', validators=[Optional(),Length(min=2, max=20)])
+    mean_cost_update = FloatField('mean_cost', validators=[Optional()])
+    plan_description_update = StringField('description', validators=[Optional(),Length(min=2, max=200)])
+    submit_plan_update = SubmitField('Submit')
+    
+#BILL FORMS
+class BillCreationForm(FlaskForm):
+    bill_id_create = StringField('bill_id', validators=[DataRequired(), Length(min=2, max=20)])
+    bill_status_create = RadioField('type', choices=[('True','Paid'),('False','Unpaid')], default='False')
+    bill_customer_id_create = StringField('bill_date', validators=[DataRequired()])
+    submit_bill_create = SubmitField('Submit')
+
+class BillGetbyIdForm(FlaskForm):
+    bill_id_get = StringField('bill_id', validators=[DataRequired(), Length(min=2, max=20)])
+    submit_bill_get = SubmitField('Submit')
+
+class BillDeletebyIdForm(FlaskForm):
+    bill_id_delete = StringField('bill_id', validators=[DataRequired(), Length(min=2, max=20)])
+    submit_bill_delete = SubmitField('Submit')
+
+class BillUpdateForm(FlaskForm):
+    bill_id_update = StringField('bill_id', validators=[Optional(),Length(min=2, max=20)])
+    bill_status_update = RadioField('type', choices=[('True','Paid'),('False','Unpaid')], default='False')
+    bill_customer_id_update = StringField('bill_date', validators=[Optional()])
+    submit_bill_update = SubmitField('Submit')
+
+#ITEM FORMS
+class ItemCreationForm(FlaskForm):
+    item_id_create = StringField('item_id', validators=[DataRequired(), Length(min=36, max=36)])
+    owner_id_create = StringField('owner_id', validators=[DataRequired(), Length(min=36, max=36)])
+    item_status_description_create = StringField('item_price', validators=[DataRequired(),Length(min=2, max=200)])
+    item_status_date_create = DateField('item_description', validators=[DateRequired()])
+    item_past_repair_status_description_create = StringField('past_repair', validators=[DataRequired(),Length(min=2, max=200)])
+    item_past_repair_status_start_date_create = DateField('past_repair_date', validators=[DateRequired()])
+    item_past_repair_status_end_date_create = DateField('past_repair_end_date', validators=[DateRequired()])
+    item_current_repair_status_description_create = StringField('current_repair', validators=[DataRequired(),Length(min=2, max=200)])
+    item_current_repair_status_start_date_create = DateField('current_repair_date', validators=[DateRequired()])
+    item_current_repair_status_end_date_create = DateField('current_repair_end_date', validators=[DateRequired()])
+    item_address_create = StringField('item_address', validators=[DataRequired(),Length(min=2, max=200)])
+    item_subscription_create = StringField('plan_type', validators=[DataRequired(),Length(min=2, max=200)])
+    item_subscription_start_date_create = DateField('subscription_start_date', validators=[DateRequired()])
+    item_subscription_end_date_create = DateField('subscription_end_date', validators=[DateRequired()])
+    submit_item_create = SubmitField('Submit')
+
+class ItemGetbyIdForm(FlaskForm):
+    item_get_by = RadioField('type', choices=[('item_id','Item_id'),('owner_id','owner_id')], default='item_id')
+    item_id_get = StringField('id', validators=[DataRequired(), Length(min=36, max=36)])
+
+class ItemDeletebyIdForm(FlaskForm):
+    item_delete_by = RadioField('type', choices=[('item_id','Item_id'),('owner_id','owner_id')], default='item_id')
+    item_id_delete = StringField('id', validators=[DataRequired(), Length(min=36, max=36)])
+    submit_item_delete = SubmitField('Submit')
+    
+class ItemUpdateForm(FlaskForm):
+    item_id_update = StringField('item_id', validators=[Optional(),Length(min=36, max=36)])
+    owner_id_update = StringField('owner_id', validators=[Optional(),Length(min=36, max=36)])
+    item_status_description_update = StringField('item_price', validators=[Optional(),Length(min=2, max=200)])
+    item_status_date_update = DateField('item_description', validators=[Optional(),DateRequired()])
+    item_past_repair_status_description_update = StringField('past_repair', validators=[Optional(),Length(min=2, max=200)])
+    item_past_repair_status_start_date_update = DateField('past_repair_date', validators=[Optional(),DateRequired()])
+    item_past_repair_status_end_date_update = DateField('past_repair_end_date', validators=[Optional(),DateRequired()])
+    item_current_repair_status_description_update = StringField('current_repair', validators=[Optional(),Length(min=2, max=200)])
+    item_current_repair_status_start_date_update = DateField('current_repair_date', validators=[Optional(),DateRequired()])
+    item_current_repair_status_end_date_update = DateField('current_repair_end_date', validators=[Optional(),DateRequired()])
+    item_address_update = StringField('item_address', validators=[Optional(),Length(min=2, max=200)])
+    item_subscription_update = StringField('plan_type', validators=[Optional(),Length(min=2, max=200)])
+    item_subscription_start_date_update = DateField('subscription_start_date', validators=[Optional()])
+    item_subscription_end_date_update = DateField('subscription_end_date', validators=[Optional()])
+    submit_item_update = SubmitField('Submit')
