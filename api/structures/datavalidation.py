@@ -121,6 +121,7 @@ class ItemCreationForm(FlaskForm):
 class ItemGetbyIdForm(FlaskForm):
     item_get_by = RadioField('type', choices=[('item_id','Item_id'),('owner_id','owner_id')], default='item_id')
     item_id_get = StringField('id', validators=[DataRequired(), Length(min=36, max=36)])
+    submit_item_get = SubmitField('Submit')
 
 class ItemDeletebyIdForm(FlaskForm):
     item_delete_by = RadioField('type', choices=[('item_id','Item_id'),('owner_id','owner_id')], default='item_id')
