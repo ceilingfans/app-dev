@@ -7,9 +7,6 @@ numpy
 pandas
 matplotlib
 seaborn
-<<<<<<< HEAD
 python-dotenv
-=======
 wtforms
 flask-wtf
->>>>>>> 636784a4329575b92953127ad209d9ef48887e2e
