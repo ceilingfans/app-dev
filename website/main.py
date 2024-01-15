@@ -9,7 +9,7 @@ from api.structures.InsuredItem import InsuredItem
 
 # sys.path.insert(1, "G://app-dev//app-dev")
 from api.structures.User import User
-from api.structures.billinghistory import Billinghistory
+from api.structures.Bill import Bill
 
 from api.db.driver import Driver
 from api.structures.datavalidation import UserForm
@@ -21,6 +21,7 @@ app.config.update(dict(SECRET_KEY='yoursecretkey'))
 
 @app.route("/")
 def index():
+
     return render_template("home.html")
 
 
@@ -140,7 +141,7 @@ def billing_crud():
     if request.method == "POST":
         match request.form["submit"]:
             case "create_bill":
-                bill = Billinghistory({
+                bill = Bill({
                     "customerid": request.form["customer_id"],
                     "billid": db.generate_id(),
                     "status": False
@@ -161,7 +162,7 @@ def billing_crud():
                 customer_id = request.form.get("customer_id")
                 status = request.form.get("bill_status") == "payed"
 
-                bill = Billinghistory({
+                bill = Bill({
                     "billid": bill_id,
                     "customerid": customer_id,
                     "status": status
