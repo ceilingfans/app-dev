@@ -7,11 +7,11 @@ import uuid
 
 # TODO: fix pathing issue, (please do not commit any hotfixes)
 
-from UserManager import UserManager
-from PromoManager import PromoManager
-from ItemManager import ItemManager
-from PlanManager import PlanManager
-from BillManager import BillManager
+from api.db.UserManager import UserManager
+from api.db.PromoManager import PromoManager
+from api.db.ItemManager import ItemManager
+from api.db.PlanManager import PlanManager
+from api.db.BillManager import BillManager
 
 # load env vars to our system
 load_dotenv(find_dotenv())
