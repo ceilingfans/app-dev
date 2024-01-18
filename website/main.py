@@ -7,10 +7,18 @@ app = Flask(__name__, static_url_path="/static")
 def home():
     return render_template("home.html")
 
-
-@app.route("/contact")
+@app.route("/contact.html")
 def contact():
     return render_template("contact.html")
+
+@app.route("/shop.html")
+def shop():
+    return render_template("shop.html")
+
+@app.route("/repair.html")
+def repair():
+    return render_template("repair.html")
+
 
 
 @app.route("/test")
