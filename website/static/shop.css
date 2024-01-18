@@ -1,0 +1,37 @@
+nav ul li{
+    display: inline;
+    padding: 15px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: black;
+}
+
+nav ul {
+    text-align: center;
+    padding: 10px;
+}
+
+.cartlogo {
+    height:20px;
+    width: 20px;
+}
+.phonylogo {
+    padding: 10px;
+    margin-left: 40%;
+    margin-right: 40%;
+}
+
+.title {
+    text-align: center;
+}
+
+.ranks {
+    text-align: center
+}
+
+.bottom {
+    padding-top: 150px;
+    text-align: center;
+}
