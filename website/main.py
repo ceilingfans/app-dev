@@ -70,8 +70,9 @@ def login_post():
 
     email = request.form.get("email")
     password = request.form.get("password")
+    remember = request.form.get("remember-me") == "remember-me"
 
-    print("info:", email, password)
+    print("info:", email, password, remember)
 
     ret_code, user = db.users.find(email=email)
     match ret_code:
@@ -84,7 +85,7 @@ def login_post():
             except VerifyMismatchError:
                 return render_template(html, login_result="Incorrect password")
 
-            flask_login.login_user(user)
+            flask_login.login_user(user, remember=remember)
             return redirect(url_for("test"))
 
         case _:
