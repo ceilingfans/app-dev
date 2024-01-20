@@ -1,6 +1,11 @@
+from argon2 import PasswordHasher
+
+ph = PasswordHasher()
+
+
 class User:
     __name: str = None
-    __password: str = None  # TODO: make this hashed
+    __password: str = None
     __id: str = None
     __email: str = None
     __address: str = None
@@ -34,3 +39,11 @@ class User:
 
     def get_address(self):
         return self.__address
+
+
+def get_hash(password):
+    return ph.hash(password)
+
+
+def check_hash(password, hash):
+    return ph.verify(hash, password)

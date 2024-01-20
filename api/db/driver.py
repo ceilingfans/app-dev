@@ -79,7 +79,7 @@ class Driver:
 # test code, please ignore
 if __name__ == "__main__":
     import datetime
-    from api.structures.User import User
+    from api.structures.User import User, get_hash
     from api.structures.Promo import Promo
     from api.structures.PlanDescription import PlanDescription
     from api.structures.InsuredItem import InsuredItem
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     _test("create user")
     user = User({
         "name": "John Doe",
-        "password": "password",
+        "password": get_hash("password"),
         "id": user_id,
         "email": "test@test.com",
         "address": "1234 Test St",
