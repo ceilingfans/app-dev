@@ -2,9 +2,12 @@ from flask import Flask, render_template, request, redirect, url_for
 from argon2.exceptions import VerifyMismatchError
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 import os
+#import sys
+#sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from api.db.driver import Driver
 from api.structures.User import check_hash
+from api.structures.datavalidation import *
 
 db = Driver()
 app = Flask(__name__, static_url_path="/static")
@@ -59,37 +62,37 @@ def test():
     return render_template("test.html", user=current_user.get_name())
 
 
-@app.route("/login")
+
+
+@app.route("/login", methods=["GET","POST"])
 def login():
-    return render_template("login.html")
-
-
-@app.route("/login", methods=["POST"])
-def login_post():
+    usersigninform = UserSignInForm()
     html = "login.html"
+    if usersigninform.submit_user_signin and usersigninform.validate():
+        email = usersigninform.email_signin.data
+        password = usersigninform.password_signin.data
+        remember = usersigninform.remember_me.data
 
-    email = request.form.get("email")
-    password = request.form.get("password")
-    remember = request.form.get("remember-me") == "remember-me"
+        print("info:", email, password, remember)
 
-    print("info:", email, password, remember)
+        ret_code, user = db.users.find(email=email)
+        match ret_code:
+            case "USERNOTFOUND":
+                return render_template(html,form = usersigninform, login_result="User not found")
 
-    ret_code, user = db.users.find(email=email)
-    match ret_code:
-        case "USERNOTFOUND":
-            return render_template(html, login_result="User not found")
+            case "SUCCESS":
+                try:
+                    check_hash(password, user.get_password())
+                except VerifyMismatchError:
+                    return render_template(html,form = usersigninform, login_result="Incorrect password")
 
-        case "SUCCESS":
-            try:
-                check_hash(password, user.get_password())
-            except VerifyMismatchError:
-                return render_template(html, login_result="Incorrect password")
+                login_user(user, remember=remember)
+                return redirect(url_for("test"))
 
-            login_user(user, remember=remember)
-            return redirect(url_for("test"))
-
-        case _:
-            return render_template(html, login_result=f"Internal server error, {user}")
+            case _:
+                return render_template(html, form = usersigninform,login_result=f"Internal server error, {user}")
+    else:
+        return render_template("login.html", form = usersigninform)
 
 
 @app.route("/logout")

@@ -6,43 +6,30 @@
       <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
       <div class="form-floating">
-        <input
-          type="email"
-          class="form-control"
-          id="floatingInput"
-          name="email"
-          placeholder="name@example.com"
-          required
-        />
-        <label for="floatingInput">Email address</label>
+        {{ form.email_signin(placeholder="Email") }}
       </div>
+      <label for="floatingInput">Email address</label>
       <div class="form-floating mt-1">
-        <input
-          type="password"
-          class="form-control"
-          id="floatingPassword"
-          name="password"
-          placeholder="Password"
-          required
-        />
-        <label for="floatingPassword">Password</label>
+        {{form.password_signin(placeholder="Password")}}
       </div>
-      <div class="form-check text-start my-3">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          name="remember-me"
-          value="remember-me"
-          id="flexCheckDefault"
-        />
-        <label class="form-check-label" for="flexCheckDefault">
-          Remember me
-        </label>
-      </div>
-      <button class="btn btn-primary w-100 py-2 my-1" type="submit">
-        Sign in
-      </button>
+      <label for="floatingPassword">Password</label>
+      <br>
+      <div class="form-check form-check-inline mt-1">
+        {{ form.remember_me(class="form-check-input") }}
+        <label class="form-check-label" for="{{ form.remember_me.id }}">Remember me</label>
+    </div>
+      {{ form.submit_user_signin(class="w-100 btn btn-lg btn-primary") }}
+      {{ form.hidden_tag() }}
     </form>
+    {% if form.errors %}
+    <ul class="errors">
+      {% for field in form %}
+      {% for error in field.errors %}
+      <li>{{field.label}}: {{ error }}</li>
+      {% endfor %}
+      {% endfor %}
+    </ul>
+    {% endif %}
     <p>{{ login_result }}</p>
   </div>
 </div>
