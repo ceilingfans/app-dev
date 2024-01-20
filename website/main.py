@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from argon2.exceptions import VerifyMismatchError
-import flask_login
+from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 import os
 
 from api.db.driver import Driver
@@ -10,7 +10,7 @@ db = Driver()
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 
-login_manager = flask_login.LoginManager()
+login_manager = LoginManager()
 login_manager.init_app(app)
 
 
@@ -54,9 +54,9 @@ def contact():
 
 
 @app.route("/test")
-@flask_login.login_required
+@login_required
 def test():
-    return render_template("test.html", user=flask_login.current_user.get_name())
+    return render_template("test.html", user=current_user.get_name())
 
 
 @app.route("/login")
@@ -85,7 +85,7 @@ def login_post():
             except VerifyMismatchError:
                 return render_template(html, login_result="Incorrect password")
 
-            flask_login.login_user(user, remember=remember)
+            login_user(user, remember=remember)
             return redirect(url_for("test"))
 
         case _:
@@ -94,7 +94,7 @@ def login_post():
 
 @app.route("/logout")
 def logout():
-    flask_login.logout_user()
+    logout_user()
     return redirect(url_for("home"))
 
 
