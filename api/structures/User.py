@@ -1,9 +1,10 @@
 from argon2 import PasswordHasher
+from flask_login import UserMixin
 
 ph = PasswordHasher()
 
 
-class User:
+class User(UserMixin):
     __name: str = None
     __password: str = None
     __id: str = None

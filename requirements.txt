@@ -11,3 +11,4 @@ python-dotenv
 wtforms
 flask-wtf
 argon2-cffi
+flask-login
