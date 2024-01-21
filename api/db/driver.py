@@ -4,9 +4,9 @@ from pymongo.server_api import ServerApi
 from dotenv import load_dotenv, find_dotenv
 import os
 import uuid
-
+import sys
 # TODO: fix pathing issue, (please do not commit any hotfixes)
-
+sys.path.append("G://app-dev//app-dev")
 from api.db.UserManager import UserManager
 from api.db.PromoManager import PromoManager
 from api.db.ItemManager import ItemManager
@@ -113,6 +113,7 @@ if __name__ == "__main__":
         "id": user_id,
         "email": "test@test.com",
         "address": "1234 Test St",
+        "newuser": True
     })
     ret_code, user = db.users.create(user)
 
@@ -134,7 +135,7 @@ if __name__ == "__main__":
     assert user.get_name() == "Jane Doe", f"expected user name to be Jane Doe, got {user.get_name()}"
     _pass()
 
-    # delete user
+    #delete user
     _test("delete user")
     ret_code, err = db.users.delete(user_id)
 

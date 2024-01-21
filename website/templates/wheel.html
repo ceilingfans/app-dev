@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Wheel
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="titlewheel text-center">
+      <h1>Bonus Wheel</h1>
+      <p>Spin and Win!</p>
+    </div>
+  </div>
+</div>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content text-center">
+    <span class="close">&times;</span>
+    <img src="" alt="coupon">
+    <h1>Congratulations!</h1>
+    <div class="coupon">
+      <p>amogus</p>
+    </div>
+  </div>
+<!-- WHEEL -->
+</div>
+<div class="wheel">
+  <div class="containerwheel container-xl">
+    <div class="one">$5</div>
+    <div class="two">$5</div>
+    <div class="three">$10</div>
+    <div class="four">$20</div>
+    <div class="five">$10</div>
+    <div class="six">$5</div>
+  </div>
+  <span class="mid"></span>
+  <button id="spin">Spin</button>
+  <div class="stoper"></div>
+</div>
+<!-- END WHEEL -->
+<!-- JS -->
+<script>
+let wheel= document.querySelector(".containerwheel");
+let btn = document.getElementById("spin");
+let number = 360;
+var span = document.getElementsByClassName("close")[0];
+let modal = document.getElementById("myModal");
+
+let flash = document.querySelector(".containerwheel div");
+let modalcoupon = document.querySelector(".modal-content .coupon p");
+let modaltext = document.querySelector(".modal-content h1");
+let modalimg = document.querySelector(".modal-content img");
+
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+btn.onclick = function () { 
+  fetch('/wheelspin')
+    .then(response => response.json())
+    .then(data => {
+      let spun = data.spun;
+      if (spun == true) {
+        modal.style.display = "block";
+        modaltext.innerHTML = "Sorry, you already spun the wheel.";
+        modalcoupon.parentNode.remove();
+        modalimg.src = "https://cdn3.emoji.gg/emojis/5721_NYOOO.png";
+        return;
+      }
+      let number = data.number;
+      let section = data.section;
+      let coupon = data.coupon;
+      let value = data.value;
+      wheel.style.transform = "rotate(" + number + "deg)";
+      setTimeout(function () {
+        modal.style.display = "block";
+        modaltext.innerHTML = "Congratulations! You won a coupon worth $"+ value;
+        modalcoupon.innerHTML =  coupon;
+        modalimg.src = "https://i.pinimg.com/originals/bb/eb/43/bbeb43706a6d7bd081723c11aceede89.jpg";
+      }, 3000);
+    });
+}
+  
+</script>
+{% endblock %}
