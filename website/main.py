@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from argon2.exceptions import VerifyMismatchError
-from flask_login import login_user, login_required, logout_user, current_user, LoginManager, current_user
+from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 import os
 #import sys
 import random
