@@ -10,6 +10,7 @@ class User(UserMixin):
     __id: str = None
     __email: str = None
     __address: str = None
+    __newuser: bool = True
 
     def __init__(self, data):
         self.__name = data.get("name", None)
@@ -17,6 +18,7 @@ class User(UserMixin):
         self.__id = data.get("id", None)
         self.__email = data.get("email", None)
         self.__address = data.get("address", None)
+        self.__newuser = data.get("newuser", None)
 
     # use dict(<User>) to get the JSON
     def __iter__(self):
@@ -25,6 +27,7 @@ class User(UserMixin):
         yield 'id', self.__id
         yield 'email', self.__email
         yield 'address', self.__address
+        yield 'newuser', self.__newuser
 
     def get_name(self):
         return self.__name
@@ -40,6 +43,11 @@ class User(UserMixin):
 
     def get_address(self):
         return self.__address
+    
+    def get_newuser(self):
+        return self.__newuser
+    
+
 
 
 def get_hash(password):
