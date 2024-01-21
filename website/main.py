@@ -37,6 +37,7 @@ def user_loader(id):
 
 @login_manager.request_loader
 def request_loader(request):
+    print("info: request_loader")
     email = request.form.get("email")
     ret_code, user = db.users.find(email=email)
     match ret_code:
@@ -104,6 +105,7 @@ def login():
                     return render_template(html, form=usersigninform, login_result="Incorrect password")
 
                 login_user(user, remember=remember)
+                print("info: logged in user at login, ", user.get_name(), current_user.get_name())
                 return redirect(url_for("test"))
 
             case _:
@@ -206,9 +208,8 @@ def signup():
 
 @app.route("/signup", methods=["POST"])
 def signup_post():
-    if current_user.is_authenticated:
-        return redirect(url_for("test"))
-
+    logout_user()  # request_loader gets called here, so we need to log out the user before signing up
+    # print("info:", dict(current_user))
     html = "signup.html"
 
     name = request.form.get("first-name") + " " + request.form.get("last-name")
@@ -218,6 +219,7 @@ def signup_post():
     repeat_password = request.form.get("repeat-password")
 
     ret_code, _ = db.users.find(email=email)
+    print("info:", ret_code)
     if ret_code == "SUCCESS":
         return render_template(html, result="Email already in use")
 
@@ -239,6 +241,7 @@ def signup_post():
     match ret_code:
         case "SUCCESS":
             login_user(user)
+            print("info: logged in user at signup, ", user.get_name(), current_user.get_name())
             return redirect(url_for("test"))
 
         case _:
