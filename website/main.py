@@ -2,16 +2,18 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 from argon2.exceptions import VerifyMismatchError
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 import os
-# import sys
+import sys
 import random
 import string
 from uuid import uuid4
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from api.db.driver import Driver
 from api.structures.User import check_hash, User, get_hash
 from api.structures.datavalidation import *
 from api.structures.Promo import Promo
+from api.Insuranceprice.getprice import getprice
+from api.structures.Bill import Bill
 
 db = Driver()
 app = Flask(__name__, static_url_path="/static")
@@ -66,9 +68,37 @@ def shop():
     return render_template("shop.html")
 
 
-@app.route("/insurance")
+@app.route("/insurance", methods=["GET", "POST"])
+@login_required
 def insurance():
-    return render_template("insurance.html")
+    insuranceform = InsuranceForm()
+    if insuranceform.submit_insure and insuranceform.validate():
+        if insuranceform.user_phone_price.data < 700:
+            phoneprice = 1
+        else :
+            phoneprice = 0
+        data = [insuranceform.user_age.data  ,insuranceform.user_gender.data ,insuranceform.user_job.data ,
+                insuranceform.user_sports.data,insuranceform.user_education.data,insuranceform.user_vacations.data,
+                phoneprice]
+        if insuranceform.user_plan.data == "1":
+            price = 50
+        elif insuranceform.user_plan.data == "2":
+            price = 100
+        elif insuranceform.user_plan.data == "3":
+            price = 150
+        # calculate price using the model
+        insureprice = getprice(data,price)
+        bill = Bill({
+            "customer_id": current_user.get_id(),
+            "bill_id": str(uuid4()),
+            "plan_id": insuranceform.user_plan.data,
+            "price": insureprice.item(),
+            "status": False
+        })
+        db.bills.create(bill)
+        # TODO MAKE THIS ADD TO THE CART and redirect to cart page
+        return render_template("insurance.html", form = insuranceform)
+    return render_template("insurance.html", form = insuranceform)
 
 
 @app.route("/repair")
