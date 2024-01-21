@@ -9,7 +9,7 @@ class PlanDescription:
     def __init__(self, data):
         self.__plan_type = PlanKind[data.get("plan_type")]
         self.__description = data.get('description')
-        self.__mean_cost = float(data.get('mean_cost'))
+        self.__mean_cost = data.get("mean_cost")
 
     def __iter__(self):
         yield "plan_type", self.__plan_type.name

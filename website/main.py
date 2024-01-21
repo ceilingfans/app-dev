@@ -2,12 +2,12 @@ from flask import Flask, render_template, request, redirect, url_for
 from argon2.exceptions import VerifyMismatchError
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 import os
-#import sys
-#sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from api.db.driver import Driver
 from api.structures.User import check_hash
 from api.structures.datavalidation import *
+
+
 
 db = Driver()
 app = Flask(__name__, static_url_path="/static")
@@ -50,10 +50,22 @@ def request_loader(request):
 def home():
     return render_template("home.html")
 
-
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
+
+@app.route("/shop")
+def shop():
+    return render_template("shop.html")
+
+@app.route("/insurance")
+def insurance():
+    return render_template("insurance.html")
+
+@app.route("/repair")
+def repair():
+    return render_template("repair.html")
+
 
 
 @app.route("/test")
