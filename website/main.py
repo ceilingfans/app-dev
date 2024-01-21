@@ -13,6 +13,8 @@ from api.structures.datavalidation import *
 from api.structures.Promo import Promo
 
 
+
+
 db = Driver()
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
@@ -54,10 +56,22 @@ def request_loader(request):
 def home():
     return render_template("home.html")
 
-
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
+
+@app.route("/shop")
+def shop():
+    return render_template("shop.html")
+
+@app.route("/insurance")
+def insurance():
+    return render_template("insurance.html")
+
+@app.route("/repair")
+def repair():
+    return render_template("repair.html")
+
 
 
 @app.route("/test")
