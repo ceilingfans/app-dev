@@ -4,9 +4,9 @@ from pymongo.server_api import ServerApi
 from dotenv import load_dotenv, find_dotenv
 import os
 import uuid
-import sys
+#import sys
 # TODO: fix pathing issue, (please do not commit any hotfixes)
-sys.path.append("G://app-dev//app-dev")
+#sys.path.append("G://app-dev//app-dev")
 from api.db.UserManager import UserManager
 from api.db.PromoManager import PromoManager
 from api.db.ItemManager import ItemManager

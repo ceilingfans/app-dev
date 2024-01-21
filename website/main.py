@@ -2,10 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 from argon2.exceptions import VerifyMismatchError
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager, current_user
 import os
-import sys
+#import sys
 import random
 import string
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+#sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from api.db.driver import Driver
 from api.structures.User import check_hash
