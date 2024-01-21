@@ -2,9 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for
 from argon2.exceptions import VerifyMismatchError
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 import os
+import sys
+
+#sys.path.append("C://Users//mdame//app-dev")
 
 from api.db.driver import Driver
 from api.structures.User import check_hash
+
+
 
 db = Driver()
 app = Flask(__name__, static_url_path="/static")
