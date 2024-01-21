@@ -1,6 +1,8 @@
-from wtforms import StringField, SubmitField , IntegerField, RadioField, FloatField , DateField 
+from wtforms import StringField, SubmitField , IntegerField, RadioField, FloatField , DateField ,BooleanField , ValidationError
 from wtforms.validators import DataRequired, Length, Email , NumberRange , Optional
 from flask_wtf import FlaskForm
+from api.db.driver import Driver
+import re
 
 '''
 How to use:
@@ -10,11 +12,26 @@ if you have mulitple forms on 1 page use if form_name.submit_name.data and form_
 to check if the form is submitted and validated.Instead of the builtin method submit_and_validate()
 '''
 
+# ADDITIONAL CHECKS!
+def password_check(form, field):
+    password = field.data
+    if not re.search(r'[A-Z]', password):
+        raise ValidationError('Password must contain at least one uppercase letter')
+    if not re.search(r'[a-z]', password):
+        raise ValidationError('Password must contain at least one lowercase letter')
+    if not re.search(r'\d', password):
+        raise ValidationError('Password must contain at least one digit')
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        raise ValidationError('Password must contain at least one special character')
+
+# END OF ADDITIONAL CHECKS!
+
+
 # USER FORMS
 class UserCreationForm(FlaskForm):
     name_create = StringField('name', validators=[DataRequired(), Length(min=2, max=20)])
     email_create = StringField('email', validators=[DataRequired(),Email()])
-    password_create = StringField('password', validators=[DataRequired(),Length(min=8,max=20)])
+    password_create = StringField('password', validators=[DataRequired(),Length(min=8,max=20),password_check])
     age_create = IntegerField('age', validators=[DataRequired(),NumberRange(min=18, max=100)])
     address_create = StringField('address', validators=[DataRequired()])
     submit_user_create = SubmitField('Submit')
@@ -35,6 +52,14 @@ class UserUpdateForm(FlaskForm):
     age_update = IntegerField('age', validators=[Optional() ,NumberRange(min=18, max=100)])
     address_update = StringField('address', validators=[Optional()])
     submit_user_update = SubmitField('Submit')
+    
+# USER SIGNIN FORM 
+
+class UserSignInForm(FlaskForm):
+    email_signin = StringField('email', validators=[DataRequired(),Email()])
+    password_signin = StringField('password', validators=[DataRequired(),Length(min=8,max=20)])
+    remember_me = BooleanField('Remember me')
+    submit_user_signin = SubmitField('Submit')
 
 # PROMO FORMS
 class PromoCreationForm(FlaskForm):
