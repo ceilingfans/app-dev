@@ -91,7 +91,6 @@ def insurance():
         bill = Bill({
             "customer_id": current_user.get_id(),
             "bill_id": str(uuid4()),
-            "plan_id": insuranceform.user_plan.data,
             "price": insureprice.item(),
             "status": False
         })
