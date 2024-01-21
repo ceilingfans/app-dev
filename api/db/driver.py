@@ -4,8 +4,10 @@ from pymongo.server_api import ServerApi
 from dotenv import load_dotenv, find_dotenv
 import os
 import uuid
+import sys
 
-# TODO: fix pathing issue, (please do not commit any hotfixes)
+#TODO: 
+#sys.path.append("C://Users//mdame//app-dev")
 
 from api.db.UserManager import UserManager
 from api.db.PromoManager import PromoManager
