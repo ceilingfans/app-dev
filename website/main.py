@@ -1,153 +1,106 @@
-import sys
-from flask import Flask, render_template, redirect , request
-from pymongo import MongoClient
-#set up actually good PYTHONPATH
-sys.path.insert(1, "C://Users//josht//OneDrive//Documents//GitHub//app-dev")
-from api.structures.User import User
-from api.structures.billinghistory import Billinghistory
+from flask import Flask, render_template, request, redirect, url_for
+from argon2.exceptions import VerifyMismatchError
+from flask_login import login_user, login_required, logout_user, current_user, LoginManager
+import os
+
 from api.db.driver import Driver
-from api.structures.datavalidation import UserForm
-from api.structures.PlanDescription import PlanDescription
-
-
+from api.structures.User import check_hash
 
 db = Driver()
-app = Flask(__name__)
-app.config.update(dict(SECRET_KEY='yoursecretkey'))
+app = Flask(__name__, static_url_path="/static")
+app.secret_key = os.environ.get("FLASK_SECRET_KEY")
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+@login_manager.user_loader
+def user_loader(id):
+    ret_code, user = db.users.find(user_id=id)
+    match ret_code:
+        case "USERNOTFOUND":
+            return
+
+        case "SUCCESS":
+            return user
+
+        case _:
+            return
+
+
+@login_manager.request_loader
+def request_loader(request):
+    email = request.form.get("email")
+    ret_code, user = db.users.find(email=email)
+    match ret_code:
+        case "USERNOTFOUND":
+            return
+
+        case "SUCCESS":
+            return user
+
+        case _:
+            return
 
 
 @app.route("/")
-def index():
+def home():
     return render_template("home.html")
 
+
 @app.route("/contact")
-def page():
+def contact():
     return render_template("contact.html")
 
-@app.route("/CRUDUSER",methods=['GET','POST'])
-def cruduser():
-    userform = UserForm()
-    if request.method == 'POST':
-        if request.form['submit'] == 'CreateUser':
-            if userform.validate_on_submit() == False:
-                return render_template("CRUDUSER.html", form=userform, Status=userform.errors)
-            else:
-                user = User({
-                "name": userform.name.data,
-                "password": userform.password.data,
-                "id": db.generate_id(),
-                "email": userform.email.data,
-                "address": userform.address.data,
-                })
-                db.create_user(user)
-                if userform.errors == {}:
-                    return render_template("CRUDUSER.html", form=userform, Status="User Created")
-        if request.form['submit'] == 'GetUser':
-            return render_template("CRUDUSER.html", form=userform, Userdata=db.get_user_by_id(request.form['id']))
-        if request.form['submit'] == 'UpdateUser':
-            new_user = User({
-            "name": request.form['upname'],
-            "password": request.form['uppassword'],
-            "id": request.form['upid'],
-            "email": request.form['upemail'],
-            "address": request.form['upaddress'],
-            })
-            return render_template("CRUDUSER.html", form=userform, Updated=db.update_user(new_user))
-        if request.form['submit'] == 'DelUser':
-            return render_template("CRUDUSER.html", form=userform, Deleted=db.delete_user_by_id(request.form['delid']))
-    return render_template("CRUDUSER.html", form=userform, Status="User Not Created")
 
-@app.route("/billing_crud", methods=["GET", "POST"])
-def billing_crud():
-    html = "billing_crud.html"
+@app.route("/test")
+@login_required
+def test():
+    return render_template("test.html", user=current_user.get_name())
 
-    if request.method == "POST":
-        match request.form["submit"]:
-            case "create_bill":
-                bill = Billinghistory({
-                    "customerid": request.form["customer_id"],
-                    "billid": db.generate_id(),
-                    "status": False
-                })
-                db.create_bill(bill)
-                return render_template(html, created_bill=str(dict(bill)))
 
-            case "find_bill":
-                bill_id = request.form["bill_id"]
-                result = db.get_bill_by_id(bill_id)
-                if result is None:
-                    return render_template(html, found_bill=f"Bill with id {bill_id} not found")
+@app.route("/login")
+def login():
+    return render_template("login.html")
 
-                return render_template(html, found_bill=str(dict(result)))
 
-            case "update_bill":
-                bill_id = request.form.get("bill_id")
-                customer_id = request.form.get("customer_id")
-                status = request.form.get("bill_status") == "payed"
+@app.route("/login", methods=["POST"])
+def login_post():
+    html = "login.html"
 
-                bill = Billinghistory({
-                    "billid": bill_id,
-                    "customerid": customer_id,
-                    "status": status
-                })
+    email = request.form.get("email")
+    password = request.form.get("password")
+    remember = request.form.get("remember-me") == "remember-me"
 
-                result = db.update_bill(bill)
-                return render_template(html, updated_bill=str(result))
+    print("info:", email, password, remember)
 
-            case "delete_bill":
-                bill_id = request.form.get("bill_id")
+    ret_code, user = db.users.find(email=email)
+    match ret_code:
+        case "USERNOTFOUND":
+            return render_template(html, login_result="User not found")
 
-                result = db.delete_bill_by_id(bill_id)
-                return render_template(html, deleted_bill=f"Deleted bill with id {bill_id}" if result else f"No bill with id {bill_id} found")
+        case "SUCCESS":
+            try:
+                check_hash(password, user.get_password())
+            except VerifyMismatchError:
+                return render_template(html, login_result="Incorrect password")
 
-            case _:
-                return "<body>invalid submit button pressed<br>somehow pressed button that doesnt exist</body>"
+            login_user(user, remember=remember)
+            return redirect(url_for("test"))
 
-    else:
-        return render_template(html)
-    
+        case _:
+            return render_template(html, login_result=f"Internal server error, {user}")
 
-from api.structures.PlanDescription import PlanDescription  # Import your PlanDescription class
 
-@app.route("/plan_crud", methods=["GET", "POST"])
-def plan_crud():
-    html = "crudtestplan.html"
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for("home"))
 
-    if request.method == "POST":
-        # Assuming you have an instance of PlanDescription class initialized as 'plan_instance'
 
-        match request.form["submit"]:
-            case "Create":
-                plan = PlanDescription({
-                'plan_type': request.form['plan_type'],
-                'description': request.form['plan_description'],
-                'mean_cost': request.form['plan_cost']
-                })
-                db.create_plan(plan)
-                return render_template(html, CreatePlan=f"{dict(plan)}")
-
-            case "Find":
-                plan=db.find_plan_by_type(request.form['plan_type'])
-                return render_template(html, FindPlan=f"{dict(plan)}")
-
-            case "Update":
-                plan = PlanDescription({
-                'plan_type': request.form['plan_type'],
-                'description': request.form['plan_description'],
-                'mean_cost': request.form['plan_cost']
-                })
-                db.update_plan(plan)
-                return render_template(html, UpdatePlan=f"{dict(plan)}")
-
-            case "Delete":
-                return render_template(html, DeletePlan=db.delete_plan_by_type(request.form['plan_type']))
-
-            case _:
-                return "<body>Invalid submit button pressed</body>"
-
-    else:
-        return render_template(html)
-
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    return 'Unauthorized cat', 401
 
 
 if __name__ == "__main__":

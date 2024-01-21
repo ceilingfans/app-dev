@@ -1,93 +1,117 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="../static/home.css">
-    <title>Home</title>
-</head>
-<body>
-<!--Navigation Bar-->
-<header>
-    <img class="phonylogo" src="../../images/phonylogo.png">
-    <nav>
-        <ul class="nav-container">
-            <li><a href="home.html">Home - {{name}}</a></li>
-            <li><a href="repair.html">Repair</a></li>
-            <li><a href="shop.html">Buy a Phone</a></li>
-            <li><a href="services.html">Services</a></li>
-            <li><a href="locations.html">Locations</a></li>
-            <li><a href="cart.html"><img class="cartlogo" src="../../images/cartlogo.svg"></a></li> 
-        </ul>
-    </nav>
-</header>
-<!--Navigation Bar End-->
+{% extends "base.html" %} {% block title %}Homepage{% endblock %} {% block
+content %}
+<div class="container">
+  <div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold text-body-emphasis">ONE-OF-A-KIND</h1>
+    <h1 class="display-5 fw-bold text-body-emphasis">INSURANCE</h1>
+  </div>
 
-<div class="title">
-    <h1>ONE-OF-A-KIND</h1>
-    <h1>INSURANCE</h1>
-</div>
+  <div class="row">
+    <div class="col-lg-4">
+      <img
+        src="/static/images/diamond.jpeg"
+        alt="diamond"
+        class="rounded"
+        height="140px"
+        width="140"
+      />
+      <h2 class="fw-normal mt-1">Diamond</h2>
+      <p>
+        Full coverage on any subscribed device, whether you run the battery out
+        or it gets stolen, you can rest assured we will have you covered.
+      </p>
+    </div>
+    <!-- /.col-lg-4 -->
+    <div class="col-lg-4">
+      <img
+        src="/static/images/plat.jpeg"
+        alt="platinum"
+        class="rounded"
+        height="140px"
+        width="140"
+      />
+      <h2 class="fw-normal mt-1">Platinum</h2>
+      <p>
+        Partial coverage on any subscribed device, you can still rest assured we
+        will have you covered.
+      </p>
+    </div>
+    <!-- /.col-lg-4 -->
+    <div class="col-lg-4">
+      <img
+        src="/static/images/gold.jpeg"
+        alt="gold"
+        class="rounded"
+        height="140px"
+        width="140"
+      />
 
-<div>
-    <table class="insurance">
-        <tr class="ranks">
-            <td><img src="../../images/diamond.jpeg"></td>
-            <td><img src="../../images/plat.jpeg"></td>
-            <td><img src="../../images/gold.jpeg"></td>
-        </tr>
-        <tr>
-            <td>Diamond Insurance</td>
-            <td>Platinum Insurance</td>
-            <td>Gold Insurance</td>
-        </tr>
-        <tr class="prices">
-            <td>$100</td>
-            <td>$75</td>
-            <td>$50</td>
-        </tr>
-        <tr>
-            <td colspan="3" class="shopbutton">
-                <button>SHOP</button>
-            </td>
-        </tr>
-    </table>
-</div>
+      <h2 class="fw-normal mt-1">Gold</h2>
+      <p>
+        Limited coverage on any subscribed device, we will only cover certain
+        situations.
+      </p>
+    </div>
+    <!-- /.col-lg-4 -->
 
-<div class="newsletter">
-    <h1>Subscribe Form</h1>
-    <input type="text" placeholder = "eg. email@example.com">
-    <p><button>Join</button></p>
-    <p>Thanks for subscribing!</p>
-</div>
+    <div class="text-center">
+      <p><a class="btn btn-secondary" href="#">Get Covered Today</a></p>
+    </div>
+  </div>
 
-<div class="about">
-    <h1>WHAT WE'RE ALL ABOUT</h1>
-    <h5>Made for everyone</h5>
-    <p>We founded Phony Insurance with one goal in mind: providing high-quality insurance for your electronics.</p>
-    <p>Our passion for excellence has driven us from the beginning and continues to propel us going forward.</p>
-    <p>We know that every device counts, and strive to make your insurance plan as comprehensive as it can be.</p>
-    <p>Don't settle for anything but the best—check us out for yourself.</p>
-</div>
-
-<div class="award">
-    
-    <img class="guy" src="../../images/guy.png">
-
-    <h2>AWARD-WINNING</h2>
-    <h5>Outstanding Quality</h5>
-    <p>
-        Phony Insurance won the Singapore Best Insurance Company 2023 Award, <br>clear of strong competitors 
-        like FWD Singapore, AIA, and HSBC Insurance.
+  <div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold text-body-emphasis">What We Are About</h1>
+    <h5 class="display-7 fw-bold text-body-emphasis">Made for Everyone</h5>
+    <p class="lead mb-4">
+      We founded Phony Insurance with one goal in mind: providing high-quality
+      insurance for your electronics. Our passion for excellence has driven us
+      from the beginning and continues to propel us going forward. We know that
+      every device counts, and strive to make your insurance plan as
+      comprehensive as it can be. Don't settle for anything but the best—check
+      us out for yourself.
     </p>
-    <p>
-        We are proud to serve over a million customers in Singapore and millions more globally,<br> 
-        protecting your valuable devices with our excellent plans & policies.
-    </p>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-4">
+      <img src="/static/images/guy.png" alt="some guy" class="rounded" />
+    </div>
+
+    <div class="col-lg-6 offset-lg-2">
+      <h1 class="display-5 fw-bold text-body-emphasis">Award Winning</h1>
+      <h5 class="display-7 fw-bold text-body-emphasis">Outstanding Quality</h5>
+      <p class="lead mb-4">
+        Phony Insurance won the Singapore Best Insurance Company 2023 Award,
+        clear of strong competitors like FWD Singapore, AIA, and HSBC Insurance.
+        We are proud to serve over a million customers in Singapore and millions
+        more globally, protecting your valuable devices with our excellent plans
+        & policies.
+      </p>
+    </div>
+  </div>
+
+  <div class="row align-items-center g-lg-5 py-5">
+    <div class="col-lg-7 text-center text-lg-start">
+        <h1 class="display-5 fw-bold text-body-emphasis">Subscribe to our Newsletter</h1>
+
+      <p class="col-lg-10 fs-4">
+        Get the latest news and promotions from Phony Insurance straight to your
+        email inbox.
+      </p>
+    </div>
+    <div class="col-md-10 mx-auto col-lg-5">
+      <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="example@gmail.com" />
+          <button type="submit" class="btn btn-secondary">Subscribe</button>
+        </div>
+        <hr class="my-4" />
+        <small class="text-body-secondary"
+          >By subscribing, you agree to our terms of use.</small
+        >
+      </form>
+    </div>
+  </div>
 </div>
 
-<div class="bottom">
-    <p>Phony Insurance</p>
-    <p>&#169;2024 by PhonyInsurance.</p>
-</div>
-
-</body>
-</html>
+{% endblock %}
