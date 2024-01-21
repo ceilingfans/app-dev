@@ -1,3 +1,5 @@
+{% extends "base.html" %} {% block title %}Shoppage{% endblock %} {% block
+content %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,21 +8,7 @@
     <title>Shop</title>
 </head>
 <body>
-<!--Navigation Bar-->
-<header>
-    <img class="phonylogo" src="/static/images/phonylogo.png">
-    <nav>
-        <ul class="nav-container">
-            <li><a href="/">Home - {{name}}</a></li>
-            <li><a href="repair.html">Repair</a></li>
-            <li><a href="shop.html">Buy a Phone</a></li>
-            <li><a href="services.html">Services</a></li>
-            <li><a href="locations.html">Locations</a></li>
-            <li><a href="cart.html"><img class="cartlogo" src="/static/images/cartlogo.svg"></a></li>
-        </ul>
-    </nav>
-</header>
-<!--Navigation Bar End-->
+
 <br>
 <div class="title">
     <h1>AVAILABLE ELECTRONICS</h1>
@@ -57,3 +45,4 @@
     </tr>
   </tbody>
 </table>
+{% endblock %}
