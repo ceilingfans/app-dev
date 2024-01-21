@@ -1,0 +1,48 @@
+{% extends "base.html" %} {% block title %}Shoppage{% endblock %} {% block
+content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../static/shop.css">
+    <title>Shop</title>
+</head>
+<body>
+
+<br>
+<div class="title">
+    <h1>AVAILABLE ELECTRONICS</h1>
+</div>
+
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">IMAGE</th>
+      <th scope="col">MODEL</th>
+      <th scope="col">PRICE</th>
+      <th class="text-left" scope="col">DESCRIPTION</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>IPHONE 13</td>
+      <td>$1000</td>
+      <td>Lorem ipsum</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>SAMSUNG S22</td>
+      <td>$1100</td>
+      <td>Lorem ipsum</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>XIAOMI NOTE 12</td>
+      <td>$300</td>
+      <td>Lorem ipsum</td>
+    </tr>
+  </tbody>
+</table>
+{% endblock %}
