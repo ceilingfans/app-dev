@@ -1,0 +1,23 @@
+{% extends "base.html" %} 
+{% block title %}Search{% endblock %} 
+{% block content %}
+    <div class="container">
+      <h2>You searched for {{ search }} </h2>
+    </div>
+    {% if results == [] %}
+        <div class="container">
+            <h3>No results found</h3>
+        </div>
+        {% else %}
+        <div class="container">
+            <h3>Results</h3>
+            <ul>
+            {% for result in results %}
+                <li><a href="{{ result }}" ><h5>{{ result }}</h5></a></li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    
+{% endblock %}
+    

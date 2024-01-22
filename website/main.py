@@ -12,18 +12,23 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from api.db.driver import Driver
 from api.structures.User import check_hash, User, get_hash
-from api.structures.datavalidation import *
 from api.structures.Promo import Promo
 from api.Insuranceprice.getprice import getprice
 from api.structures.Bill import Bill
+from api.structures.datavalidation import *
 
 db = Driver()
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+@app.context_processor
+def base():
+    searchform = SearchForm()
+    if searchform.submit_search and searchform.validate():
+        return redirect (url_for("search"))
+    return dict(searchform=searchform)
 
 @login_manager.user_loader
 def user_loader(id):
@@ -58,6 +63,28 @@ def request_loader(request):
 @app.route("/")
 def home():
     return render_template("home.html")
+
+@app.route("/search", methods=["GET","POST"])
+def search():
+    search = request.args.get('search')
+    search = search.lower()
+    # the keys are the html files, the values are the words that will trigger the search
+    html_files = {"contact": ["contact", "contact-us","email"], 
+                  "insurance": ["insurance","coverage","products","quote","price","cost","estimate","calculate","calc"],
+                  "login": ["login","signin","sign-in","sign in"],
+                  "repair": ["repair","fix"], 
+                  "shop": ["shop","phone","samsung","iphone","products","oppo"], 
+                  "signup": ["signup","create","account","make","register","sign-up","sign"], 
+                  "wheel": ["wheel","spin","prize","win"],
+                  "home": ["home","main","index","website","site","page"]}
+    results = []
+    # Ignore the O(n^2) complexity, it's only 7 items
+    for search in search.split(" "):
+        for key, desc in html_files.items():
+            for word in desc:
+                if search == word:
+                    results.append(key)
+    return render_template("search.html", search=search, results=results)
 
 
 @app.route("/contact",methods=["GET", "POST"])
