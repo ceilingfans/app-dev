@@ -1,5 +1,5 @@
 
-from wtforms import StringField, SubmitField , IntegerField, RadioField, FloatField , DateField ,BooleanField , ValidationError ,PasswordField, SelectField
+from wtforms import StringField, SubmitField , IntegerField, RadioField, FloatField , DateField ,BooleanField , ValidationError ,PasswordField, SelectField , TextAreaField
 from wtforms.validators import DataRequired, Length, Email , NumberRange , Optional , EqualTo
 from flask_wtf import FlaskForm
 from api.db.driver import Driver
@@ -25,6 +25,15 @@ def password_check(form, field):
         raise ValidationError('Password must contain at least one digit')
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
         raise ValidationError('Password must contain at least one special character')
+    
+def phone_check(form, field):
+    phone = field.data
+    if re.search(r'[a-zA-Z]', phone):
+        raise ValidationError('Phone number must contain only numbers')
+    if not re.search(r'[0-9]{8}', phone):
+        raise ValidationError('Phone number must be 8 digits long')
+    if not re.search(r'[0-9]{4}[0-9]{4}', phone):
+        raise ValidationError('Phone number must be in the format XXXXXXXX')
 
 
 # END OF ADDITIONAL CHECKS!
@@ -224,3 +233,12 @@ class InsuranceForm(FlaskForm):
     user_plan = SelectField('plan', choices=[('1', 'Bronze'), ('2', 'Silver'), ('3', 'Gold')],
                             validators=[DataRequired()])
     submit_insure = SubmitField('Submit')
+    
+# CONTACT US 
+
+class ContactUs(FlaskForm):
+    name = StringField('name', validators=[DataRequired()])
+    email = StringField('email', validators=[DataRequired(),Email()])
+    phone_number = StringField('phone number', validators=[DataRequired(),phone_check])
+    message = TextAreaField('message', validators=[DataRequired()])
+    submit_contact = SubmitField('Submit')

@@ -6,6 +6,7 @@ import sys
 import random
 import string
 from uuid import uuid4
+from dhooks import Webhook
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -59,9 +60,15 @@ def home():
     return render_template("home.html")
 
 
-@app.route("/contact")
+@app.route("/contact",methods=["GET", "POST"])
 def contact():
-    return render_template("contact.html")
+    hook = Webhook("https://discord.com/api/webhooks/1198939240235532358/Gu5Dw7cmkupwqo9yg-PgdSKXlj1toWbCHsSqQUabIJc-A3dOlHfDdVkkqwurh34wXdaR")
+    contactform = ContactUs()
+    if contactform.submit_contact and contactform.validate():
+        print("info: contact form submitted")
+        hook.send(f"Name: {contactform.name.data}\nEmail: {contactform.email.data}\nPhone Number: {contactform.phone_number.data}\nMessage: {contactform.message.data}")
+        return render_template("contact.html", form = contactform, result = "Your message has been sent")
+    return render_template("contact.html", form = contactform)
 
 
 @app.route("/shop")
