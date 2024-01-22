@@ -4,14 +4,9 @@
   <div class="col-lg-4">
     <form method="post" action="">
       <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-
-      <div class="form-floating">
-        {{ form.email_signin(placeholder="Email") }}
-      </div>
+        {{ form.email_signin(class="form-control",placeholder="Email") }}
       <label for="floatingInput">Email address</label>
-      <div class="form-floating mt-1">
-        {{form.password_signin(placeholder="Password")}}
-      </div>
+        {{form.password_signin(class="form-control" ,placeholder="Password")}}
       <label for="floatingPassword">Password</label>
       <br>
       <div class="form-check form-check-inline mt-1">

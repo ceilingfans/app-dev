@@ -1,5 +1,5 @@
-from wtforms import StringField, SubmitField , IntegerField, RadioField, FloatField , DateField ,BooleanField , ValidationError , SelectField
-from wtforms.validators import DataRequired, Length, Email , NumberRange , Optional
+from wtforms import StringField, SubmitField , IntegerField, RadioField, FloatField , DateField ,BooleanField , ValidationError ,PasswordField, SelectField
+from wtforms.validators import DataRequired, Length, Email , NumberRange , Optional , EqualTo
 from flask_wtf import FlaskForm
 from api.db.driver import Driver
 import re
@@ -30,9 +30,10 @@ def password_check(form, field):
 # USER FORMS
 class UserCreationForm(FlaskForm):
     name_create = StringField('name', validators=[DataRequired(), Length(min=2, max=20)])
+    name_last_create = StringField('name', validators=[DataRequired(), Length(min=2, max=20)])
     email_create = StringField('email', validators=[DataRequired(),Email()])
-    password_create = StringField('password', validators=[DataRequired(),Length(min=8,max=20),password_check])
-    age_create = IntegerField('age', validators=[DataRequired(),NumberRange(min=18, max=100)])
+    password_create = PasswordField('password', validators=[DataRequired(),Length(min=8,max=20),password_check])
+    password_confirm = PasswordField('repeat password', validators=[DataRequired(),EqualTo('password_create', message='Passwords must match')])
     address_create = StringField('address', validators=[DataRequired()])
     submit_user_create = SubmitField('Submit')
     
@@ -49,7 +50,6 @@ class UserUpdateForm(FlaskForm):
     name_update = StringField('name', validators=[Optional() ,Length(min=2, max=20)])
     email_update = StringField('email', validators=[Optional() ,Email()])
     password_update = StringField('password', validators=[Optional() ,Length(min=8,max=20)])
-    age_update = IntegerField('age', validators=[Optional() ,NumberRange(min=18, max=100)])
     address_update = StringField('address', validators=[Optional()])
     submit_user_update = SubmitField('Submit')
     
@@ -57,7 +57,7 @@ class UserUpdateForm(FlaskForm):
 
 class UserSignInForm(FlaskForm):
     email_signin = StringField('email', validators=[DataRequired(),Email()])
-    password_signin = StringField('password', validators=[DataRequired(),Length(min=8,max=20)])
+    password_signin = PasswordField('password', validators=[DataRequired(),Length(min=8,max=20)])
     remember_me = BooleanField('Remember me')
     submit_user_signin = SubmitField('Submit')
 
