@@ -9,19 +9,25 @@
     <!-- Custom css-->
     <link href="{{ url_for('static', filename='css/wheel.css') }}" rel="stylesheet">
 </head>
-<body>
+<body class="d-flex flex-column h-100">
+
+
 {% block navbar %}
     {% include 'includes/_navbar.html' %}
 {% endblock %}
 
-<div class="container-fluid">
+<main class="flex-shrink-0">
     {% block content %}
     {% endblock %}
-</div>
+</main>
+
 
 {% block footer %}
     {% include 'includes/_footer.html' %}
 {% endblock %}
+
+
+
 
 {% block scripts %}
     <!-- Bootstrap 5.3.2 JavaScript -->

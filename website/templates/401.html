@@ -1,0 +1,32 @@
+{% extends "base.html" %} {% block title %}401 Not Authenticated{% endblock %} {%
+block content %}
+<div class="container">
+  <div class="my-5">
+    <div class="p-5 text-center">
+      <div class="container py-5">
+        <img
+          src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fe1.pxfuel.com%2Fdesktop-wallpaper%2F465%2F943%2Fdesktop-wallpaper-cats-funny-fat-animal-staring-fat-animals.jpg&f=1&nofb=1&ipt=cedb7060cea4d309859b2b898af7584e6c6c80e153cd1249b70f387c3140330b&ipo=images"
+          alt="fat cat"
+          class="rounded my-3"
+          width="200px"
+          height="150px"
+        />
+        <h1 class="fw-bold">401 Not Authenticated</h1>
+        <p class="col-lg-8 mx-auto lead">
+          Looks like your cat logged you out. Please log back in to continue.
+        </p>
+        <a class="btn btn-primary" type="button" href="{{ url_for('login') }}"
+          >Login</a
+        >
+        <a
+          class="btn btn-secondary"
+          type="button"
+          href="{{ url_for('signup') }}"
+          >Signup</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
