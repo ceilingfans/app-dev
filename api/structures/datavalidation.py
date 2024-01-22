@@ -1,4 +1,4 @@
-from wtforms import StringField, SubmitField , IntegerField, RadioField, FloatField , DateField ,BooleanField , ValidationError
+from wtforms import StringField, SubmitField , IntegerField, RadioField, FloatField , DateField ,BooleanField , ValidationError , SelectField
 from wtforms.validators import DataRequired, Length, Email , NumberRange , Optional
 from flask_wtf import FlaskForm
 from api.db.driver import Driver
@@ -170,3 +170,20 @@ class ItemUpdateForm(FlaskForm):
     item_subscription_start_date_update = DateField('subscription_start_date', validators=[Optional()])
     item_subscription_end_date_update = DateField('subscription_end_date', validators=[Optional()])
     submit_item_update = SubmitField('Submit')
+#INSURANCE FORMS
+
+class InsuranceForm(FlaskForm):
+    user_age = IntegerField('age', validators=[DataRequired(),NumberRange(min=18, max=100)])
+    user_gender = RadioField('gender', choices=[('Female','Female'),('Male','Male')],validators=[DataRequired()])
+    user_job = SelectField('job', choices=[('1','Student'),('0','Blue Collar'),('1','White Collar'),('1','Unemployed')],validators=[DataRequired()])
+    user_sports = RadioField('user_sports', choices=[('1','Yes'),('0','No')],validators=[DataRequired()])
+    user_education = SelectField('user_edu', choices=[('Associate degree','Associate degree'),
+                                                  ('High school diploma or equivalent','High school diploma or equivalent'),
+                                                  ('Some college, no degree','In college, no degree'),
+                                                  ('Less than high school','Less than high school'),
+                                                  ('Bachelor’s degree','Bachelor’s degree'),
+                                                  ('Doctoral degree','Doctoral degree'),('Master’s degree','Master’s degree')],validators=[DataRequired()])
+    user_vacations = IntegerField('vacations', validators=[DataRequired(),NumberRange(min=0, max=100)])
+    user_phone_price = IntegerField('phoneprice', validators=[DataRequired(),NumberRange(min=0, max=10000)])
+    user_plan = SelectField('plan', choices=[('1','Bronze'),('2','Silver'),('3','Gold')],validators=[DataRequired()])
+    submit_insure = SubmitField('Submit')

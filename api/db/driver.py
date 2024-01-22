@@ -304,7 +304,8 @@ if __name__ == "__main__":
     bill = Bill({
         "customer_id": user_id,
         "bill_id": bill_id,
-        "status": False
+        "status": False,
+        "price": 25.75
     })
     ret_code, bill = db.bills.create(bill)
 
