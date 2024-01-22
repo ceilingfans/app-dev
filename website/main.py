@@ -6,6 +6,7 @@ import sys
 import random
 import string
 from uuid import uuid4
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from api.db.driver import Driver
@@ -75,10 +76,10 @@ def insurance():
     if insuranceform.submit_insure and insuranceform.validate():
         if insuranceform.user_phone_price.data < 700:
             phoneprice = 1
-        else :
+        else:
             phoneprice = 0
-        data = [insuranceform.user_age.data  ,insuranceform.user_gender.data ,insuranceform.user_job.data ,
-                insuranceform.user_sports.data,insuranceform.user_education.data,insuranceform.user_vacations.data,
+        data = [insuranceform.user_age.data, insuranceform.user_gender.data, insuranceform.user_job.data,
+                insuranceform.user_sports.data, insuranceform.user_education.data, insuranceform.user_vacations.data,
                 phoneprice]
         if insuranceform.user_plan.data == "1":
             price = 50
@@ -87,7 +88,7 @@ def insurance():
         elif insuranceform.user_plan.data == "3":
             price = 150
         # calculate price using the model
-        insureprice = getprice(data,price)
+        insureprice = getprice(data, price)
         bill = Bill({
             "customer_id": current_user.get_id(),
             "bill_id": str(uuid4()),
@@ -96,8 +97,8 @@ def insurance():
         })
         db.bills.create(bill)
         # TODO MAKE THIS ADD TO THE CART and redirect to cart page
-        return render_template("insurance.html", form = insuranceform)
-    return render_template("insurance.html", form = insuranceform)
+        return render_template("insurance.html", form=insuranceform)
+    return render_template("insurance.html", form=insuranceform)
 
 
 @app.route("/repair")
@@ -157,7 +158,7 @@ def wheel():
 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
-    return 'Unauthorized cat', 401
+    return render_template("401.html"), 401
 
 
 @app.route("/wheelspin")
@@ -275,6 +276,11 @@ def signup_post():
 
         case _:
             return render_template(html, result=f"Internal server error, {user}")
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
 
 
 if __name__ == "__main__":

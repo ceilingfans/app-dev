@@ -1,0 +1,26 @@
+{% extends "base.html" %} {% block title %}proof of concept{% endblock %} {%
+block content %}
+<div class="container">
+  <div class="my-5">
+    <div class="p-5 text-center">
+      <div class="container py-5">
+        <img
+          src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.pinimg.com%2F736x%2F1c%2F8b%2F20%2F1c8b20084e352b83c236c55fa9150882.jpg&f=1&nofb=1&ipt=808990b2b91fd80c9a1b99881d7f91863a1e3ac226f505fb392abd053e0fe2d4&ipo=images"
+          alt=""
+          class="rounded my-3"
+          width="200px"
+          height="150px"
+        />
+        <h1 class="fw-bold">404 Not Found</h1>
+        <p class="col-lg-8 mx-auto lead">
+          This page was not found, maybe a cat ate it?
+        </p>
+        <a class="btn btn-primary" type="button" href="{{ url_for('home') }}"
+          >Go Home</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
