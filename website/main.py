@@ -230,51 +230,46 @@ def wheelspin():
     return jsonify(number=number, section=section, spun=False, coupon=coupon, value=value)
 
 
-@app.route("/signup")
+
+@app.route("/signup", methods=["GET","POST"])
 def signup():
-    return render_template("signup.html")
-
-
-@app.route("/signup", methods=["POST"])
-def signup_post():
+    if current_user.is_authenticated:
+        return redirect(url_for("test"))
     logout_user()  # request_loader gets called here, so we need to log out the user before signing up
     # print("info:", dict(current_user))
     html = "signup.html"
+    form = UserCreationForm()
+    if form.submit_user_create and form.validate():
+        name = form.name_create.data + " " + form.name_last_create.data
+        email = form.email_create.data
+        address = form.address_create.data
+        password = form.password_create.data
+        password_confirm = form.password_confirm.data
+        
+        ret_code, _ = db.users.find(email=email)
+        print("info:", ret_code)
+        if ret_code == "SUCCESS":
+            return render_template(html,form = form,result="Email already in use")
 
-    name = request.form.get("first-name") + " " + request.form.get("last-name")
-    email = request.form.get("email")
-    address = request.form.get("address")
-    password = request.form.get("password")
-    repeat_password = request.form.get("repeat-password")
-
-    ret_code, _ = db.users.find(email=email)
-    print("info:", ret_code)
-    if ret_code == "SUCCESS":
-        return render_template(html, result="Email already in use")
-
-    if len(password) > 20 or len(password) < 8:
-        return render_template(html, result="Password must be between 8 and 20 characters long")
-    if password != repeat_password:
-        return render_template(html, result="Passwords do not match")
-
-    user = User({
-        "name": name,
-        "password": get_hash(password),
-        "id": str(uuid4()),
-        "email": email,
-        "address": address,
-        "newuser": True
-    })
-
-    ret_code, user = db.users.create(user)
-    match ret_code:
-        case "SUCCESS":
-            login_user(user)
-            print("info: logged in user at signup, ", user.get_name(), current_user.get_name())
-            return redirect(url_for("test"))
-
-        case _:
-            return render_template(html, result=f"Internal server error, {user}")
+        user = User({
+            "name": name,
+            "password": get_hash(password),
+            "id": str(uuid4()),
+            "email": email,
+            "address": address,
+            "newuser": True
+        })
+    
+        ret_code, user = db.users.create(user)
+        match ret_code:
+            case "SUCCESS":
+                login_user(user)
+                print("info: logged in user at signup, ", user.get_name(), current_user.get_name())
+                return redirect(url_for("test"))
+    
+            case _:
+                return render_template(html,form = form ,result=f"Internal server error, {user}")
+    return render_template(html, form=form)
 
 
 if __name__ == "__main__":
