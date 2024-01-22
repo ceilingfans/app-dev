@@ -231,7 +231,7 @@ def wheelspin():
     return jsonify(number=number, section=section, spun=False, coupon=coupon, value=value)
 
 
-@app.route("/signup", methods=["GET", "POST"])
+@app.route("/signup", methods=["GET","POST"])
 def signup():
     if current_user.is_authenticated:
         return redirect(url_for("test"))
@@ -245,11 +245,10 @@ def signup():
         address = form.address_create.data
         password = form.password_create.data
         password_confirm = form.password_confirm.data
-
         ret_code, _ = db.users.find(email=email)
         print("info:", ret_code)
         if ret_code == "SUCCESS":
-            return render_template(html, form=form, result="Email already in use")
+            return render_template(html,form = form,result="Email already in use")
 
         user = User({
             "name": name,
