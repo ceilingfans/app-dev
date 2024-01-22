@@ -13,3 +13,4 @@ flask-wtf
 argon2-cffi
 flask-login
 email_validator
+dhooks
