@@ -1,0 +1,164 @@
+{% extends "base.html" %} {% block title %}Profile | {{ current_user.get_name()
+}}{% endblock %} {% block content %}
+<div class="container px-4 py-5">
+  <h2 class="text-center fw-bold pb-2">Your Profile</h2>
+
+  <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
+    <div class="col d-flex flex-column align-items-start gap-2">
+      <img
+        src="/static/images/avatar.png"
+        alt="pfp"
+        class="img-fluid"
+        width="200px"
+        height="200px"
+      />
+    </div>
+
+    <div class="col">
+      <div class="row row-cols-1 row-cols-sm-2 g-4">
+        <div class="col d-flex flex-column gap-2">
+          <h4 class="fw-semibold mb-0 text-body-emphasis">Name</h4>
+          <p class="text-body-secondary">
+            <code class="text-black">{{ current_user.get_name() }}</code>
+          </p>
+        </div>
+
+        <div class="col d-flex flex-column gap-2">
+          <h4 class="fw-semibold mb-0 text-body-emphasis">Email</h4>
+          <p class="text-body-secondary">
+            <code class="text-black">{{ current_user.get_email() }}</code>
+          </p>
+        </div>
+
+        <div class="col d-flex flex-column gap-2">
+          <h4 class="fw-semibold mb-0 text-body-emphasis">Address</h4>
+          <p class="text-body-secondary">
+            <code class="text-black">{{ current_user.get_address() }}</code>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {% if current_user.get_newuser() %}
+    <h2 class="text-center fw-bold pb-2">
+      You have a free promocode to <a href="{{ url_for('wheel') }}">claim</a>.
+    </h2>
+    {% endif %}
+  </div>
+</div>
+
+<div class="container col-xl-10 col-xxl-8 px-4 py-5">
+  <div class="row g-lg-5 py-5">
+    <div class="col-lg-7 text-center text-lg-start">
+      <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">
+        Update Profile
+      </h1>
+      <p class="col-lg-10 fs-4">
+        Change your password or update your address, as required by law, here.
+      </p>
+    </div>
+    <div class="col-md-10 mx-auto col-lg-5">
+      <form class="needs-validation" novalidate="" method="post">
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <label for="first-name" class="form-label">First name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="first-name"
+              name="first-name"
+              placeholder="{{ current_user.get_name().split()[0] }}"
+              value=""
+            />
+            <div class="invalid-feedback">Valid first name is required.</div>
+          </div>
+
+          <div class="col-sm-6">
+            <label for="last-name" class="form-label">Last name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="last-name"
+              name="last-name"
+              placeholder="{{ current_user.get_name().split()[1] }}"
+              value=""
+            />
+            <div class="invalid-feedback">Valid last name is required.</div>
+          </div>
+
+          <div class="col-12">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              placeholder="{{ current_user.get_email() }}"
+            />
+            <div class="invalid-feedback">
+              Please enter a valid email address for shipping updates.
+            </div>
+          </div>
+
+          <div class="col-12">
+            <label for="address" class="form-label">Address</label>
+            <input
+              type="text"
+              class="form-control"
+              id="address"
+              name="address"
+              placeholder="{{ current_user.get_address() }}"
+            />
+            <div class="invalid-feedback">Please enter your address.</div>
+          </div>
+
+          <div class="col-12">
+            <label for="old-password" class="form-label">Old Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="old-password"
+              name="old-password"
+              placeholder="Password"
+            />
+            <div class="invalid-feedback">Please enter your old password.</div>
+          </div>
+
+          <div class="col-sm-6">
+            <label for="new-password" class="form-label">New Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="new-password"
+              name="new-password"
+              placeholder="Password"
+              value=""
+            />
+            <div class="invalid-feedback">Valid new password is required.</div>
+          </div>
+
+          <div class="col-sm-6 mt-auto">
+            <input
+              type="password"
+              class="form-control"
+              id="confirm-password"
+              name="confirm-password"
+              placeholder="Confirm Password"
+              value=""
+            />
+            <div class="invalid-feedback">
+              Ensure both passwords are the same.
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <button class="btn btn-primary btn-lg" type="submit">Update</button>
+      </form>
+      <p>{{ result }}</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

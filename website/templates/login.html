@@ -4,25 +4,27 @@
   <div class="col-lg-4">
     <form method="post" action="">
       <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-        {{ form.email_signin(class="form-control",placeholder="Email") }}
       <label for="floatingInput">Email address</label>
-        {{form.password_signin(class="form-control" ,placeholder="Password")}}
+
+      {{ form.email_signin(class="form-control",placeholder="Email") }}
       <label for="floatingPassword">Password</label>
-      <br>
+
+      {{form.password_signin(class="form-control" ,placeholder="Password")}}
+      <br />
       <div class="form-check form-check-inline mt-1">
         {{ form.remember_me(class="form-check-input") }}
-        <label class="form-check-label" for="{{ form.remember_me.id }}">Remember me</label>
-    </div>
-      {{ form.submit_user_signin(class="w-100 btn btn-lg btn-primary") }}
-      {{ form.hidden_tag() }}
+        <label class="form-check-label" for="{{ form.remember_me.id }}"
+          >Remember me</label
+        >
+      </div>
+      {{ form.submit_user_signin(class="w-100 btn btn-lg btn-primary") }} {{
+      form.hidden_tag() }}
     </form>
     {% if form.errors %}
     <ul class="errors">
-      {% for field in form %}
-      {% for error in field.errors %}
+      {% for field in form %} {% for error in field.errors %}
       <li>{{field.label}}: {{ error }}</li>
-      {% endfor %}
-      {% endfor %}
+      {% endfor %} {% endfor %}
     </ul>
     {% endif %}
     <p>{{ login_result }}</p>
