@@ -242,3 +242,9 @@ class ContactUs(FlaskForm):
     phone_number = StringField('phone number', validators=[DataRequired(),phone_check])
     message = TextAreaField('message', validators=[DataRequired()])
     submit_contact = SubmitField('Submit')
+    
+#SEARCH
+
+class SearchForm(FlaskForm):
+    search = StringField('search', validators=[DataRequired()])
+    submit_search = SubmitField('')
