@@ -25,7 +25,7 @@ from api.structures.datavalidation import *
 db = Driver()
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
-app.config["UPLOADED_PHOTOS_DEST"] = 'website//static//images//userprofileimg'
+app.config["UPLOADED_PHOTOS_DEST"] = os.path.join(app.root_path, "static", "images", "userprofileimg")
 login_manager = LoginManager()
 login_manager.init_app(app)
 profile_pics = UploadSet("photos", IMAGES)

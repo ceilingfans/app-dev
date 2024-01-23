@@ -72,7 +72,7 @@ class UserUpdateForm(FlaskForm):
     submit_user_update = SubmitField('Submit')
     
 class UserProfile(FlaskForm):
-    image = FileField('Update Profile Picture', validators=[DataRequired(),FileAllowed(['jpg', 'png'], message="Only jpg and png files are allowed")])
+    image = FileField('Update Profile Picture', validators=[DataRequired(),FileAllowed(['png'], message="Only PNG files are allowed")])
     submit_profile = SubmitField('Update')
 
 
