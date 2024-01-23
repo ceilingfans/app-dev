@@ -34,7 +34,7 @@ configure_uploads(app, profile_pics)
 @app.context_processor
 def base():
     searchform = SearchForm()
-    if searchform.submit_search and searchform.validate():
+    if searchform.submit_search.data and searchform.validate():
         return redirect(url_for("search"))
     return dict(searchform=searchform)
 
@@ -105,7 +105,7 @@ def contact():
     hook = Webhook(
         "https://discord.com/api/webhooks/1198939240235532358/Gu5Dw7cmkupwqo9yg-PgdSKXlj1toWbCHsSqQUabIJc-A3dOlHfDdVkkqwurh34wXdaR")
     contactform = ContactUs()
-    if contactform.submit_contact and contactform.validate():
+    if contactform.submit_contact.data and contactform.validate():
         print("info: contact form submitted")
         hook.send(
             f"Name: {contactform.name.data}\nEmail: {contactform.email.data}\nPhone Number: {contactform.phone_number.data}\nMessage: {contactform.message.data}")
@@ -126,7 +126,7 @@ def cart():
 @login_required
 def insurance():
     insuranceform = InsuranceForm()
-    if insuranceform.submit_insure and insuranceform.validate():
+    if insuranceform.submit_insure.data and insuranceform.validate():
         if insuranceform.user_phone_price.data < 700:
             phoneprice = 1
         else:
@@ -292,7 +292,7 @@ def signup():
     # print("info:", dict(current_user))
     html = "signup.html"
     form = UserCreationForm()
-    if form.submit_user_create and form.validate():
+    if form.submit_user_create.data and form.validate():
         name = form.name_create.data + " " + form.name_last_create.data
         email = form.email_create.data
         address = form.address_create.data
