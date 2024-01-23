@@ -5,7 +5,7 @@ import pandas as pd
 # if you are getting the error TypeError: __randomstate_ctor() takes from 0 to 1 positional arguments but 2 were given it is because the 
 # model was trained with an older version of python. To fix this error, you need to retrain the model ( go into the junpiter notebook 
 # and run the code again)
-mdl = joblib.load(r'C:\Users\mdame\app-dev\api\Insuranceprice\model.joblib')
+mdl = joblib.load('api\Insuranceprice\model.joblib')
 
 columns = ['age','gender','blue collar or white collar','Doing Sports','education','Vacations','phone price']
 

@@ -7,7 +7,7 @@ import uuid
 import sys
 
 #TODO: 
-sys.path.append("C://Users//mdame//app-dev")
+#sys.path.append("C://Users//mdame//app-dev")
 
 from api.db.UserManager import UserManager
 from api.db.PromoManager import PromoManager
