@@ -6,7 +6,12 @@ import sys
 import random
 import string
 from uuid import uuid4
+from werkzeug.utils import secure_filename
 from dhooks import Webhook
+from PIL import Image
+
+from flask_uploads import UploadSet, configure_uploads, IMAGES
+
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -20,14 +25,16 @@ from api.structures.datavalidation import *
 db = Driver()
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
+app.config["UPLOADED_PHOTOS_DEST"] = 'website//static//images//userprofileimg'
 login_manager = LoginManager()
 login_manager.init_app(app)
-
+profile_pics = UploadSet("photos", IMAGES)
+configure_uploads(app, profile_pics)
 
 @app.context_processor
 def base():
     searchform = SearchForm()
-    if searchform.submit_search and searchform.validate():
+    if searchform.submit_search.data and searchform.validate():
         return redirect(url_for("search"))
     return dict(searchform=searchform)
 
@@ -98,7 +105,7 @@ def contact():
     hook = Webhook(
         "https://discord.com/api/webhooks/1198939240235532358/Gu5Dw7cmkupwqo9yg-PgdSKXlj1toWbCHsSqQUabIJc-A3dOlHfDdVkkqwurh34wXdaR")
     contactform = ContactUs()
-    if contactform.submit_contact and contactform.validate():
+    if contactform.submit_contact.data and contactform.validate():
         print("info: contact form submitted")
         hook.send(
             f"Name: {contactform.name.data}\nEmail: {contactform.email.data}\nPhone Number: {contactform.phone_number.data}\nMessage: {contactform.message.data}")
@@ -119,7 +126,7 @@ def cart():
 @login_required
 def insurance():
     insuranceform = InsuranceForm()
-    if insuranceform.submit_insure and insuranceform.validate():
+    if insuranceform.submit_insure.data and insuranceform.validate():
         if insuranceform.user_phone_price.data < 700:
             phoneprice = 1
         else:
@@ -285,7 +292,7 @@ def signup():
     # print("info:", dict(current_user))
     html = "signup.html"
     form = UserCreationForm()
-    if form.submit_user_create and form.validate():
+    if form.submit_user_create.data and form.validate():
         name = form.name_create.data + " " + form.name_last_create.data
         email = form.email_create.data
         address = form.address_create.data
@@ -317,79 +324,87 @@ def signup():
     return render_template(html, form=form)
 
 
-@app.route("/profile")
+
+
+
+@app.route("/profile", methods=["POST","GET"])
 @login_required
 def profile():
-    return render_template("profile.html")
-
-
-@app.route("/profile", methods=["POST"])
-@login_required
-def profile_post():
     html = "profile.html"
+    form = UserUpdateForm()
+    imageform = UserProfile()
+    if imageform.submit_profile.data and imageform.validate():
+        print(imageform.errors)
+        file = imageform.image.data
+        filename, file_extension = os.path.splitext(file.filename)
+        new_filename = secure_filename(str(current_user.get_id()) + file_extension)
+        file.filename = new_filename
+        target = os.path.join(app.config["UPLOADED_PHOTOS_DEST"], new_filename)
+        if os.path.isfile(target):
+            os.remove(target)
+        img = Image.open(file) 
+        
+        img = img.resize((200, 200))   
+        
+        img.save(target)
+        db.users.update({"id": current_user.get_id()}, {"picture": new_filename})
+        
+        return render_template(html, form=form, imageform=imageform, result2="Profile picture updated", image = (url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
-    first_name = request.form.get("first-name")
-    last_name = request.form.get("last-name")
-    email = request.form.get("email")
-    address = request.form.get("address")
-    password = request.form.get("old-password")
-    new_password = request.form.get("new-password")
-    password_confirm = request.form.get("confirm-password")
+    if form.submit_user_update.data and form.validate():
 
-    items = [first_name, last_name, email, address, password, new_password, password_confirm]
-    print("info:",
-          f"first_name: {first_name}, last_name: {last_name}, email: {email}, address: {address}, password: {password}, new_password: {new_password}, password_confirm: {password_confirm}")
-    if not any(bool(i) for i in items):
-        return render_template(html, result="You need at least 1 field filled out")
+        first_name = form.name_update.data
+        last_name = form.name_last_update.data
+        email = form.email_update.data
+        address =  form.email_update.data
+        password = form.old_password.data
+        new_password = form.password_update.data
+        password_confirm = form.password_confirm.data
 
-    if password != "":
+        items = [first_name, last_name, email, address, password, new_password, password_confirm]
+        print("info:",
+              f"first_name: {first_name}, last_name: {last_name}, email: {email}, address: {address}, password: {password}, new_password: {new_password}, password_confirm: {password_confirm}")
+        if not any(bool(i) for i in items):
+            return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+
         try:
             check_hash(password, current_user.get_password())
         except VerifyMismatchError:
-            return render_template(html, result="Incorrect password")
+            return render_template(html, form=form, imageform=imageform, result="Incorrect password", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
-        if new_password == "" or password_confirm == "":
-            return render_template(html, result="You need to fill out all the password fields")
+        new = {}
+        if first_name != "":
+            new["name"] = first_name + " " + current_user.get_name().split()[1]
+        if last_name != "":
+            new["name"] = current_user.get_name().split()[0] + " " + last_name
+        if first_name != "" and last_name != "":
+            new["name"] = first_name + " " + last_name
 
-        if new_password != password_confirm:
-            return render_template(html, result="New passwords do not match")
+        if email != "":
+            ret_code, _ = db.users.find(email=email)
+            if ret_code == "SUCCESS":
+                return render_template(html, form=form, imageform=imageform, result="Email already in use", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+            new["email"] = email
 
-        if len(new_password) < 8:
-            return render_template(html, result="New password must be at least 8 characters long")
+        if address != "":
+            new["address"] = address
 
-    new = {}
-    if first_name != "":
-        new["name"] = first_name + " " + current_user.get_name().split()[1]
-    if last_name != "":
-        new["name"] = current_user.get_name().split()[0] + " " + last_name
-    if first_name != "" and last_name != "":
-        new["name"] = first_name + " " + last_name
+        if new_password != "":
+            new["password"] = get_hash(new_password)
 
-    if email != "":
-        ret_code, _ = db.users.find(email=email)
-        if ret_code == "SUCCESS":
-            return render_template(html, result="Email already in use")
-        new["email"] = email
+        if len(new) == 0:
+            return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
-    if address != "":
-        new["address"] = address
+        ret_code, user = db.users.update({"id": current_user.get_id()}, new)
+        match ret_code:
+            case "SUCCESS":
+                login_user(user)
+                print("info: logged in user at profile, ", user.get_name(), current_user.get_name())
+                return render_template(html, form=form, imageform=imageform, result="Profile updated", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
-    if new_password != "":
-        new["password"] = get_hash(new_password)
-
-    if len(new) == 0:
-        return render_template(html, result="You need at least 1 field filled out")
-
-    ret_code, user = db.users.update({"id": current_user.get_id()}, new)
-    match ret_code:
-        case "SUCCESS":
-            login_user(user)
-            print("info: logged in user at profile, ", user.get_name(), current_user.get_name())
-            return render_template(html, result="Profile updated")
-
-        case _:
-            return render_template(html, result=f"Internal server error, {user}")
-
+            case _:
+                return render_template(html, form=form, imageform=imageform, result=f"Internal server error, {user}", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+    return render_template(html, form=form, imageform=imageform, image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
 @app.errorhandler(404)
 def page_not_found(e):
