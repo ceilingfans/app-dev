@@ -349,7 +349,7 @@ def profile():
         img.save(target)
         db.users.update({"id": current_user.get_id()}, {"picture": new_filename})
         
-        return render_template(html, form=form, imageform=imageform, result="Profile picture updated", image = (url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+        return render_template(html, form=form, imageform=imageform, result2="Profile picture updated", image = (url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
     if form.submit_user_update.data and form.validate():
 
