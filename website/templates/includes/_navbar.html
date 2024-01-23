@@ -1,3 +1,22 @@
+<style>
+
+    .dropdownbtn {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        z-index: 10000;
+        width: 8px;
+        height: 8px;
+        border: 2px solid #333;
+        rotate: -45deg;
+    }
+    .dropdowncontainer {
+        position: relative;
+    }
+</style>
+
+
+
 <nav class="py-2 bg-body-tertiary border-bottom">
     <div class="container d-flex flex-wrap">
         <ul class="nav me-auto">
@@ -6,7 +25,7 @@
             <li class="nav-item"><a href="/repair" class="nav-link link-body-emphasis px-2">Repair</a></li>
             <li class="nav-item"><a href="/shop" class="nav-link link-body-emphasis px-2">Shop</a></li>
             <li class="nav-item"><a href="/insurance" class="nav-link link-body-emphasis px-2">Services</a></li>
-            <li class="nav-item"><a href="/contact" class="nav-link link-body-emphasis px-2">Locations</a></li>
+            <li class="nav-item"><a href="/contact" class="nav-link link-body-emphasis px-2">Contact Us</a></li>
         </ul>
         <ul class="nav">
             <li class="nav-item"><a href="#" class="nav-link link-body-emphasis px-2">
@@ -33,8 +52,12 @@
         <a href="/" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto link-body-emphasis text-decoration-none">
             <img src="/static/images/phonylogo.png" alt="logo">
         </a>
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0" role="search">
-            <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0" role="search" action="{{ url_for('search')}}">
+            {{ searchform.hidden_tag() }}
+            <div class="dropdowncontainer">
+            {{ searchform.search(class="form-control") }}
+            {{ searchform.submit_search(class=" dropdownbtn") }}
+            </div>
         </form>
     </div>
 </header>
