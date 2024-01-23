@@ -61,11 +61,13 @@ class UserDeletebyIdForm(FlaskForm):
 
 
 class UserUpdateForm(FlaskForm):
-    user_id_update = StringField('id', validators=[DataRequired(),Length(min=36, max=36)])
-    name_update = StringField('name', validators=[Optional() ,Length(min=2, max=20)])
+    name_update = StringField('first name', validators=[Optional() ,Length(min=2, max=20)])
+    name_last_update = StringField('last name', validators=[Optional() ,Length(min=2, max=20)])
     email_update = StringField('email', validators=[Optional() ,Email()])
-    password_update = StringField('password', validators=[Optional() ,Length(min=8,max=20)])
+    password_update = PasswordField('new password', validators=[Optional() ,Length(min=8,max=20),password_check])
     address_update = StringField('address', validators=[Optional()])
+    old_password = PasswordField("old password",validators=[DataRequired()])
+    password_confirm = PasswordField('confirm new password', validators=[EqualTo('password_update', message='Passwords must match')])
     submit_user_update = SubmitField('Submit')
 
 

@@ -313,78 +313,69 @@ def signup():
     return render_template(html, form=form)
 
 
-@app.route("/profile")
+
+
+
+@app.route("/profile", methods=["POST","GET"])
 @login_required
 def profile():
-    return render_template("profile.html")
-
-
-@app.route("/profile", methods=["POST"])
-@login_required
-def profile_post():
     html = "profile.html"
+    form = UserUpdateForm()
+    
+    if form.submit_user_update() and form.validate():
 
-    first_name = request.form.get("first-name")
-    last_name = request.form.get("last-name")
-    email = request.form.get("email")
-    address = request.form.get("address")
-    password = request.form.get("old-password")
-    new_password = request.form.get("new-password")
-    password_confirm = request.form.get("confirm-password")
+        first_name = form.name_update.data
+        last_name = form.name_last_update.data
+        email = form.email_update.data
+        address =  form.email_update.data
+        password = form.old_password.data
+        new_password = form.password_update.data
+        password_confirm = form.password_confirm.data
 
-    items = [first_name, last_name, email, address, password, new_password, password_confirm]
-    print("info:",
-          f"first_name: {first_name}, last_name: {last_name}, email: {email}, address: {address}, password: {password}, new_password: {new_password}, password_confirm: {password_confirm}")
-    if not any(bool(i) for i in items):
-        return render_template(html, result="You need at least 1 field filled out")
+        items = [first_name, last_name, email, address, password, new_password, password_confirm]
+        print("info:",
+              f"first_name: {first_name}, last_name: {last_name}, email: {email}, address: {address}, password: {password}, new_password: {new_password}, password_confirm: {password_confirm}")
+        if not any(bool(i) for i in items):
+            return render_template(html, form=form, result="You need at least 1 field filled out")
 
-    if password != "":
         try:
             check_hash(password, current_user.get_password())
         except VerifyMismatchError:
-            return render_template(html, result="Incorrect password")
+            return render_template(html, form=form, result="Incorrect password")
 
-        if new_password == "" or password_confirm == "":
-            return render_template(html, result="You need to fill out all the password fields")
+        new = {}
+        if first_name != "":
+            new["name"] = first_name + " " + current_user.get_name().split()[1]
+        if last_name != "":
+            new["name"] = current_user.get_name().split()[0] + " " + last_name
+        if first_name != "" and last_name != "":
+            new["name"] = first_name + " " + last_name
 
-        if new_password != password_confirm:
-            return render_template(html, result="New passwords do not match")
+        if email != "":
+            ret_code, _ = db.users.find(email=email)
+            if ret_code == "SUCCESS":
+                return render_template(html, form=form, result="Email already in use")
+            new["email"] = email
 
-        if len(new_password) < 8:
-            return render_template(html, result="New password must be at least 8 characters long")
+        if address != "":
+            new["address"] = address
 
-    new = {}
-    if first_name != "":
-        new["name"] = first_name + " " + current_user.get_name().split()[1]
-    if last_name != "":
-        new["name"] = current_user.get_name().split()[0] + " " + last_name
-    if first_name != "" and last_name != "":
-        new["name"] = first_name + " " + last_name
+        if new_password != "":
+            new["password"] = get_hash(new_password)
 
-    if email != "":
-        ret_code, _ = db.users.find(email=email)
-        if ret_code == "SUCCESS":
-            return render_template(html, result="Email already in use")
-        new["email"] = email
+        if len(new) == 0:
+            return render_template(html, form=form, result="You need at least 1 field filled out")
 
-    if address != "":
-        new["address"] = address
+        ret_code, user = db.users.update({"id": current_user.get_id()}, new)
+        match ret_code:
+            case "SUCCESS":
+                login_user(user)
+                print("info: logged in user at profile, ", user.get_name(), current_user.get_name())
+                return render_template(html, form=form, result="Profile updated")
 
-    if new_password != "":
-        new["password"] = get_hash(new_password)
-
-    if len(new) == 0:
-        return render_template(html, result="You need at least 1 field filled out")
-
-    ret_code, user = db.users.update({"id": current_user.get_id()}, new)
-    match ret_code:
-        case "SUCCESS":
-            login_user(user)
-            print("info: logged in user at profile, ", user.get_name(), current_user.get_name())
-            return render_template(html, result="Profile updated")
-
-        case _:
-            return render_template(html, result=f"Internal server error, {user}")
+            case _:
+                return render_template(html, form=form, result=f"Internal server error, {user}")
+    return render_template(html, form=form)
 
 
 @app.errorhandler(404)
