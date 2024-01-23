@@ -5,13 +5,42 @@
 
   <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
     <div class="col d-flex flex-column align-items-start gap-2">
+      <p class="fw-semibold mb-0 text-body-emphasis col-lg-10 fs-4">
+       Profile Picture
+      </p>
+      {% if image == "/static/images/userprofileimg/None" %}
       <img
-        src="/static/images/avatar.png"
+        src="/static/images/userprofileimg/avatar.png"
         alt="pfp"
-        class="img-fluid"
+        class="img-fluid border border-primary rounded-circle "
         width="200px"
-        height="200px"
-      />
+        height="200px">
+      </img>
+      {% else %}
+      <img
+        src="{{ image }}"
+        alt="pfp"
+        class="img-fluid border border-primary rounded-circle "
+        width="200px"
+        height="200px">
+      </img>
+      {% endif %}
+      <form method="post" enctype="multipart/form-data">
+      {{ imageform.csrf_token }}
+      {{ imageform.image(class="form-control w-100")}}
+      <br>
+      {{ imageform.submit_profile(placeholder="Submit", class="btn btn-primary")}}
+      </form>
+      {% if imageform.errors %}
+      <p>Profile not updated</p>
+      <ul class="errors">
+        {% for field in imageform %}
+        {% for error in field.errors %}
+        <li>{{field.label}}: {{ error }}</li>
+        {% endfor %} 
+        {% endfor %}
+      </ul>
+      {% endif %}
     </div>
 
     <div class="col">
@@ -56,10 +85,13 @@
       <p class="col-lg-10 fs-4">
         Change your password or update your address, as required by law, here.
       </p>
+      <p class="col-lg-10 fs-4">
+        Leave the fields blank if you do not wish to change them.
+      </p>
     </div>
     <div class="col-md-10 mx-auto col-lg-5">
       <form class="needs-validation" novalidate="" method="post">
-        {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
         <div class="row g-3">
           <div class="col-sm-6">
             <label for="first-name" class="form-label">First name</label>
@@ -101,8 +133,9 @@
             </div>
           </div>
           <div class="col-12">
-            <label for="confirm" class="form-label">Old password</label>
-            {{ form.old_password(placeholder="Old password", class="form-control")}}
+            <hr>
+            <label for="confirm" class="form-label">Current password</label>
+            {{ form.old_password(placeholder="Current password", class="form-control")}}
             <div class="invalid-feedback">Please enter your address.</div>
           </div>
         </div>

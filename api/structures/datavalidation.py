@@ -3,6 +3,7 @@ from wtforms import StringField, SubmitField , IntegerField, RadioField, FloatFi
 from wtforms.validators import DataRequired, Length, Email , NumberRange , Optional , EqualTo
 from flask_wtf import FlaskForm
 from api.db.driver import Driver
+from flask_wtf.file import FileField, FileAllowed
 import re
 
 '''
@@ -69,6 +70,10 @@ class UserUpdateForm(FlaskForm):
     old_password = PasswordField("old password",validators=[DataRequired()])
     password_confirm = PasswordField('confirm new password', validators=[EqualTo('password_update', message='Passwords must match')])
     submit_user_update = SubmitField('Submit')
+    
+class UserProfile(FlaskForm):
+    image = FileField('Update Profile Picture', validators=[DataRequired(),FileAllowed(['jpg', 'png'], message="Only jpg and png files are allowed")])
+    submit_profile = SubmitField('Update')
 
 
 # USER SIGNIN FORM

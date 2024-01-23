@@ -6,7 +6,12 @@ import sys
 import random
 import string
 from uuid import uuid4
+from werkzeug.utils import secure_filename
 from dhooks import Webhook
+from PIL import Image
+
+from flask_uploads import UploadSet, configure_uploads, IMAGES
+
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -20,9 +25,11 @@ from api.structures.datavalidation import *
 db = Driver()
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
+app.config["UPLOADED_PHOTOS_DEST"] = 'website//static//images//userprofileimg'
 login_manager = LoginManager()
 login_manager.init_app(app)
-
+profile_pics = UploadSet("photos", IMAGES)
+configure_uploads(app, profile_pics)
 
 @app.context_processor
 def base():
@@ -325,8 +332,26 @@ def signup():
 def profile():
     html = "profile.html"
     form = UserUpdateForm()
-    
-    if form.submit_user_update() and form.validate():
+    imageform = UserProfile()
+    if imageform.submit_profile.data and imageform.validate():
+        print(imageform.errors)
+        file = imageform.image.data
+        filename, file_extension = os.path.splitext(file.filename)
+        new_filename = secure_filename(str(current_user.get_id()) + file_extension)
+        file.filename = new_filename
+        target = os.path.join(app.config["UPLOADED_PHOTOS_DEST"], new_filename)
+        if os.path.isfile(target):
+            os.remove(target)
+        img = Image.open(file) 
+        
+        img = img.resize((200, 200))   
+        
+        img.save(target)
+        db.users.update({"id": current_user.get_id()}, {"picture": new_filename})
+        
+        return render_template(html, form=form, imageform=imageform, result="Profile picture updated", image = (url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+
+    if form.submit_user_update.data and form.validate():
 
         first_name = form.name_update.data
         last_name = form.name_last_update.data
@@ -340,12 +365,12 @@ def profile():
         print("info:",
               f"first_name: {first_name}, last_name: {last_name}, email: {email}, address: {address}, password: {password}, new_password: {new_password}, password_confirm: {password_confirm}")
         if not any(bool(i) for i in items):
-            return render_template(html, form=form, result="You need at least 1 field filled out")
+            return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
         try:
             check_hash(password, current_user.get_password())
         except VerifyMismatchError:
-            return render_template(html, form=form, result="Incorrect password")
+            return render_template(html, form=form, imageform=imageform, result="Incorrect password", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
         new = {}
         if first_name != "":
@@ -358,7 +383,7 @@ def profile():
         if email != "":
             ret_code, _ = db.users.find(email=email)
             if ret_code == "SUCCESS":
-                return render_template(html, form=form, result="Email already in use")
+                return render_template(html, form=form, imageform=imageform, result="Email already in use", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
             new["email"] = email
 
         if address != "":
@@ -368,19 +393,18 @@ def profile():
             new["password"] = get_hash(new_password)
 
         if len(new) == 0:
-            return render_template(html, form=form, result="You need at least 1 field filled out")
+            return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
         ret_code, user = db.users.update({"id": current_user.get_id()}, new)
         match ret_code:
             case "SUCCESS":
                 login_user(user)
                 print("info: logged in user at profile, ", user.get_name(), current_user.get_name())
-                return render_template(html, form=form, result="Profile updated")
+                return render_template(html, form=form, imageform=imageform, result="Profile updated", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
             case _:
-                return render_template(html, form=form, result=f"Internal server error, {user}")
-    return render_template(html, form=form)
-
+                return render_template(html, form=form, imageform=imageform, result=f"Internal server error, {user}", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+    return render_template(html, form=form, imageform=imageform, image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
 @app.errorhandler(404)
 def page_not_found(e):
