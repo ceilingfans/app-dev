@@ -23,12 +23,14 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+
 @app.context_processor
 def base():
     searchform = SearchForm()
     if searchform.submit_search and searchform.validate():
-        return redirect (url_for("search"))
+        return redirect(url_for("search"))
     return dict(searchform=searchform)
+
 
 @login_manager.user_loader
 def user_loader(id):
@@ -64,19 +66,23 @@ def request_loader(request):
 def home():
     return render_template("home.html")
 
-@app.route("/search", methods=["GET","POST"])
+
+@app.route("/search", methods=["GET", "POST"])
 def search():
     search = request.args.get('search')
     search = search.lower()
     # the keys are the html files, the values are the words that will trigger the search
-    html_files = {"contact": ["contact", "contact-us","email"], 
-                  "insurance": ["insurance","coverage","products","quote","price","cost","estimate","calculate","calc"],
-                  "login": ["login","signin","sign-in","sign in"],
-                  "repair": ["repair","fix"], 
-                  "shop": ["shop","phone","samsung","iphone","products","oppo"], 
-                  "signup": ["signup","create","account","make","register","sign-up","sign"], 
-                  "wheel": ["wheel","spin","prize","win"],
-                  "home": ["home","main","index","website","site","page"]}
+    html_files = {"contact": ["contact", "contact-us", "email"],
+                  "insurance": ["insurance", "coverage", "products", "quote", "price", "cost", "estimate", "calculate",
+                                "calc"],
+                  "login": ["login", "signin", "sign-in", "sign in"],
+                  "repair": ["repair", "fix"],
+                  "shop": ["shop", "phone", "samsung", "iphone", "products", "oppo"],
+                  "signup": ["signup", "create", "account", "make", "register", "sign-up", "sign"],
+                  "wheel": ["wheel", "spin", "prize", "win"],
+                  "home": ["home", "main", "index", "website", "site", "page"],
+                  "profile": ["profile", "account", "me", "user", "settings", "preferences", "password"]
+                  }
     results = []
     # Ignore the O(n^2) complexity, it's only 7 items
     for search in search.split(" "):
@@ -87,15 +93,17 @@ def search():
     return render_template("search.html", search=search, results=results)
 
 
-@app.route("/contact",methods=["GET", "POST"])
+@app.route("/contact", methods=["GET", "POST"])
 def contact():
-    hook = Webhook("https://discord.com/api/webhooks/1198939240235532358/Gu5Dw7cmkupwqo9yg-PgdSKXlj1toWbCHsSqQUabIJc-A3dOlHfDdVkkqwurh34wXdaR")
+    hook = Webhook(
+        "https://discord.com/api/webhooks/1198939240235532358/Gu5Dw7cmkupwqo9yg-PgdSKXlj1toWbCHsSqQUabIJc-A3dOlHfDdVkkqwurh34wXdaR")
     contactform = ContactUs()
     if contactform.submit_contact and contactform.validate():
         print("info: contact form submitted")
-        hook.send(f"Name: {contactform.name.data}\nEmail: {contactform.email.data}\nPhone Number: {contactform.phone_number.data}\nMessage: {contactform.message.data}")
-        return render_template("contact.html", form = contactform, result = "Your message has been sent")
-    return render_template("contact.html", form = contactform)
+        hook.send(
+            f"Name: {contactform.name.data}\nEmail: {contactform.email.data}\nPhone Number: {contactform.phone_number.data}\nMessage: {contactform.message.data}")
+        return render_template("contact.html", form=contactform, result="Your message has been sent")
+    return render_template("contact.html", form=contactform)
 
 
 @app.route("/shop")
@@ -174,7 +182,7 @@ def login():
 
                 login_user(user, remember=remember)
                 print("info: logged in user at login, ", user.get_name(), current_user.get_name())
-                return redirect(url_for("test"))
+                return redirect(url_for("profile"))
 
             case _:
                 return render_template(html, form=usersigninform, login_result=f"Internal server error, {user}")
@@ -269,10 +277,10 @@ def wheelspin():
     return jsonify(number=number, section=section, spun=False, coupon=coupon, value=value)
 
 
-@app.route("/signup", methods=["GET","POST"])
+@app.route("/signup", methods=["GET", "POST"])
 def signup():
     if current_user.is_authenticated:
-        return redirect(url_for("test"))
+        return redirect(url_for("profile"))
     logout_user()  # request_loader gets called here, so we need to log out the user before signing up
     # print("info:", dict(current_user))
     html = "signup.html"
@@ -286,7 +294,7 @@ def signup():
         ret_code, _ = db.users.find(email=email)
         print("info:", ret_code)
         if ret_code == "SUCCESS":
-            return render_template(html,form = form,result="Email already in use")
+            return render_template(html, form=form, result="Email already in use")
 
         user = User({
             "name": name,
@@ -302,11 +310,86 @@ def signup():
             case "SUCCESS":
                 login_user(user)
                 print("info: logged in user at signup, ", user.get_name(), current_user.get_name())
-                return redirect(url_for("test"))
+                return redirect(url_for("profile"))
 
             case _:
                 return render_template(html, form=form, result=f"Internal server error, {user}")
     return render_template(html, form=form)
+
+
+@app.route("/profile")
+@login_required
+def profile():
+    return render_template("profile.html")
+
+
+@app.route("/profile", methods=["POST"])
+@login_required
+def profile_post():
+    html = "profile.html"
+
+    first_name = request.form.get("first-name")
+    last_name = request.form.get("last-name")
+    email = request.form.get("email")
+    address = request.form.get("address")
+    password = request.form.get("old-password")
+    new_password = request.form.get("new-password")
+    password_confirm = request.form.get("confirm-password")
+
+    items = [first_name, last_name, email, address, password, new_password, password_confirm]
+    print("info:",
+          f"first_name: {first_name}, last_name: {last_name}, email: {email}, address: {address}, password: {password}, new_password: {new_password}, password_confirm: {password_confirm}")
+    if not any(bool(i) for i in items):
+        return render_template(html, result="You need at least 1 field filled out")
+
+    if password != "":
+        try:
+            check_hash(password, current_user.get_password())
+        except VerifyMismatchError:
+            return render_template(html, result="Incorrect password")
+
+        if new_password == "" or password_confirm == "":
+            return render_template(html, result="You need to fill out all the password fields")
+
+        if new_password != password_confirm:
+            return render_template(html, result="New passwords do not match")
+
+        if len(new_password) < 8:
+            return render_template(html, result="New password must be at least 8 characters long")
+
+    new = {}
+    if first_name != "":
+        new["name"] = first_name + " " + current_user.get_name().split()[1]
+    if last_name != "":
+        new["name"] = current_user.get_name().split()[0] + " " + last_name
+    if first_name != "" and last_name != "":
+        new["name"] = first_name + " " + last_name
+
+    if email != "":
+        ret_code, _ = db.users.find(email=email)
+        if ret_code == "SUCCESS":
+            return render_template(html, result="Email already in use")
+        new["email"] = email
+
+    if address != "":
+        new["address"] = address
+
+    if new_password != "":
+        new["password"] = get_hash(new_password)
+
+    if len(new) == 0:
+        return render_template(html, result="You need at least 1 field filled out")
+
+    ret_code, user = db.users.update({"id": current_user.get_id()}, new)
+    match ret_code:
+        case "SUCCESS":
+            login_user(user)
+            print("info: logged in user at profile, ", user.get_name(), current_user.get_name())
+            return render_template(html, result="Profile updated")
+
+        case _:
+            return render_template(html, result=f"Internal server error, {user}")
+
 
 @app.errorhandler(404)
 def page_not_found(e):
