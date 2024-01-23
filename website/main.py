@@ -76,6 +76,10 @@ def shop():
     return render_template("shop.html")
 
 
+@app.route("/cart")
+def cart():
+    return render_template("cart.html")
+
 @app.route("/insurance", methods=["GET", "POST"])
 @login_required
 def insurance():
