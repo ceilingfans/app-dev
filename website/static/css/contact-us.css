@@ -2,10 +2,6 @@
     margin: 0;
     padding: 0;
 }
-body {
-    font-size: 14px;
-    font-family: 'Poppins', sans-serif;
-}
 .container {
     width: 80%;
     margin: 50px auto;
