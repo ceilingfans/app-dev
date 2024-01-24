@@ -2,6 +2,7 @@
 
 const allFilterItems = document.querySelectorAll('.filter-item');
 const allFilterBtns = document.querySelectorAll('.filter-btn');
+var globalcart = {};
 
 window.addEventListener('DOMContentLoaded', () => {
     allFilterBtns[1].classList.add('active-btn');
@@ -66,16 +67,27 @@ else{
 
 
  function purchaseClicked(){
-     alert('Thank you for your purchase!!!');
-     var cartItems = document.getElementsByClassName('cart-items')[0];
-     while(cartItems.hasChildNodes()){
-         cartItems.removeChild(cartItems.firstChild)
+    var currentUrl = window.location.href;
+    var lastSlashIndex = currentUrl.lastIndexOf('/');
+    if (lastSlashIndex !== -1) {
+        currentUrl = currentUrl.substring(0, lastSlashIndex); // Remove the last section of the URL
+    }
+    var cartData = encodeURIComponent(JSON.stringify(globalcart));
+    window.location.href = `${currentUrl}/payment?cart=${cartData}`;
+    var cartItems = document.getElementsByClassName('cart-items')[0];
+    while(cartItems.hasChildNodes()){
+        cartItems.removeChild(cartItems.firstChild)
      }
+     globalcart = {};
      updateCartTotal();
  }
 
 function removeCartItem(event){
     var buttonClicked = event.target;
+    var parentElementName = buttonClicked.parentElement.parentElement;
+    var name = parentElementName.getElementsByClassName('cart-item-title')[0];
+    delete globalcart[name.innerHTML]
+
     buttonClicked.parentElement.parentElement.remove();
     updateCartTotal();
     
@@ -105,7 +117,6 @@ function addItemToCart(title, price, imageSrc){
     cartRow.classList.add('cart-row');
     var cartItems = document.getElementsByClassName('cart-items')[0];
     var cartItemNames = cartItems.getElementsByClassName('cart-item-title');
-
     for (i = 0; i< cartItemNames.length ; i++){
         if(cartItemNames[i].innerText == title){
             alert('This item already has added to the cart!');
@@ -141,10 +152,15 @@ function updateCartTotal(){
     var total = 0;
     for (var i = 0 ; i< cartRows.length ; i++){
         var cartRow =cartRows[i];
+        var titleElement = cartRow.getElementsByClassName('cart-item-title')[0];
+        var title = titleElement.innerText;
         var priceElement = cartRow.getElementsByClassName('cart-price')[0];
         var quantityElement = cartRow.getElementsByClassName('cart-quantity-input')[0];
         var price = parseFloat(priceElement.innerText.replace('$' , ''))
         var quantity = quantityElement.value;
+        var price = parseFloat(priceElement.innerText.replace('$' , ''));
+        globalcart[title] = [quantity,price];
+        console.warn(globalcart)
         total = total + (price * quantity);
     }
     total = Math.round(total * 100 )/100;
