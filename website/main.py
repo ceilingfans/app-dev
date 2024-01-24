@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify , abort
 from argon2.exceptions import VerifyMismatchError
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 import os
@@ -120,8 +120,11 @@ def shop():
 
 @app.route("/payment",methods=["GET", "POST"])
 def payment():
-    cart = request.args.get('cart')
-    cart = json.loads(cart)
+    try:
+        cart = request.args.get('cart')
+        cart = json.loads(cart)
+    except: 
+        abort(404)
     total = sum(item[1] for item in cart.values())
     return render_template("payment.html", cart=cart, total=total)
 
