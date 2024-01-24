@@ -44,7 +44,7 @@ class BillManager:
             | Success - ("SUCCESS", Bill)
         """
         try:
-            if bill_id is None and bill_id is None:
+            if bill_id is None and owner_id is None:
                 return "ALL", self.col.find()
 
             query = {}
@@ -53,7 +53,8 @@ class BillManager:
             if bill_id is not None:
                 query = {"bill_id": bill_id}
             elif owner_id is not None:
-                query = {"owner_id": owner_id}
+                owner_flag = True
+                query = {"customer_id": owner_id}
 
             result = list(self.col.find(query))
             if len(result) == 0:
