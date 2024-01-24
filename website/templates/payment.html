@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}Shop{% endblock %} {% block
+{% extends "base.html" %} {% block title %}Payment{% endblock %} {% block
   content %}
 
     <style>
@@ -137,7 +137,7 @@
 <div class="container">
   <main>
     <div class="py-5 text-center">
-      <img class="d-block mx-auto mb-4" src="../assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
+      
       <h2>Checkout form</h2>
       <p class="lead">Below is an example form built entirely with Bootstrap’s form controls. Each required form group has a validation state that can be triggered by attempting to submit the form without completing it.</p>
     </div>
@@ -146,7 +146,7 @@
       <div class="col-md-5 col-lg-4 order-md-last">
         <h4 class="d-flex justify-content-between align-items-center mb-3">
           <span class="text-primary">Your cart</span>
-          <span class="badge bg-primary rounded-pill">3</span>
+          <span class="badge bg-primary rounded-pill"></span>
         </h4>
         <ul class="list-group mb-3">
           {% for key, item in cart.items() %}
@@ -187,17 +187,6 @@
               <input type="text" class="form-control" id="lastName" placeholder="" value="" required>
               <div class="invalid-feedback">
                 Valid last name is required.
-              </div>
-            </div>
-
-            <div class="col-12">
-              <label for="username" class="form-label">Username</label>
-              <div class="input-group has-validation">
-                <span class="input-group-text">@</span>
-                <input type="text" class="form-control" id="username" placeholder="Username" required>
-              <div class="invalid-feedback">
-                  Your username is required.
-                </div>
               </div>
             </div>
 
