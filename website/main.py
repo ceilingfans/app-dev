@@ -119,14 +119,26 @@ def shop():
     return render_template("shop.html")
 
 @app.route("/payment",methods=["GET", "POST"])
+@login_required
 def payment():
     try:
         cart = request.args.get('cart')
         cart = json.loads(cart)
     except: 
         abort(404)
-    total = sum(item[1] for item in cart.values())
-    return render_template("payment.html", cart=cart, total=total)
+    userid = current_user.get_id()
+    ret_code, bill = db.bills.find(owner_id=userid)
+    if ret_code != "BILLNOTFOUND":
+       if  (bill[0]).get_status() == False:
+           total = sum(item[1] for item in cart.values())
+           billprice = (bill[0]).get_price()
+           billprice = round(billprice,2)
+           cart['Quote for plan'] = ['1',billprice]
+           total += billprice
+           return render_template("payment.html", cart=cart, total=total)
+    else:
+        total = sum(item[1] for item in cart.values())
+        return render_template("payment.html", cart=cart, total=total)
 
 @app.route("/insurance", methods=["GET", "POST"])
 @login_required
@@ -155,8 +167,7 @@ def insurance():
             "status": False
         })
         db.bills.create(bill)
-        # TODO MAKE THIS ADD TO THE CART and redirect to cart page
-        return render_template("insurance.html", form=insuranceform)
+        return redirect( url_for('shop'))
     return render_template("insurance.html", form=insuranceform)
 
 
