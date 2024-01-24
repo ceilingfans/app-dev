@@ -9,6 +9,7 @@ from uuid import uuid4
 from werkzeug.utils import secure_filename
 from dhooks import Webhook
 from PIL import Image
+import json
 
 from flask_uploads import UploadSet, configure_uploads, IMAGES
 
@@ -117,10 +118,12 @@ def contact():
 def shop():
     return render_template("shop.html")
 
-
-@app.route("/payment")
+@app.route("/payment",methods=["GET", "POST"])
 def payment():
-    return render_template("payment.html")
+    cart = request.args.get('cart')
+    cart = json.loads(cart)
+    total = sum(item[1] for item in cart.values())
+    return render_template("payment.html", cart=cart, total=total)
 
 @app.route("/insurance", methods=["GET", "POST"])
 @login_required
@@ -169,7 +172,7 @@ def test():
 def login():
     usersigninform = UserSignInForm()
     html = "login.html"
-    if usersigninform.submit_user_signin and usersigninform.validate():
+    if usersigninform.submit_user_signin.data and usersigninform.validate():
         email = usersigninform.email_signin.data
         password = usersigninform.password_signin.data
         remember = usersigninform.remember_me.data
