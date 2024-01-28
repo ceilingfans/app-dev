@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify , abort
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 from argon2.exceptions import VerifyMismatchError
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 import os
@@ -12,7 +12,6 @@ from PIL import Image
 import json
 
 from flask_uploads import UploadSet, configure_uploads, IMAGES
-
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -31,6 +30,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 profile_pics = UploadSet("photos", IMAGES)
 configure_uploads(app, profile_pics)
+
 
 @app.context_processor
 def base():
@@ -118,27 +118,32 @@ def contact():
 def shop():
     return render_template("shop.html")
 
-@app.route("/payment",methods=["GET", "POST"])
+
+@app.route("/payment", methods=["GET", "POST"])
 @login_required
 def payment():
     try:
         cart = request.args.get('cart')
         cart = json.loads(cart)
-    except: 
+    except:
         abort(404)
+
     userid = current_user.get_id()
-    ret_code, bill = db.bills.find(owner_id=userid)
+    ret_code, bills = db.bills.find(owner_id=userid)
+
+    total = sum(item[1] for item in cart.values())
+    cnt = 0
+
     if ret_code != "BILLNOTFOUND":
-       if  (bill[0]).get_status() == False:
-           total = sum(item[1] for item in cart.values())
-           billprice = (bill[0]).get_price()
-           billprice = round(billprice,2)
-           cart['Quote for plan'] = ['1',billprice]
-           total += billprice
-           return render_template("payment.html", cart=cart, total=total)
-    else:
-        total = sum(item[1] for item in cart.values())
-        return render_template("payment.html", cart=cart, total=total)
+        for bill in bills:
+            if not bill.get_status():
+                bill_price = round(bill.get_price(), 2)
+                total += bill_price
+                cnt += 1
+                cart[f"Plan Quote {cnt}"] = ['1', bill_price]
+
+    return render_template("payment.html", cart=cart, total=total)
+
 
 @app.route("/insurance", methods=["GET", "POST"])
 @login_required
@@ -167,7 +172,7 @@ def insurance():
             "status": False
         })
         db.bills.create(bill)
-        return redirect( url_for('shop'))
+        return redirect(url_for('shop'))
     return render_template("insurance.html", form=insuranceform)
 
 
@@ -341,10 +346,7 @@ def signup():
     return render_template(html, form=form)
 
 
-
-
-
-@app.route("/profile", methods=["POST","GET"])
+@app.route("/profile", methods=["POST", "GET"])
 @login_required
 def profile():
     html = "profile.html"
@@ -359,21 +361,22 @@ def profile():
         target = os.path.join(app.config["UPLOADED_PHOTOS_DEST"], new_filename)
         if os.path.isfile(target):
             os.remove(target)
-        img = Image.open(file) 
-        
-        img = img.resize((200, 200))   
-        
+        img = Image.open(file)
+
+        img = img.resize((200, 200))
+
         img.save(target)
         db.users.update({"id": current_user.get_id()}, {"picture": new_filename})
-        
-        return render_template(html, form=form, imageform=imageform, result2="Profile picture updated", image = (url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+
+        return render_template(html, form=form, imageform=imageform, result2="Profile picture updated", image=(
+            url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
     if form.submit_user_update.data and form.validate():
 
         first_name = form.name_update.data
         last_name = form.name_last_update.data
         email = form.email_update.data
-        address =  form.email_update.data
+        address = form.email_update.data
         password = form.old_password.data
         new_password = form.password_update.data
         password_confirm = form.password_confirm.data
@@ -382,12 +385,15 @@ def profile():
         print("info:",
               f"first_name: {first_name}, last_name: {last_name}, email: {email}, address: {address}, password: {password}, new_password: {new_password}, password_confirm: {password_confirm}")
         if not any(bool(i) for i in items):
-            return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+            return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out",
+                                   image=(url_for('static',
+                                                  filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
         try:
             check_hash(password, current_user.get_password())
         except VerifyMismatchError:
-            return render_template(html, form=form, imageform=imageform, result="Incorrect password", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+            return render_template(html, form=form, imageform=imageform, result="Incorrect password", image=(
+                url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
         new = {}
         if first_name != "":
@@ -400,7 +406,8 @@ def profile():
         if email != "":
             ret_code, _ = db.users.find(email=email)
             if ret_code == "SUCCESS":
-                return render_template(html, form=form, imageform=imageform, result="Email already in use", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                return render_template(html, form=form, imageform=imageform, result="Email already in use", image=(
+                    url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
             new["email"] = email
 
         if address != "":
@@ -410,18 +417,25 @@ def profile():
             new["password"] = get_hash(new_password)
 
         if len(new) == 0:
-            return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+            return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out",
+                                   image=(url_for('static',
+                                                  filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
         ret_code, user = db.users.update({"id": current_user.get_id()}, new)
         match ret_code:
             case "SUCCESS":
                 login_user(user)
                 print("info: logged in user at profile, ", user.get_name(), current_user.get_name())
-                return render_template(html, form=form, imageform=imageform, result="Profile updated", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                return render_template(html, form=form, imageform=imageform, result="Profile updated", image=(
+                    url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
             case _:
-                return render_template(html, form=form, imageform=imageform, result=f"Internal server error, {user}", image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
-    return render_template(html, form=form, imageform=imageform, image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                return render_template(html, form=form, imageform=imageform, result=f"Internal server error, {user}",
+                                       image=(url_for('static',
+                                                      filename=f'images/userprofileimg/{current_user.get_picture()}')))
+    return render_template(html, form=form, imageform=imageform,
+                           image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+
 
 @app.errorhandler(404)
 def page_not_found(e):
