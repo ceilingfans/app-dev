@@ -142,7 +142,7 @@ def payment():
                 cnt += 1
                 cart[f"Plan Quote {cnt}"] = ['1', bill_price]
 
-    return render_template("payment.html", cart=cart, total=total)
+    return render_template("payment.html", cart=cart, total=round(total, 2))
 
 
 @app.route("/insurance", methods=["GET", "POST"])
