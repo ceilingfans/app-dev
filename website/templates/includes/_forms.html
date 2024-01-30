@@ -1,0 +1,19 @@
+{% macro render_field(form_field, placeholder="", form_div_sizing="col-12 p-2") %}
+{% if not form_field.errors %}
+    <div class="{{ form_div_sizing }}">
+        {{ form_field(class="form-control p-2", placeholder=placeholder) }}
+    </div>
+{% else %}
+    <div class="{{ form_div_sizing }}">
+        {{ form_field(class="form-control p-2 border border-danger",
+        placeholder=placeholder) }}
+    </div>
+
+    <div>
+        <p class="text-danger">
+        {% for error in form_field.errors %} {{ error }} <br />
+        {% endfor %}
+        </p>
+    </div>
+{% endif %}
+{% endmacro %}
