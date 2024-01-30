@@ -1,8 +1,8 @@
-{% extends "base.html" %} {% block title %}Signup{% endblock %} {% block content
-%}
+{% from "includes/_forms.html" import render_field with context %} {% extends
+"base.html" %} {% block title %}Signup{% endblock %} {% block content %}
 <div class="container">
   <div class="d-flex justify-content-center align-items-center">
-    <div class="col-md-7 col-lg-8 p-3 shadow border border-grey rounded ">
+    <div class="col-md-7 col-lg-8 p-3 shadow border border-grey rounded">
       <form class="row p-3" method="post">
         <h5 class="mb-3 fw-bold">Sign up to Phony Insurance</h5>
 
@@ -17,99 +17,37 @@
           {{ form.name_last_create(class="form-control p-2", placeholder="Last Name") }}
         </div>
 
-       <!-- EMAIL -->
-        {% if not form.email_create.errors %}
-        <div class="col-12 p-2">
-          {{ form.email_create(class="form-control p-2", placeholder="Email") }}
-          <p class="m-0 ms-1 mt-1 pb-2 text-body-tertiary">This email address will be used to receive invoices and receipts.</p>
-        </div>
-        {% else %}
-          <div class="col-12 p-2">
-            {{ form.email_create(class="form-control p-2 border border-danger",
-            placeholder="Email") }}
-          </div>
-
-          <div>
-            <p class="text-danger">
-              {% for error in form.email_create.errors %} {{ error }} <br />
-              {% endfor %}
-            </p>
-          </div>
-        {% endif %}
+        <!-- EMAIL -->
+        {{ render_field(form.email_create, "your@email.com") }}
 
         <!-- ADDRESS -->
-        {% if not form.address_create.errors %}
-        <div class="col-12 p-2">
-          {{ form.address_create(class="form-control p-2", placeholder="28 Pork Street, Singapore 212128") }}
-        </div>
-        {% else %}
-          <div class="col-12 p-2">
-            {{ form.address_create(class="form-control p-2 border border-danger",
-            placeholder="28 Pork Street, Singapore 212128") }}
-          </div>
-
-          <div>
-            <p class="text-danger">
-              {% for error in form.address_create.errors %} {{ error }} <br />
-              {% endfor %}
-            </p>
-          </div>
-        {% endif %}
+        {{ render_field(form.address_create, "28 Pork Street, Singapore 212128") }}
 
         <!-- PASSWORD -->
-        {% if not form.password_create.errors %}
-          <div class="col-sm-6 p-2">
-            {{ form.password_create(class="form-control p-2", placeholder="Password") }}
-          </div>
-        {% else %}
-          <div class="col-sm-6 p-2">
-            {{ form.password_create(class="form-control p-2 border border-danger",
-            placeholder="Password") }}
+        {{ render_field(form.password_create, "Password", "col-sm-6 p-2") }}
+        
+        <!-- CONFIRM -->
+        {{ render_field(form.password_confirm, "Confirm", "col-sm-6 p-2") }}
+        <p class="m-0 ms-1 mt-1 px-2 pb-2 text-body-tertiary">
+          Use 8 or more characters with a mix of letters numbers and symbols.
+        </p>
 
-            <div>
-              <p class="text-danger">
-                {% for error in form.password_create.errors %} {{ error }} <br />
-                {% endfor %}
-              </p>
-            </div>
-          </div>
-        {% endif %}
-
-        {% if not form.password_confirm.errors %}
-          <div class="col-sm-6 p-2">
-            {{ form.password_confirm(class="form-control p-2", placeholder="Confirm") }}
-          </div>
-        {% else %}
-          <div class="col-sm-6 p-2">
-            {{ form.password_confirm(class="form-control p-2 border border-danger",
-            placeholder="Confirm") }}
-
-            <p class="text-danger">
-              {% for error in form.password_confirm.errors %} {{ error }} <br />
-              {% endfor %}
-            </p>
-          </div>
-        {% endif %}  
-          <p class="m-0 ms-1 mt-1 px-2 pb-2 text-body-tertiary">Use 8 or more characters with a mix of letters numbers and symbols.</p>
-
-
-          <div class="col-12 py-4">
-            {{ form.submit_user_create(class="w-50 btn btn-lg btn-light border-2
+        <div class="col-12 py-4">
+          {{ form.submit_user_create(class="w-50 btn btn-lg btn-light border-2
           border-dark rounded-pill") }}
-          </div>
-          <p class="text-danger">{{ result }}</p>
+        </div>
+        <p class="text-danger">{{ result }}</p>
 
-          <hr class="my-4" />
+        <hr class="my-4" />
 
-          <h5 class="pt-3 mb-3 fw-bold">Already have an account?</h5>
-          <div class="col-12 p-2">
-            <a
-              href="{{ url_for('login') }}"
-              class="col-12 p-2 w-50 btn btn-lg btn-dark rounded-pill"
-              >Login</a
-            >
-          </div>
-
+        <h5 class="pt-3 mb-3 fw-bold">Already have an account?</h5>
+        <div class="col-12 p-2">
+          <a
+            href="{{ url_for('login') }}"
+            class="col-12 p-2 w-50 btn btn-lg btn-dark rounded-pill"
+            >Login</a
+          >
+        </div>
       </form>
     </div>
   </div>
