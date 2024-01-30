@@ -1,34 +1,81 @@
 {% extends "base.html" %} {% block title %}Login{% endblock %} {% block content
 %}
 <div class="cotainer d-flex align-items-center justify-content-center">
-  <div class="col-lg-4">
-    <form method="post" action="">
-      <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-      <label for="floatingInput">Email address</label>
+  <div class="col-lg-4 col-md-4 p-3 shadow border border-grey rounded">
+    <form class="row p-3" method="post" action="">
+      <h5 class="mb-3 fw-bold">Sign in to Phony Insurance</h5>
 
-      {{ form.email_signin(class="form-control",placeholder="Email") }}
-      <label for="floatingPassword">Password</label>
+      <!-- TODO: make this a macro -->
+      <!-- EMAIL -->
+      {% if not form.email_signin.errors %}
+        <div class="col-12 p-2">
+          {{ form.email_signin(class="form-control p-2", placeholder="Email") }}
+        </div>
+      {% else %}
+        <div class="col-12 p-2">
+          {{ form.email_signin(class="form-control p-2 border border-danger",
+          placeholder="Email") }}
+        </div>
 
-      {{form.password_signin(class="form-control" ,placeholder="Password")}}
-      <br />
-      <div class="form-check form-check-inline mt-1">
-        {{ form.remember_me(class="form-check-input") }}
-        <label class="form-check-label" for="{{ form.remember_me.id }}"
-          >Remember me</label
+        {% if result != "Email already in use"%}
+          <div>
+            <p class="text-danger">
+              {% for error in form.email_signin.errors %} {{ error }} <br />
+              {% endfor %}
+            </p>
+          </div>
+        {% endif %}
+      {% endif %}
+
+
+      <!-- PASSWORD -->
+      {% if not form.password_signin.errors %}
+        <div class="col-12 p-2">
+          {{ form.password_signin(class="form-control p-2", placeholder="Password") }}
+        </div>
+      {% else %}
+        <div class="col-12 p-2">
+          {{ form.password_signin(class="form-control p-2 border border-danger",
+          placeholder="Password") }}
+        </div>
+
+        <div>
+          <p class="text-danger">
+            {% for error in form.password_signin.errors %} {{ error }} <br />
+            {% endfor %}
+          </p>
+        </div>
+      {% endif %}
+
+
+      <div class="col-12 p-2">
+        <div class="form-check">
+          {{ form.remember_me(class="form-check-input") }}
+          <label class="form-check-label" for="{{ form.remember_me.id }}"
+            >Keep me signed in</label
+          >
+        </div>
+      </div>
+
+      <div class="col-12 p-2">
+        {{ form.submit_user_signin(class="w-50 btn btn-lg btn-light border-2
+        border-dark rounded-pill") }} {{ form.hidden_tag() }}
+      </div>
+      
+
+      <p class="text-danger">{{ login_result }}</p>
+
+      <hr class="my-4" />
+
+      <h5 class="mb-3 fw-bold">New to Phony Insurance?</h5>
+      <div class="col-12 p-2">
+        <a
+          href="{{ url_for('signup') }}"
+          class="col-12 p-2 w-50 btn btn-lg btn-dark rounded-pill"
+          >Sign Up</a
         >
       </div>
-      {{ form.submit_user_signin(class="w-100 btn btn-lg btn-primary") }} {{
-      form.hidden_tag() }}
     </form>
-    {% if form.errors %}
-    <ul class="errors">
-      {% for field in form %} {% for error in field.errors %}
-      <li>{{field.label}}: {{ error }}</li>
-      {% endfor %} {% endfor %}
-    </ul>
-    {% endif %}
-    <p>{{ login_result }}</p>
   </div>
 </div>
-
 {% endblock %}
