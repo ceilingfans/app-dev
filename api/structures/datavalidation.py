@@ -48,7 +48,7 @@ class UserCreationForm(FlaskForm):
     password_create = PasswordField('password', validators=[DataRequired(),Length(min=8,max=20),password_check])
     password_confirm = PasswordField('repeat password', validators=[DataRequired(),EqualTo('password_create', message='Passwords must match')])
     address_create = StringField('address', validators=[DataRequired()])
-    submit_user_create = SubmitField('Submit')
+    submit_user_create = SubmitField('Register')
 
 
 class UserGetbyIdForm(FlaskForm):
@@ -82,7 +82,7 @@ class UserSignInForm(FlaskForm):
     email_signin = StringField('email', validators=[DataRequired(),Email()])
     password_signin = PasswordField('password', validators=[DataRequired(),Length(min=8,max=20)])
     remember_me = BooleanField('Remember me')
-    submit_user_signin = SubmitField('Submit')
+    submit_user_signin = SubmitField('Sign In')
 
 
 # PROMO FORMS
