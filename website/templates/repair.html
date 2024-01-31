@@ -1,123 +1,209 @@
-{% extends "base.html" %}
-
-{% block title %}
-  Repair
-{% endblock %}
-{% block content %}
+{% extends "base.html" %} {% block title %} Repair {% endblock %} {% block
+content %}
 <div class="container">
-    
-    <section class="py-5 text-center container">
-        <div class="row py-lg-5">
-          <div class="col-lg-6 col-md-8 mx-auto">
-            <h1 class="fw-light">Gadget Repair</h1>
-            <p class="lead text-body-secondary">We provide the best service in repairing gadgets, no matter the type.</p>
+  <section class="py-5 text-center container">
+    <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">Gadget Repair</h1>
+        <p class="lead text-body-secondary">
+          We provide the best service in repairing gadgets, no matter the type.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="album py-5 bg-body-tertiary">
+    <div class="container">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        <div class="col">
+          <div class="card shadow-sm">
+            <img
+              class="bd-placeholder-img card-img-top"
+              src="/static/images/Phonepic.jpg"
+              width="100%"
+              height="300"
+              role="img"
+            />
+            <div class="card-body">
+              <h3>Mobile Phones</h3>
+              <p class="card-text">
+                Revive your mobile companion with our expert repair services,
+                restoring functionality and performance to keep you connected
+                seamlessly.
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                  >
+                    View
+                  </button>
+                </div>
+                <small class="text-body-secondary">~ $200 - $300</small>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
 
-      <div class="album py-5 bg-body-tertiary">
-        <div class="container">
-    
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-            <div class="col">
-              <div class="card shadow-sm">
-                <img class="bd-placeholder-img card-img-top" src="/static/images/Phonepic.jpg" width="100%" height="300" role="img"></img>
-                <div class="card-body">
-                  <h3>Mobile Phones</h3>
-                  <p class="card-text">Revive your mobile companion with our expert repair services, restoring functionality and performance to keep you connected seamlessly.</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                    </div>
-                    <small class="text-body-secondary">~ $200 - $300</small>
-                  </div>
+        <div class="col">
+          <div class="card shadow-sm">
+            <img
+              class="bd-placeholder-img card-img-top"
+              src="/static/images/laptop.jpeg"
+              width="100%"
+              height="300"
+              role="img"
+            />
+            <div class="card-body">
+              <h3>Laptop</h3>
+              <p class="card-text">
+                Breathe new life into your laptop – our repair solutions cover
+                everything from screen replacements to hardware upgrades.
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                  >
+                    View
+                  </button>
                 </div>
+                <small class="text-body-secondary">~ $300 - $500</small>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div class="col">
-              <div class="card shadow-sm">
-                <img class="bd-placeholder-img card-img-top" src="/static/images/laptop.jpeg" width="100%" height="300" role="img"></img>
-                <div class="card-body">
-                  <h3>Laptop</h3>
-                  <p class="card-text">Breathe new life into your laptop – our repair solutions cover everything from screen replacements to hardware upgrades.</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                    </div>
-                    <small class="text-body-secondary">~ $300 - $500</small>
-                  </div>
+        <div class="col">
+          <div class="card shadow-sm">
+            <img
+              class="bd-placeholder-img card-img-top"
+              src="/static/images/desk.jpg"
+              width="100%"
+              height="300"
+              role="img"
+            />
+            <div class="card-body">
+              <h3>Desktops</h3>
+              <p class="card-text">
+                From power issues to hardware glitches, trust us to diagnose and
+                fix your desktop problems, bringing back the speed and
+                reliability you need.
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                  >
+                    View
+                  </button>
                 </div>
-              </div>
-            </div>
-
-            <div class="col">
-              <div class="card shadow-sm">
-                <img class="bd-placeholder-img card-img-top" src="/static/images/desk.jpg" width="100%" height="300" role="img"></img>
-                <div class="card-body">
-                  <h3>Desktops</h3>
-                  <p class="card-text">From power issues to hardware glitches, trust us to diagnose and fix your desktop problems, bringing back the speed and reliability you need.</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                    </div>
-                    <small class="text-body-secondary">~ $600 - $900+</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-            </div><br><br>
-
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-            <div class="col">
-              <div class="card shadow-sm">
-                <img class="bd-placeholder-img card-img-top" src="/static/images/tablet.jpg" width="100%" height="300" role="img"></img>
-                <div class="card-body">
-                  <h3>Tablets</h3>
-                  <p class="card-text">Rediscover the full potential of your tablet as our skilled technicians offer swift and effective repairs for a seamless user experience.</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                    </div>
-                    <small class="text-body-secondary">~ $200 - $400</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col">
-              <div class="card shadow-sm">
-                <img class="bd-placeholder-img card-img-top" src="/static/images/monitor.jpeg" width="100%" height="300" role="img"></img>
-                <div class="card-body">
-                  <h3>Monitors</h3>
-                  <p class="card-text">Restore clarity and vibrancy to your display with our monitor repair services, addressing issues like dead pixels, flickering screens, and more.</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                    </div>
-                    <small class="text-body-secondary">~ $100 - $200</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col">
-              <div class="card shadow-sm">
-                <img class="bd-placeholder-img card-img-top" src="/static/images/peripherals.jpeg" width="100%" height="300" role="img"></img>
-                <div class="card-body">
-                  <h3>Peripherals</h3>
-                  <p class="card-text">Whether it's printers, keyboards, or mice, our repair specialists handle a wide range of peripherals, ensuring all your gadgets work harmoniously.</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                    </div>
-                    <small class="text-body-secondary">~ $40 - $100</small>
-                  </div>
-                </div>
+                <small class="text-body-secondary">~ $600 - $900+</small>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <br /><br />
+
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        <div class="col">
+          <div class="card shadow-sm">
+            <img
+              class="bd-placeholder-img card-img-top"
+              src="/static/images/tablet.jpg"
+              width="100%"
+              height="300"
+              role="img"
+            />
+            <div class="card-body">
+              <h3>Tablets</h3>
+              <p class="card-text">
+                Rediscover the full potential of your tablet as our skilled
+                technicians offer swift and effective repairs for a seamless
+                user experience.
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                  >
+                    View
+                  </button>
+                </div>
+                <small class="text-body-secondary">~ $200 - $400</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card shadow-sm">
+            <img
+              class="bd-placeholder-img card-img-top"
+              src="/static/images/monitor.jpeg"
+              width="100%"
+              height="300"
+              role="img"
+            />
+            <div class="card-body">
+              <h3>Monitors</h3>
+              <p class="card-text">
+                Restore clarity and vibrancy to your display with our monitor
+                repair services, addressing issues like dead pixels, flickering
+                screens, and more.
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                  >
+                    View
+                  </button>
+                </div>
+                <small class="text-body-secondary">~ $100 - $200</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card shadow-sm">
+            <img
+              class="bd-placeholder-img card-img-top"
+              src="/static/images/peripherals.jpeg"
+              width="100%"
+              height="300"
+              role="img"
+            />
+            <div class="card-body">
+              <h3>Peripherals</h3>
+              <p class="card-text">
+                Whether it's printers, keyboards, or mice, our repair
+                specialists handle a wide range of peripherals, ensuring all
+                your gadgets work harmoniously.
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                  >
+                    View
+                  </button>
+                </div>
+                <small class="text-body-secondary">~ $40 - $100</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
