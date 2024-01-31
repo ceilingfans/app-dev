@@ -1,3 +1,5 @@
+{% from "includes/_forms.html" import render_field with context %}
+
 {% extends "base.html" %} {% block title %}Login{% endblock %} {% block content
 %}
 <div class="cotainer d-flex align-items-center justify-content-center">
@@ -5,8 +7,7 @@
     <form class="row p-3" method="post" action="">
       <h5 class="mb-3 fw-bold">Sign in to Phony Insurance</h5>
 
-      <!-- TODO: make this a macro -->
-      <!-- EMAIL -->
+      <!-- EMAIL, cannot use macro due to special error -->
       {% if not form.email_signin.errors %}
         <div class="col-12 p-2">
           {{ form.email_signin(class="form-control p-2", placeholder="Email") }}
@@ -29,23 +30,7 @@
 
 
       <!-- PASSWORD -->
-      {% if not form.password_signin.errors %}
-        <div class="col-12 p-2">
-          {{ form.password_signin(class="form-control p-2", placeholder="Password") }}
-        </div>
-      {% else %}
-        <div class="col-12 p-2">
-          {{ form.password_signin(class="form-control p-2 border border-danger",
-          placeholder="Password") }}
-        </div>
-
-        <div>
-          <p class="text-danger">
-            {% for error in form.password_signin.errors %} {{ error }} <br />
-            {% endfor %}
-          </p>
-        </div>
-      {% endif %}
+      {{ render_field(form.password_signin, "Password") }}
 
 
       <div class="col-12 p-2">
