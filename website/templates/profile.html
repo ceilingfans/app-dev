@@ -6,42 +6,40 @@
   <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
     <div class="col d-flex flex-column align-items-start gap-2">
       <p class="fw-semibold mb-0 text-body-emphasis col-lg-10 fs-4">
-       Profile Picture
+        Profile Picture
       </p>
       {% if image == "/static/images/userprofileimg/None" %}
       <img
         src="/static/images/userprofileimg/avatar.png"
         alt="pfp"
-        class="img-fluid border border-primary rounded-circle "
+        class="img-fluid border border-primary rounded-circle"
         width="200px"
-        height="200px">
-      </img>
+        height="200px"
+      />
       {% else %}
       <img
         src="{{ image }}"
         alt="pfp"
-        class="img-fluid border border-primary rounded-circle "
+        class="img-fluid border border-primary rounded-circle"
         width="200px"
-        height="200px">
-      </img>
+        height="200px"
+      />
       {% endif %}
       <form method="post" enctype="multipart/form-data">
-      {{ imageform.csrf_token }}
-      {{ imageform.image(class="form-control w-100")}}
-      <br>
-      {{ imageform.submit_profile(placeholder="Submit", class="btn btn-primary")}}
+        {{ imageform.csrf_token }} {{ imageform.image(class="form-control
+        w-100")}}
+        <br />
+        {{ imageform.submit_profile(placeholder="Submit", class="btn
+        btn-primary")}}
       </form>
       {% if imageform.errors %}
       <p>Profile not updated</p>
       <ul class="errors">
-        {% for field in imageform %}
-        {% for error in field.errors %}
+        {% for field in imageform %} {% for error in field.errors %}
         <li>{{field.label}}: {{ error }}</li>
-        {% endfor %} 
-        {% endfor %}
+        {% endfor %} {% endfor %}
       </ul>
-      {% endif %}
-      {{ result2 }}
+      {% endif %} {{ result2 }}
     </div>
 
     <div class="col">
@@ -96,19 +94,22 @@
         <div class="row g-3">
           <div class="col-sm-6">
             <label for="first-name" class="form-label">First name</label>
-            {{ form.name_update(placeholder='new first name', class="form-control")}}
+            {{ form.name_update(placeholder='new first name',
+            class="form-control")}}
             <div class="invalid-feedback">Valid first name is required.</div>
           </div>
 
           <div class="col-sm-6">
             <label for="last-name" class="form-label">Last name</label>
-            {{ form.name_last_update(placeholder="new last name", class="form-control")}}
+            {{ form.name_last_update(placeholder="new last name",
+            class="form-control")}}
             <div class="invalid-feedback">Valid last name is required.</div>
           </div>
 
           <div class="col-12">
             <label for="email" class="form-label">Email</label>
-            {{ form.email_update(placeholder="new email", class="form-control")}}
+            {{ form.email_update(placeholder="new email",
+            class="form-control")}}
             <div class="invalid-feedback">
               Please enter a valid email address for shipping updates.
             </div>
@@ -116,43 +117,48 @@
 
           <div class="col-12">
             <label for="address" class="form-label">Address</label>
-            {{ form.address_update(placeholder="new address", class="form-control")}}
+            {{ form.address_update(placeholder="new address",
+            class="form-control")}}
             <div class="invalid-feedback">Please enter your address.</div>
           </div>
 
           <div class="col-sm-6">
             <label for="new-password" class="form-label">New Password</label>
-            {{ form.password_update(placeholder="new password", class="form-control")}}
+            {{ form.password_update(placeholder="new password",
+            class="form-control")}}
             <div class="invalid-feedback">Valid new password is required.</div>
           </div>
 
           <div class="col-sm-6 mt-auto">
             <label for="last-name" class="form-label">Confirm password</label>
-            {{ form.password_confirm(placeholder="Confirm password", class="form-control")}}
+            {{ form.password_confirm(placeholder="Confirm password",
+            class="form-control")}}
             <div class="invalid-feedback">
               Ensure both passwords are the same.
             </div>
           </div>
           <div class="col-12">
-            <hr>
+            <hr />
             <label for="confirm" class="form-label">Current password</label>
-            {{ form.old_password(placeholder="Current password", class="form-control")}}
+            {{ form.old_password(placeholder="Current password",
+            class="form-control")}}
             <div class="invalid-feedback">Please enter your address.</div>
           </div>
         </div>
 
         <hr class="my-4" />
 
-        {{ form.submit_user_update(placeholder="Update", class="btn btn-primary") }}
+        {{ form.submit_user_update(placeholder="Update", class="btn
+        btn-primary") }}
       </form>
       <p>{{ result }}</p>
       {% if form.errors %}
-    <ul class="errors">
-      {% for field in form %} {% for error in field.errors %}
-      <li>{{field.label}}: {{ error }}</li>
-      {% endfor %} {% endfor %}
-    </ul>
-    {% endif %}
+      <ul class="errors">
+        {% for field in form %} {% for error in field.errors %}
+        <li>{{field.label}}: {{ error }}</li>
+        {% endfor %} {% endfor %}
+      </ul>
+      {% endif %}
     </div>
   </div>
 </div>
