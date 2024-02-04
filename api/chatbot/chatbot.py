@@ -1,38 +1,39 @@
-from flask import Flask, render_template, request
-import openai
+from bardapi import Bard
 
+os.environ["_BARD_API_KEY"] = "insert key here"
 
-app = Flask(__name__)
+def response_api(prompt):
+    response = Bard().get_answer(str(prompt))['content']
+    return response
 
-# Set up OpenAI API credentials
-openai.api_key = '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'
+def user_input():
+    input_text = input("Enter your prompt: ")  # Change this to your preferred method of getting user input
+    return input_text
 
+generate = []
+past = []
 
-# Define the default route to return the index.html file
-@app.route("/")
-def index():
-    return render_template("index.html")
+user_text = user_input()
 
-# Define the /api route to handle POST requests
-@app.route("/api", methods=["POST"])
-def api():
-    # Get the message from the POST request
-    message = request.json.get("message")
-    # Send the message to OpenAI's API and receive the response
-    
-    
-    completion = openai.chat.completions.create(
-    model="gpt-4",
-    messages=[
-        {"role": "user", "content": message}
-    ]
-    )
-    if completion.choices[0].message!=None:
-        return completion.choices[0].message
+if any(keyword in user_text for keyword in ["buy", "purchase", "iphone", "iPhone", "Samsung", "samsung", "Redmi", "redmi", "POCO", "poco", "Xiaomi", "xiaomi"]):
+    print("Our website comes with a shop page! Why don't you take a look at our second-hand products that have been repaired.")
+elif any(keyword in user_text for keyword in ["insurance", "insurance plan"]):
+    print("Our insurance page has all the details regarding our plans.")
+elif any(keyword in user_text for keyword in ["help", "assistance"]):
+    print("Looking for help? no worries, simply go to our contact page and submit a form. We'll get back to you as soon as possible.")
+elif any(keyword in user_text for keyword in ["can't find", "lost"]):
+    print("Our website has a search bar that can guide you to any page that you wish to look for.")
+elif any(keyword in user_text for keyword in ["Error 401", "error 401"]):
+    print("Looks like you didn't sign in. ")
+else:
+    # If no keywords are detected, proceed with the response from the API
+    output = response_api(user_text)
+    past.append(user_text)
+    generate.append(output)
+    past.append(output)
 
-    else :
-        return 'Failed to Generate response!'
-    
-
-if __name__=='__main__':
-    app.run()
+    for i in range(len(past) - 1, -1, -1):
+        if i % 2 == 0:
+            print(f"User: {past[i]}")  # Display user messages
+        else:
+            print(f"Bot: {past[i]}")  # Display bot responses
