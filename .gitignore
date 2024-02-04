@@ -160,4 +160,4 @@ cython_debug/
 .idea/
 
 # user pfp
-website/static/images/userprofileimg
+static/images/userprofileimg
