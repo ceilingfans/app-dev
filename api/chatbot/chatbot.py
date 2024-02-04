@@ -1,9 +1,10 @@
 from bardapi import Bard
+import os
 
-os.environ["_BARD_API_KEY"] = "insert key here"
+os.environ["_BARD_API_KEY"] = "fQi6BaaeIxWonm0CcUqhQZKOGOZNLTiQueOiJ1FoxecqNeSvR0IXp8jXOKrndyamIhBZ0Q."
 
 def response_api(prompt):
-    response = Bard().get_answer(str(prompt))['content']
+    response = Bard(token='fQi6BaaeIxWonm0CcUqhQZKOGOZNLTiQueOiJ1FoxecqNeSvR0IXp8jXOKrndyamIhBZ0Q.').get_answer(str(prompt))['content']
     return response
 
 def user_input():
