@@ -479,14 +479,14 @@ def userchat():
     return render_template("examplechat.html", form=form)
 
 #TODO LINK TO JS @JUNWEI GO DO 
-@app.route('/sentstaffchat', methods=['GET'])
+@app.route('/api/sentstaffchat', methods=['GET'])
 def sent_staff_chat():
     admin = chats["admin"]
     message = "burgerboyadmin" #Set to grab the json that JS sends.
     admin.set_text(message)
     return render_template("home.html")
 
-@app.route('/sentuserchat', methods=['GET'])
+@app.route('/api/sentuserchat', methods=['GET'])
 def sent_user_chat():
     print(chats)
     user = chats["user"]
@@ -495,12 +495,12 @@ def sent_user_chat():
     return render_template("home.html")
 
 # Should probably return a json to the JS front end.
-@app.route('/getstaffreply', methods=['GET'])
+@app.route('/api/getstaffreply', methods=['GET'])
 def get_staff_reply():
     admin = chats["admin"]
     return admin.get_reply()
 
-@app.route('/getstaffreply', methods=['GET'])
+@app.route('/api/getuserreply', methods=['GET'])
 def get_user_reply():
     user = chats["user"]
     return user.get_reply()
