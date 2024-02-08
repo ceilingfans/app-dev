@@ -9,6 +9,7 @@ from uuid import uuid4
 from werkzeug.utils import secure_filename
 from dhooks import Webhook
 from PIL import Image
+import threading
 import json
 
 from flask_uploads import UploadSet, configure_uploads, IMAGES
@@ -21,15 +22,20 @@ from api.structures.Promo import Promo
 from api.Insuranceprice.getprice import getprice
 from api.structures.Bill import Bill
 from api.structures.datavalidation import *
+from api.chatbot.adminchat import AdminChat
+from api.chatbot.customerchat import UserChat
+from api.chatbot.bardchat import bardchat
 
 db = Driver()
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
+hook = Webhook("https://discord.com/api/webhooks/1198939240235532358/Gu5Dw7cmkupwqo9yg-PgdSKXlj1toWbCHsSqQUabIJc-A3dOlHfDdVkkqwurh34wXdaR")
 app.config["UPLOADED_PHOTOS_DEST"] = os.path.join(app.root_path, "static", "images", "userprofileimg")
 login_manager = LoginManager()
 login_manager.init_app(app)
 profile_pics = UploadSet("photos", IMAGES)
 configure_uploads(app, profile_pics)
+chats = {}
 
 
 @app.context_processor
@@ -103,8 +109,6 @@ def search():
 
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
-    hook = Webhook(
-        "https://discord.com/api/webhooks/1198939240235532358/Gu5Dw7cmkupwqo9yg-PgdSKXlj1toWbCHsSqQUabIJc-A3dOlHfDdVkkqwurh34wXdaR")
     contactform = ContactUs()
     if contactform.submit_contact.data and contactform.validate():
         print("info: contact form submitted")
@@ -435,6 +439,71 @@ def profile():
                                                       filename=f'images/userprofileimg/{current_user.get_picture()}')))
     return render_template(html, form=form, imageform=imageform,
                            image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+    
+@app.route("/chat", methods=["POST", "GET"])
+def chat():
+    form = Chatform()
+    #This cannot be done like below, it requires a AJAX request to the server to get the response instead of reloading the whole html everytime.
+    if form.submit_chat.data and form.validate():
+        text = bardchat(form.message.data)
+        return render_template("examplechat.html", form=form, result=text)
+    return render_template("examplechat.html", form=form)
+
+# This is the AJAX request to the server to get the response from the chatbot
+@app.route("/get_bard")
+def get_bard(text):
+    return bardchat(text)
+
+@app.route("/staffchat", methods=["POST", "GET"])
+def staffchat():
+    form = Chatform()
+    # MAKE THIS INTO OWN SITE OR AJAX TO RUN 
+    admin = AdminChat(55555,"admin","chatlog.txt")
+    chats["admin"] = admin
+    admin_thread = threading.Thread(target=admin.connect, args=())
+    admin_thread.start()
+    
+    return render_template("examplechat.html", form=form)
+        
+        
+@app.route("/userchat", methods=["POST", "GET"])
+def userchat():
+    form = Chatform()
+    # MAKE THIS INTO OWN SITE OR AJAX TO RUN
+    # Randomly generate the port for the user to connect to make the txt file the port number and obtain the username's name.
+    user = UserChat(55555,"user","chatlog.txt")
+    chats["user"] = user
+    user_thread = threading.Thread(target=user.connect, args=())
+    user_thread.start()
+    
+    return render_template("examplechat.html", form=form)
+
+#TODO LINK TO JS @JUNWEI GO DO 
+@app.route('/sentstaffchat', methods=['GET'])
+def sent_staff_chat():
+    admin = chats["admin"]
+    message = "burgerboyadmin" #Set to grab the json that JS sends.
+    admin.set_text(message)
+    return render_template("home.html")
+
+@app.route('/sentuserchat', methods=['GET'])
+def sent_user_chat():
+    print(chats)
+    user = chats["user"]
+    message = "burgerboyuser" #Set to grab the json that JS sends.
+    user.set_text(message)
+    return render_template("home.html")
+
+# Should probably return a json to the JS front end.
+@app.route('/getstaffreply', methods=['GET'])
+def get_staff_reply():
+    admin = chats["admin"]
+    return admin.get_reply()
+
+@app.route('/getstaffreply', methods=['GET'])
+def get_user_reply():
+    user = chats["user"]
+    return user.get_reply()
 
 
 @app.errorhandler(404)

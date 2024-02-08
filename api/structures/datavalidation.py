@@ -255,3 +255,7 @@ class ContactUs(FlaskForm):
 class SearchForm(FlaskForm):
     search = StringField('search', validators=[DataRequired()])
     submit_search = SubmitField('')
+    
+class Chatform(FlaskForm):
+    message = StringField('message', validators=[DataRequired()])
+    submit_chat = SubmitField('Send')
