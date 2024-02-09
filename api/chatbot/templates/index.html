@@ -1,120 +1,164 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %} {% block head %}
+<style>
+  body {
+  background-color: #ffffff; /* Bootstrap default background color */
+  }
 
-<head>
-  <title>Chat App</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-  <script src="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/lib/languages/python.min.js"></script>
+  .container {
+    max-width: 800px; /* Limit the width of the container */
+    margin: 0 auto; /* Center the container horizontally */
+    padding-top: 50px; /* Leave space for the navbar */
+  }
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/a11y-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-</head>
+  .chat-box {
+    background-color: #ffffff; /* White background for the chat box */
+    border: 1px solid #ced4da; /* Bootstrap default border color */
+    border-radius: 5px; /* Rounded corners */
+    padding: 20px; /* Padding inside the chat box */
+    overflow-y: scroll; /* Allow vertical scrolling */
+    max-height: 400px; /* Limit the height of the chat box */
+  }
 
-<body>
-  <div class="container mt-5">
-    <h1 style="color:white">Chat Bot</h1>
-    <div class="chat-box mt-3">
-      <!-- Chat messages will be added here dynamically -->
-    </div>
-    <div class="form-group mt-3">
-      <textarea class="form-control" rows="3" placeholder="Type your message here" id="message-input"></textarea>
-    </div>
-    <button type="button" class="btn btn-primary" id="send-btn">Send</button>
+  .user-icon, .bot-icon {
+    width: 30px; /* Width of the user and bot icons */
+    height: 30px; /* Height of the user and bot icons */
+    border-radius: 50%; /* Make the icons circular */
+    margin-right: 10px; /* Spacing between the icon and text */
+  }
+
+  .user-message,
+  .bot-message {
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Center vertically */
+  }
+
+  .user-message {
+    justify-content: flex-end; /* Right-align user messages */
+  }
+
+  .mt-3 {
+    margin-top: 15px; /* Margin top for spacing */
+  }
+
+  .p-3 {
+    padding: 15px; /* Padding for message boxes */
+  }
+
+  .rounded {
+    border-radius: 5px; /* Rounded corners for message boxes */
+  }
+
+  #message-input {
+    resize: none; /* Disable resizing of the textarea */
+  }
+
+  #send-btn {
+    margin-top: 10px; /* Margin top for the send button */
+  }
+
+</style>
+{% endblock %}
+
+{% extends "base.html" %}
+{% block title %} ChatBot {% endblock %}
+{% block content %}
+
+<div class="container mt-5">
+  <h1 style="color:black">Chat Bot</h1>
+  <div class="chat-box mt-3">
+    <!-- Chat messages will be added here dynamically -->
   </div>
-  <script>
+  <div class="form-group mt-3">
+    <textarea class="form-control" rows="3" placeholder="Type your message here" id="message-input"></textarea>
+  </div>
+  <button type="button" class="btn btn-primary" id="send-btn">Send</button>
+</div>
+<script>
 setInterval(highlightAll,1000);
 // Function to highlight code using highlight.js library
 function highlightAll() {
-  document.querySelectorAll("pre code").forEach(block => {
-    hljs.highlightBlock(block);
-  });
+document.querySelectorAll("pre code").forEach(block => {
+  hljs.highlightBlock(block);
+});
 }
 
-    const chatBox = document.querySelector(".chat-box");
-    const messageInput = document.querySelector("#message-input");
-    const sendBtn = document.querySelector("#send-btn");
+  const chatBox = document.querySelector(".chat-box");
+  const messageInput = document.querySelector("#message-input");
+  const sendBtn = document.querySelector("#send-btn");
 
-    function addMessage(message, isUserMessage) {
-      const messageDiv = document.createElement("div");
-      messageDiv.classList.add("mt-3", "p-3", "rounded");
+  function addMessage(message, isUserMessage) {
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("mt-3", "p-3", "rounded");
 
-      if (isUserMessage) {
-        messageDiv.classList.add("user-message");
+    if (isUserMessage) {
+      messageDiv.classList.add("user-message");
 
-      } else {
-        messageDiv.classList.add("bot-message");
-      }
-
-      messageDiv.innerHTML = `
-        <img src="{{ url_for('static', filename='images/user.png') }}" class="user-icon"><p>${message}</p>
-        `;
-
-      chatBox.appendChild(messageDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
+    } else {
+      messageDiv.classList.add("bot-message");
     }
 
+    messageDiv.innerHTML = `
+      <img src="{{ url_for('static', filename='images/user.png') }}" class="user-icon"><p>${message}</p>
+      `;
+
+    chatBox.appendChild(messageDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
 
 
 
-    function sendMessage() {
-      const message = messageInput.value.trim();
 
-      if (message !== "") {
-        addMessage(message, true);
+  function sendMessage() {
+    const message = messageInput.value.trim();
 
-        fetch("/api", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ message })
-        })
-          .then(response => response.json())
-          .then(data => {
-                      messageInput.value = "";
-            const messageDiv = document.createElement("div");
-            messageDiv.classList.add("mt-3", "p-3", "rounded");
-            messageDiv.classList.add("bot-message");
-           
-            const content = data.content;
+    if (message !== "") {
+      addMessage(message, true);
+
+      fetch("/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message })
+      })
+        .then(response => response.json())
+        .then(data => {
+                    messageInput.value = "";
+          const messageDiv = document.createElement("div");
+          messageDiv.classList.add("mt-3", "p-3", "rounded");
+          messageDiv.classList.add("bot-message");
+          
+          const content = data.content;
+          
+          // Check if the content has code block
+          const hasCodeBlock = content.includes("```");
+          if (hasCodeBlock) {
+            // If the content has code block, wrap it in a <pre><code> element
+            const codeContent = content.replace(/```([\s\S]+?)```/g, '</p><pre><code>$1</code></pre><p>');
+
             
-            // Check if the content has code block
-            const hasCodeBlock = content.includes("```");
-            if (hasCodeBlock) {
-              // If the content has code block, wrap it in a <pre><code> element
-              const codeContent = content.replace(/```([\s\S]+?)```/g, '</p><pre><code>$1</code></pre><p>');
+            messageDiv.innerHTML = `<img src="{{ url_for('static', filename='images/gpt.jpg') }}" class="bot-icon"><p>${codeContent}</p>`
+            
+          }
+          else{
+            messageDiv.innerHTML = `<img src="{{ url_for('static', filename='images/gpt.jpg') }}" class="bot-icon"><p>${content}</p>`
+          }
+          chatBox.appendChild(messageDiv);
+          chatBox.scrollTop = chatBox.scrollHeight;
 
-             
-              messageDiv.innerHTML = `<img src="{{ url_for('static', filename='images/gpt.jpg') }}" class="bot-icon"><p>${codeContent}</p>`
-             
-            }
-            else{
-              messageDiv.innerHTML = `<img src="{{ url_for('static', filename='images/gpt.jpg') }}" class="bot-icon"><p>${content}</p>`
-            }
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-          })
-          .catch(error => console.error(error));
-      }
+        })
+        .catch(error => console.error(error));
     }
+  }
 
-    
-    sendBtn.addEventListener("click", sendMessage);
-    messageInput.addEventListener("keydown", event => {
-      if (event.keyCode === 13 && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
-      }
-    });
-  </script>
-</body>
+  
+  sendBtn.addEventListener("click", sendMessage);
+  messageInput.addEventListener("keydown", event => {
+    if (event.keyCode === 13 && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
+    }
+  });
+</script>
 
-</html>
+{% endblock %}
