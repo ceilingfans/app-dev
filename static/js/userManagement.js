@@ -119,7 +119,7 @@ function handleDelete() {
     .then((response) => response.json())
     .then((data) => {
       if (!data.success) return alert("Failed to delete user");
-      window.location.reload();
+      window.location = window.location.href;
   })
 }
 
