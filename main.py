@@ -12,6 +12,7 @@ from PIL import Image
 import json
 
 from flask_uploads import UploadSet, configure_uploads, IMAGES
+from flask_login import AnonymousUserMixin
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -441,11 +442,52 @@ def profile():
 @login_required
 @app.route("/admin")
 def admin_home():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return abort(401)
+    
     return render_template("admin.html", ip_addr=request.remote_addr)
+
+@login_required
+@app.route("/admin/users", methods=["POST"])
+def admin_search():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+
+    if not current_user.get_admin():
+        return abort(401)
+
+    id = request.form.get("search")
+    is_email = bool(re.search(r"^[\w\.-]+@[\w\.-]+\.\w+$", id)) # praying this works
+
+    if not id:
+        ret_code, users = db.users.find()
+        if ret_code == "USERNOTFOUND":
+            return abort(500)
+
+        return render_template("admin_user.html", users=users, ip_addr=request.remote_addr)
+    
+    if is_email:
+        ret_code, user = db.users.find(email=id)
+    else:
+        ret_code, user = db.users.find(user_id=id)
+
+    if ret_code == "USERNOTFOUND":
+        return render_template("admin_user.html", ip_addr=request.remote_addr, error="USER_NOT_FOUND", search=id)
+    
+    return render_template("admin_user.html", ip_addr=request.remote_addr, users=[user])
 
 @login_required
 @app.route("/admin/users")
 def admin_users():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return abort(401)
+
     ret_code, users = db.users.find()
     if ret_code == "USERNOTFOUND":
         return abort(500) # TODO: actual error page
@@ -455,12 +497,18 @@ def admin_users():
 @login_required
 @app.route("/api/admin/create_user")
 def create_user():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
     logout_user()
     return redirect(url_for("signup"))
 
 @login_required
 @app.route("/api/admin/roles", methods=["POST"])
 def update_roles():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+
     if not current_user.get_admin():
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -470,7 +518,7 @@ def update_roles():
         return jsonify({"error": "No data provided"}), 400
     if not data.get("id"):
         return jsonify({"error": "Missing id"}), 400
-    if data.get("role") is None:  # role can be False so cannot do not data.get(...)
+    if data.get("role") is None:  # role can be False so cannot do 'not data.get(...)'
         return jsonify({"error": "Missing role"}), 400
     
     ret_code, user = db.users.find(user_id=data["id"])
@@ -489,6 +537,9 @@ def update_roles():
 @login_required
 @app.route("/api/admin/password", methods=["POST"])
 def admin_password():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+
     if not current_user.get_admin():
         return jsonify({"error": "Unauthorized"}), 401
     
@@ -513,10 +564,39 @@ def admin_password():
     
     return jsonify({"success": "Password updated"}), 200
 
+@login_required
+@app.route("/api/admin/delete", methods=["POST"])
+def delete_user():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+
+    if not current_user.get_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    if not data.get("id"):
+        return jsonify({"error": "Missing id"}), 400
+    
+    ret_code, e = db.users.delete(data.get('id'))
+    if ret_code == "USERNOTFOUND":
+        return jsonify({"error": "User not found"}), 404
+    
+    if ret_code != "SUCCESS":
+        return jsonify({"error": "Internal server error", "message": str(e)}), 500
+    
+    return jsonify({"success": "User deleted"}), 200
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
 
+@app.errorhandler(401)
+def unauthorized(e):
+    return render_template("401.html"), 401
 
 if __name__ == "__main__":
     app.run(debug=True)

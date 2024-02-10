@@ -188,8 +188,11 @@
           >
             Reset
           </button>
-          <hr>
-          <small class="text-muted">The page will refresh when the password is successfully updated.</small>
+          <hr />
+          <small class="text-muted"
+            >The page will refresh when the password is successfully
+            updated.</small
+          >
         </form>
       </div>
       <div class="modal-footer">
@@ -200,6 +203,42 @@
     </div>
   </div>
 </div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="delete-user-modal"
+  tabindex="-1"
+  aria-labelledby="delete-user-label"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="delete-user-label">
+          Confirm Deletion
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        This action is <strong>irreversible</strong>. Are you sure you want to
+        delete this user?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger rounded-pill" 
+        onclick="handleDelete()">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %} {% block content %}
 <div class="container-fluid">
   <div class="row">
@@ -378,15 +417,20 @@
       <div
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
       >
-        <h1 class="h2">Dashboard</h1>
+        <h1 class="h2">Users</h1>
       </div>
       <div class="pb-3 mb-2 border-bottom">
         <a
           href="{{ url_for('create_user')}}"
-          class="btn btn-light border-2 border-dark rounded-pill mx-1"
+          class="btn btn-dark rounded-pill mx-1"
           >Create User</a
         >
-        <button class="btn btn-dark rounded-pill">Sync User List</button>
+        <a
+          href="{{ url_for('admin_users', _anchor='invoices') }}"
+          class="btn btn-dark rounded-pill mx-1"
+          >View Invoices</a
+        >
+        <a href="#" class="btn btn-dark rounded-pill mx-1">View Chats</a>
       </div>
 
       <div
@@ -394,96 +438,140 @@
       >
         <h1 class="h2">Manage Users</h1>
       </div>
-      <form class="w-100 me-3" role="search" action="" method="POST">
+      <form class="w-100 me-3 mb-3" role="search" action="" method="post">
         <input
           type="search"
-          class="form-control"
-          placeholder="Search for a user..."
+          class="form-control border-2"
+          placeholder="Search by email or Id..."
           aria-label="Search"
+          id="search"
+          name="search"
         />
       </form>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col">Email</th>
-            <th scope="col">Address</th>
-            <th scope="col">Id</th>
-            <th scope="col">Password</th>
-            <th scope="col">Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for user in users %}
-          <tr>
-            <td scope="row">
-              <img
-                src="{{ url_for('static', filename='images/userprofileimg/' + ( user.get_picture() or 'avatar.png')) }}"
-                alt="pfp"
-                height="32"
-                width="32"
-                class="img-fluid border border-primary rounded-circle"
-              />
-              <span class="ms-1">{{ user.get_email() }}</span>
-              <span class="text-muted"
-                >{% if user.get_id() == current_user.get_id() %} (You) {% endif
-                %}
-              </span>
-              <span class="text-success" id="feedback"></span>
-            </td>
-            <td>{{ user.get_address() }}</td>
+      {% if error %}
+      <div class="bg-body-tertiary p-5 rounded">
+        <h1>No User found</h1>
+        <p class="lead">
+          Your searched for <code>{{ search }}</code>, but no user was found.
+          Maybe you typed in the wrong Id or email? Try again after checking the
+          spelling.
+        </p>
+        <p class="lead">
+          If you are searching via Id, make sure the Id looks like this:
+          <code>75db9252-3db1-405f-9440-e0b52602d728</code>
+        </p>
+        <p class="lead">
+          If you are searching via email address, make sure the email has both
+          the username and domain.
+        </p>
+        <p class="lead">
+          You can see all users again by searching for nothing.
+        </p>
+      </div>
+      {% else %}
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">User</th>
+              <th scope="col">Address</th>
+              <th scope="col">Id</th>
+              <th scope="col">Password</th>
+              <th scope="col">Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td scope="row">
+                <img
+                  src="{{ url_for('static', filename='images/userprofileimg/' + ( user.get_picture() or 'avatar.png')) }}"
+                  alt="pfp"
+                  height="32"
+                  width="32"
+                  class="img-fluid border border-primary rounded-circle"
+                />
+                <span class="ms-1">{{ user.get_email() }}</span>
+                <span class="text-muted"
+                  >{% if user.get_id() == current_user.get_id() %} (You) {%
+                  endif %}
+                </span>
+                <span class="text-success" id="feedback"></span>
+              </td>
+              <td>{{ user.get_address() }}</td>
 
-            <td>
-              <button
-                type="button"
-                id="{{ user.get_id() }}-copy"
-                class="btn btn-light border-2 border-dark rounded-pill"
-                onclick="copy('{{ user.get_id()}}')"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                data-bs-title="{{ user.get_id() }}"
-              >
-                Copy
-              </button>
-            </td>
-            <td>
-              <button
-                type="button"
-                id="{{ user.get_id() }}-password-reset"
-                class="btn btn-light border-2 border-dark rounded-pill"
-                onclick="setPasswordResetId('{{ user.get_id() }}')"
-                data-bs-toggle="modal"
-                data-bs-target="#password-modal"
-              >
-                Reset
-              </button>
-            </td>
-            <td>
-              <select
-                class="form-select border-2 border-dark admin-select"
-                style="width: fit-content"
-                id="{{ user.get_id() }}-admin-select"
-                {%
-                if
-                user.get_admin()
-                %}
-                disabled
-                {%
-                endif
-                %}
-              >
-                {% if user.get_admin() and user.get_admin() != None %}
-                <option value="admin" selected>Admin</option>
-                <option value="user">User</option>
-                {% else %}
-                <option value="admin">Admin</option>
-                <option value="user" selected>User</option>
-                {% endif %}
-              </select>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+              <td>
+                <button
+                  type="button"
+                  id="{{ user.get_id() }}-copy"
+                  class="btn btn-light border-2 border-dark rounded-pill"
+                  onclick="copy('{{ user.get_id()}}')"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="{{ user.get_id() }}"
+                >
+                  Copy
+                </button>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  id="{{ user.get_id() }}-password-reset"
+                  class="btn btn-light border-2 border-dark rounded-pill"
+                  onclick="setPasswordResetId('{{ user.get_id() }}')"
+                  data-bs-toggle="modal"
+                  data-bs-target="#password-modal"
+                >
+                  Reset
+                </button>
+              </td>
+              <td>
+                <select
+                  class="form-select border-2 border-dark admin-select"
+                  style="width: fit-content"
+                  id="{{ user.get_id() }}-admin-select"
+                  {%
+                  if
+                  user.get_admin()
+                  %}
+                  disabled
+                  {%
+                  endif
+                  %}
+                >
+                  {% if user.get_admin() and user.get_admin() != None %}
+                  <option value="admin" selected>Admin</option>
+                  <option value="user">User</option>
+                  {% else %}
+                  <option value="admin">Admin</option>
+                  <option value="user" selected>User</option>
+                  {% endif %}
+                </select>
+              </td>
+              <td>
+                <button
+                  class="btn btn-danger rounded-pill"
+                  onclick="setUserDeleteId('{{ user.get_id() }}')"
+                  data-bs-toggle="modal"
+                  data-bs-target="#delete-user-modal"
+                  {%
+                  if
+                  user.get_admin()
+                  %}
+                  disabled
+                  {%
+                  endif
+                  %}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
 
       <footer
         class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"

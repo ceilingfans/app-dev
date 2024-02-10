@@ -1,4 +1,5 @@
 var passwordResetId;
+var userDeleteId;
 
 function copy(id) {
   // copy to clipboard
@@ -77,6 +78,49 @@ function handlePasswordReset(password, confirm) {
       if (!data.success) return alert("Failed to reset password");
       window.location.reload();
     });
+}
+
+function handleSearch(search) {
+  const isEmail = validateEmail(search);
+  const data = {
+    search,
+    isEmail,
+  };
+
+  fetch("/api/admin/search", {
+
+  });
+
+  alert(JSON.stringify(data))
+}
+
+const validateEmail = (email) => {
+  const str = String(email)
+  .toLowerCase()
+  .match(
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  );
+  
+  return str !== null; /* praying this works also */
+};
+
+function setUserDeleteId(id) {
+  userDeleteId = id;
+}
+
+function handleDelete() {
+  fetch("/api/admin/delete", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id: userDeleteId }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (!data.success) return alert("Failed to delete user");
+      window.location.reload();
+  })
 }
 
 // change event listener for each admin select
