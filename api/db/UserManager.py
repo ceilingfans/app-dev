@@ -46,7 +46,7 @@ class UserManager:
         """
         try:
             if user_id is None and email is None:
-                return "ALL", self.col.find()
+                return "ALL", [User(u) for u in self.col.find()]
 
             query = {}
             if user_id is not None:
