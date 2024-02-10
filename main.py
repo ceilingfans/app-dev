@@ -465,7 +465,6 @@ def update_roles():
         return jsonify({"error": "Unauthorized"}), 401
 
     data = request.json
-    print(data)
 
     if not data:
         return jsonify({"error": "No data provided"}), 400
@@ -486,6 +485,33 @@ def update_roles():
         return jsonify({"error": "Internal server error", "message": str(e)}), 500
 
     return jsonify({"success": "Role updated"}), 200
+
+@login_required
+@app.route("/api/admin/password", methods=["POST"])
+def admin_password():
+    if not current_user.get_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    if not data.get("id"):
+        return jsonify({"error": "Missing id"}), 400
+    
+    if not data.get("password"):
+        return jsonify({"error": "Missing password"}), 400
+    
+    ret_code, user = db.users.find(user_id=data["id"])
+    if ret_code == "USERNOTFOUND":
+        return jsonify({"error": "User not found"}), 404
+    
+    ret_code, e = db.users.update({"id": data["id"]}, {"password": get_hash(data["password"])})
+    if ret_code != "SUCCESS":
+        return jsonify({"error": "Internal server error", "message": str(e)}), 500
+    
+    return jsonify({"success": "Password updated"}), 200
 
 @app.errorhandler(404)
 def page_not_found(e):
