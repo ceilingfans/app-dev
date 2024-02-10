@@ -18,3 +18,6 @@ flask_reuploaded
 werkzeug
 threading
 socket
+flask[async]
+paypalrestsdk
+
