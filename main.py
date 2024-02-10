@@ -27,7 +27,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 app.config["UPLOADED_PHOTOS_DEST"] = os.path.join(app.root_path, "static", "images", "userprofileimg")
 login_manager = LoginManager()
-login_manager.init_app(app)
+login_manager.init_app(app) 
 profile_pics = UploadSet("photos", IMAGES)
 configure_uploads(app, profile_pics)
 
@@ -331,7 +331,8 @@ def signup():
             "id": str(uuid4()),
             "email": email,
             "address": address,
-            "newuser": True
+            "newuser": True,
+            "admin": False
         })
 
         ret_code, user = db.users.create(user)
@@ -436,6 +437,55 @@ def profile():
     return render_template(html, form=form, imageform=imageform,
                            image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
 
+
+@login_required
+@app.route("/admin")
+def admin_home():
+    return render_template("admin.html", ip_addr=request.remote_addr)
+
+@login_required
+@app.route("/admin/users")
+def admin_users():
+    ret_code, users = db.users.find()
+    if ret_code == "USERNOTFOUND":
+        return abort(500) # TODO: actual error page
+    
+    return render_template("admin_user.html", users=users, ip_addr=request.remote_addr)
+
+@login_required
+@app.route("/api/admin/create_user")
+def create_user():
+    logout_user()
+    return redirect(url_for("signup"))
+
+@login_required
+@app.route("/api/admin/roles", methods=["POST"])
+def update_roles():
+    if not current_user.get_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.json
+    print(data)
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    if not data.get("id"):
+        return jsonify({"error": "Missing id"}), 400
+    if data.get("role") is None:  # role can be False so cannot do not data.get(...)
+        return jsonify({"error": "Missing role"}), 400
+    
+    ret_code, user = db.users.find(user_id=data["id"])
+    if ret_code == "USERNOTFOUND":
+        return jsonify({"error": "User not found"}), 404
+    
+    if user.get_admin() == data["role"]:
+        return jsonify({"error": "Role already set"}), 400
+    
+    ret_code, e = db.users.update({"id": data["id"]}, {"admin": data["role"]})
+    if ret_code != "SUCCESS":
+        return jsonify({"error": "Internal server error", "message": str(e)}), 500
+
+    return jsonify({"success": "Role updated"}), 200
 
 @app.errorhandler(404)
 def page_not_found(e):
