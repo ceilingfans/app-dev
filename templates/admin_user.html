@@ -474,6 +474,7 @@
           <thead>
             <tr>
               <th scope="col">User</th>
+              <th scope="col">Email</th>
               <th scope="col">Address</th>
               <th scope="col">Id</th>
               <th scope="col">Password</th>
@@ -491,13 +492,14 @@
                   width="32"
                   class="img-fluid border border-primary rounded-circle"
                 />
-                <span class="ms-1">{{ user.get_email() }}</span>
+                <span class="ms-1">{{ user.get_name() }}</span>
                 <span class="text-muted"
                   >{% if user.get_id() == current_user.get_id() %} (You) {%
                   endif %}
                 </span>
                 <span class="text-success" id="feedback"></span>
               </td>
+              <td>{{ user.get_email() }}</td>
               <td>{{ user.get_address() }}</td>
 
               <td>

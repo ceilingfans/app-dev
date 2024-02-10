@@ -581,9 +581,14 @@ def delete_user():
     if not data.get("id"):
         return jsonify({"error": "Missing id"}), 400
     
-    ret_code, e = db.users.delete(data.get('id'))
+    ret_code, user = db.users.find(user_id=data["id"])
     if ret_code == "USERNOTFOUND":
         return jsonify({"error": "User not found"}), 404
+    
+    if user.get_admin():
+        return jsonify({"error": "Cannot delete admin"}), 400
+
+    ret_code, e = db.users.delete(data.get('id'))
     
     if ret_code != "SUCCESS":
         return jsonify({"error": "Internal server error", "message": str(e)}), 500
