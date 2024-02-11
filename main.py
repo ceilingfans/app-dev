@@ -13,6 +13,7 @@ import threading
 import json
 import requests
 import paypalrestsdk
+from datetime import datetime
 
 
 from flask_uploads import UploadSet, configure_uploads, IMAGES
@@ -186,7 +187,8 @@ def insurance():
             "customer_id": current_user.get_id(),
             "bill_id": current_user.get_id()+"BILL",
             "price": insureprice.item(),
-            "status": False
+            "status": False,
+            "plan": insuranceform.user_plan.data
         })
         db.bills.create(bill)
         return redirect(url_for('shop'))
@@ -369,6 +371,7 @@ def profile():
     html = "profile.html"
     form = UserUpdateForm()
     imageform = UserProfile()
+    plan = current_user.get_currentplan()
     if imageform.submit_profile.data and imageform.validate():
         print(imageform.errors)
         file = imageform.image.data
@@ -386,7 +389,7 @@ def profile():
         db.users.update({"id": current_user.get_id()}, {"picture": new_filename})
 
         return render_template(html, form=form, imageform=imageform, result2="Profile picture updated", image=(
-            url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+            url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
     if form.submit_user_update.data and form.validate():
 
@@ -404,13 +407,13 @@ def profile():
         if not any(bool(i) for i in items):
             return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out",
                                    image=(url_for('static',
-                                                  filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                                                  filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
         try:
             check_hash(password, current_user.get_password())
         except VerifyMismatchError:
             return render_template(html, form=form, imageform=imageform, result="Incorrect password", image=(
-                url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
         new = {}
         if first_name != "":
@@ -424,7 +427,7 @@ def profile():
             ret_code, _ = db.users.find(email=email)
             if ret_code == "SUCCESS":
                 return render_template(html, form=form, imageform=imageform, result="Email already in use", image=(
-                    url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                    url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
             new["email"] = email
 
         if address != "":
@@ -436,7 +439,7 @@ def profile():
         if len(new) == 0:
             return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out",
                                    image=(url_for('static',
-                                                  filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                                                  filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
         ret_code, user = db.users.update({"id": current_user.get_id()}, new)
         match ret_code:
@@ -444,14 +447,14 @@ def profile():
                 login_user(user)
                 print("info: logged in user at profile, ", user.get_name(), current_user.get_name())
                 return render_template(html, form=form, imageform=imageform, result="Profile updated", image=(
-                    url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                    url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
             case _:
                 return render_template(html, form=form, imageform=imageform, result=f"Internal server error, {user}",
                                        image=(url_for('static',
-                                                      filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                                                      filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
     return render_template(html, form=form, imageform=imageform,
-                           image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                           image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
     
 @app.route("/chat", methods=["POST", "GET"])
 def chat():
@@ -607,8 +610,18 @@ def makecart(shopping):
 
 def paid(cart):
     items, total = makecart(cart)
-    db.bills.update(current_user.get_id()+"BILL", {"status": True})
-    
+    ret , bill = db.bills.update(current_user.get_id()+"BILL", {"status": True})
+    if ret == "SUCCESS":
+        plan_type = bill.get_plan()
+        if plan_type == "1":
+            plan_type = "Bronze"
+        elif plan_type == "2":
+            plan_type = "Silver"
+        elif plan_type == "3":
+            plan_type = "Gold"
+        db.users.update({"id": current_user.get_id()}, {"currentplan": f"{plan_type},Started on {datetime.now().date()}"})
+    db.users.update({"id": current_user.get_id()}, {"products": items})
+        
     return 
     
 if __name__ == "__main__":
