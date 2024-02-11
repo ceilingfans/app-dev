@@ -45,7 +45,7 @@ class BillManager:
         """
         try:
             if bill_id is None and owner_id is None:
-                return "ALL", self.col.find()
+                return "ALL", [Bill(b) for b in self.col.find()]
 
             query = {}
             owner_flag = False

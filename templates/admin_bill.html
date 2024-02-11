@@ -133,7 +133,46 @@
     background-color: var(--bs-tertiary-bg);
   }
 </style>
-{% endblock %} {% block top_level_body %} {% endblock %} {% block content %}
+{% endblock %} {% block top_level_body %}
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="delete-bill-modal"
+  tabindex="-1"
+  aria-labelledby="delete-bill-label"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="delete-bill-label">
+          Confirm Deletion
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        This action is <strong>irreversible</strong>. Are you sure you want to
+        delete this invoice?
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-danger rounded-pill"
+          onclick="handleBillDelete()"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block content %}
 <div class="container-fluid">
   <div class="row">
     <div
@@ -180,14 +219,14 @@
                   <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                     <li>
                       <a
-                        href="#"
+                        href="{{ url_for('admin_home') }}"
                         class="link-body-emphasis d-inline-flex text-decoration-none rounded"
                         >Dashboard</a
                       >
                     </li>
                     <li>
                       <a
-                        href="#plans"
+                        href="{{ url_for('admin_home', _anchor='plans') }}"
                         class="link-body-emphasis d-inline-flex text-decoration-none rounded"
                         >Plans</a
                       >
@@ -311,216 +350,120 @@
       <div
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
       >
-        <h1 class="h2">Dashboard</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-          <select
-            class="form-select border border-secondary"
-            style="width: fit-content"
-            id="dashboard-filter"
-          >
-            <option selected value="overview">Overview</option>
-            <option value="quarterly">Quarter</option>
-            <option value="weekly">This Week</option>
-          </select>
-        </div>
+        <h1 class="h2">Invoices</h1>
       </div>
-
-      <div class="row pb-3">
-        <div class="col-md-4 py-1">
-          <div class="card">
-            <div class="card-header">Site Traffic</div>
-            <div class="card-body">
-              <canvas
-                class="my-4"
-                id="traffic-graph"
-                width="1552"
-                height="655"
-                style="
-                  display: block;
-                  box-sizing: border-box;
-                  height: 655px;
-                  width: 1552px;
-                "
-              ></canvas>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-4 py-1">
-          <div class="card">
-            <div class="card-header">Transactions</div>
-            <div class="card-body">
-              <canvas
-                class="my-4"
-                id="transaction-graph"
-                width="1552"
-                height="655"
-                style="
-                  display: block;
-                  box-sizing: border-box;
-                  height: 655px;
-                  width: 1552px;
-                "
-              ></canvas>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-4 py-1">
-          <div class="card">
-            <div class="card-header">Customers</div>
-            <div class="card-body">
-              <canvas
-                class="my-4"
-                id="customer-graph"
-                width="1552"
-                height="655"
-                style="
-                  display: block;
-                  box-sizing: border-box;
-                  height: 655px;
-                  width: 1552px;
-                "
-              ></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-4 py-1">
-          <div class="card">
-            <div class="card-header">Plan Proportion Percentage</div>
-            <div class="card-body d-flex justify-content-center">
-              <div class="w-50 h-50">
-                <canvas
-                  class="my-4"
-                  id="plan-graph"
-                  width="1552"
-                  height="655"
-                  style="
-                    display: block;
-                    box-sizing: border-box;
-                    height: 655px;
-                    width: 1552px;
-                  "
-                ></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4 py-1">
-          <div class="card">
-            <div class="card-header">Top Customers</div>
-            <div class="card-body d-flex justify-content-center">
-              <canvas
-                class="my-4"
-                id="top-customer-graph"
-                width="1552"
-                height="655"
-                style="
-                  display: block;
-                  box-sizing: border-box;
-                  height: 655px;
-                  width: 1552px;
-                "
-              ></canvas>
-            </div>
-          </div>
-        </div>
+      <div class="pb-3 mb-2 border-bottom">
+        <a
+          href="{{ url_for('admin_users') }}"
+          class="btn btn-dark rounded-pill mx-1"
+          >View Users</a
+        >
+        <a href="#" class="btn btn-dark rounded-pill mx-1">View Chats</a>
       </div>
 
       <div
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
       >
-        <h1 class="h2" id="plans">Plans</h1>
+        <h1 class="h2">Manage Invoices</h1>
       </div>
-      <div class="row">
-        <div class="col-md-4">
-          <div
-            class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative"
-          >
-            <div class="col p-4 d-flex flex-column position-static">
-              <h3 class="mb-0">Bronze</h3>
-              <div class="mb-1 text-body-secondary">60% Customer Base</div>
-              <p class="card-text mb-auto pb-2">
-                Limited coverage on any subscribed device, we will only cover
-                certain situations.
-              </p>
-              <button
-                class="w-50 btn btn-light border-2 border-dark rounded-pill"
-              >
-                Update
-              </button>
-            </div>
-            <div class="col-auto d-none d-lg-block">
-              <img
-                src="{{ url_for('static', filename='images/val_ranks/Bronze_3_Rank.png') }}"
-                width="150"
-                height="150"
-                alt="bronze"
-                class="my-5 me-2"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div
-            class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative"
-          >
-            <div class="col p-4 d-flex flex-column position-static">
-              <h3 class="mb-0">Silver</h3>
-              <div class="mb-1 text-body-secondary">37% Customer Base</div>
-              <p class="card-text mb-auto pb-2">
-                Partial coverage on any subscribed device, you can still rest
-                assured we will have you covered.
-              </p>
-              <button
-                class="w-50 btn btn-light border-2 border-dark rounded-pill"
-              >
-                Update
-              </button>
-            </div>
-            <div class="col-auto d-none d-lg-block">
-              <img
-                src="{{ url_for('static', filename='images/val_ranks/Silver_3_Rank.png') }}"
-                width="150"
-                height="150"
-                alt="silver"
-                class="my-5 me-2"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div
-            class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative"
-          >
-            <div class="col p-4 d-flex flex-column position-static">
-              <h3 class="mb-0">Gold</h3>
-              <div class="mb-1 text-body-secondary">13% Customer Base</div>
-              <p class="card-text mb-auto pb-2">
-                Full coverage on any subscribed device, whether you run the
-                battery out or it gets stolen, you can rest assured we will have
-                you covered.
-              </p>
-              <button
-                class="w-50 btn btn-light border-2 border-dark rounded-pill"
-              >
-                Update
-              </button>
-            </div>
-            <div class="col-auto d-none d-lg-block">
-              <img
-                src="{{ url_for('static', filename='images/val_ranks/Gold_3_Rank.png') }}"
-                width="150"
-                height="150"
-                alt="Gold"
-                class="my-5 me-2"
-              />
-            </div>
-          </div>
-        </div>
+      <form class="w-100 me-3 mb-3" role="search" action="" method="post">
+        <input
+          type="search"
+          class="form-control border-2"
+          placeholder="Search by owner or bill Id..."
+          aria-label="Search"
+          id="search"
+          name="search"
+        />
+      </form>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">User</th>
+              <th scope="col">Email</th>
+              <th scope="col">Value</th>
+              <th scope="col">Id</th>
+              <th scope="col">Bill Id</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for bill, user in bills %}
+            <tr>
+              <td scope="row">
+                <img
+                  src="{{ url_for('static', filename='images/userprofileimg/' + ( user.get_picture() or 'avatar.png')) }}"
+                  alt="pfp"
+                  height="32"
+                  width="32"
+                  class="img-fluid border border-primary rounded-circle"
+                />
+                <span class="ms-1">{{ user.get_name() }}</span>
+                <span class="text-muted"
+                  >{% if user.get_id() == current_user.get_id() %} (You) {%
+                  endif %}
+                </span>
+                <span class="text-success" id="feedback"></span>
+              </td>
+              <td>{{ user.get_email() }}</td>
+              <td>${{ bill.get_price()|round(2, 'floor') }}</td>
+              <td>
+                <button
+                  type="button"
+                  id="{{ user.get_id() }}-copy"
+                  class="btn btn-light border-2 border-dark rounded-pill"
+                  onclick="copy('{{ user.get_id()}}')"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="{{ user.get_id() }}"
+                >
+                  Copy
+                </button>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  id="{{ bill.get_bill_id() }}-copy"
+                  class="btn btn-light border-2 border-dark rounded-pill"
+                  onclick="copy('{{ bill.get_bill_id()}}')"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="{{ bill.get_bill_id() }}"
+                >
+                  Copy
+                </button>
+              </td>
+
+              <td>
+                <select
+                  class="form-select border-2 border-dark admin-bill-select"
+                  style="width: fit-content"
+                  id="{{ bill.get_bill_id() }}-admin-bill-select"
+                >
+                  {% if bill.get_status() %}
+                  <option value="paid" selected>Paid</option>
+                  <option value="unpaid">Unpaid</option>
+                  {% else %}
+                  <option value="paid">Paid</option>
+                  <option value="unpaid" selected>Unpaid</option>
+                  {% endif %}
+                </select>
+              </td>
+              <td>
+                <button
+                  class="btn btn-danger rounded-pill"
+                  onclick="setBillDeleteId('{{ bill.get_bill_id() }}')"
+                  data-bs-toggle="modal"
+                  data-bs-target="#delete-bill-modal"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
 
       <footer
@@ -539,5 +482,6 @@
   integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
   crossorigin="anonymous"
 ></script>
-<script src="{{ url_for('static', filename='js/dashboard.js')}}"></script>
+<script src="{{ url_for('static', filename='js/tooltips.js')}}"></script>
+<script src="{{ url_for('static', filename='js/userManagement.js')}}"></script>
 {% endblock %}

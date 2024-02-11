@@ -495,6 +495,29 @@ def admin_users():
     return render_template("admin_user.html", users=users, ip_addr=request.remote_addr)
 
 @login_required
+@app.route("/admin/invoices")
+def admin_bills():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return abort(401)
+    
+    ret_code, bills = db.bills.find()
+    if ret_code == "BILLNOTFOUND":
+        return abort(500)
+    
+    pairs = []
+    for bill in bills:
+        ret_code, user = db.users.find(user_id=bill.get_customer_id())  # why are we using customer instead of owner
+        if ret_code == "USERNOTFOUND":
+            db.bills.delete(bill.get_bill_id())
+        
+        pairs.append((bill, user))
+
+    return render_template("admin_bill.html", bills=pairs, ip_addr=request.remote_addr)
+
+@login_required
 @app.route("/api/admin/create_user")
 def create_user():
     if isinstance(current_user, AnonymousUserMixin):
@@ -533,6 +556,41 @@ def update_roles():
         return jsonify({"error": "Internal server error", "message": str(e)}), 500
 
     return jsonify({"success": "Role updated"}), 200
+
+@login_required
+@app.route("/api/admin/invoices/status", methods=["POST"])
+def update_invoice_status():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+    print(data)
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    if not data.get("id"):
+        return jsonify({"error": "Missing id"}), 400
+    
+    if data.get("status") is None:
+        return jsonify({"error": "Missing status"}), 400
+    
+    ret_code, bill = db.bills.find(bill_id=data["id"])
+    print(ret_code, bill)
+    if ret_code == "BILLNOTFOUND":
+        return jsonify({"error": "Bill not found"}), 404
+    
+    if bill.get_status() == data["status"]:
+        return jsonify({"error": "Status already set"}), 400
+    
+    ret_code, e = db.bills.update(data["id"], {"status": data["status"]})
+    if ret_code != "SUCCESS":
+        return jsonify({"error": "Internal server error", "message": str(e)}), 500
+    
+    return jsonify({"success": "Status updated"}), 200
 
 @login_required
 @app.route("/api/admin/password", methods=["POST"])
@@ -594,6 +652,32 @@ def delete_user():
         return jsonify({"error": "Internal server error", "message": str(e)}), 500
     
     return jsonify({"success": "User deleted"}), 200
+
+@login_required
+@app.route("/api/admin/bills/delete", methods=["POST"])
+def delete_bill():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    if not data.get("id"):
+        return jsonify({"error": "Missing id"}), 400
+    
+    ret_code, bill = db.bills.delete(data.get('id'))
+    if ret_code == "BILLNOTFOUND":
+        return jsonify({"error": "Bill not found"}), 404
+    elif ret_code == "ERROR":
+        return jsonify({"error": "Internal server error", "message": str(bill)}), 500
+    
+    return jsonify({"success": "Bill deleted"}), 200
+
 
 @app.errorhandler(404)
 def page_not_found(e):

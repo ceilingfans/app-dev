@@ -1,5 +1,6 @@
 var passwordResetId;
 var userDeleteId;
+var billDeleteId;
 
 function copy(id) {
   // copy to clipboard
@@ -65,7 +66,6 @@ function handlePasswordReset(password, confirm) {
     password,
   };
 
-
   fetch("/api/admin/password", {
     method: "POST",
     headers: {
@@ -79,30 +79,6 @@ function handlePasswordReset(password, confirm) {
       window.location.reload();
     });
 }
-
-function handleSearch(search) {
-  const isEmail = validateEmail(search);
-  const data = {
-    search,
-    isEmail,
-  };
-
-  fetch("/api/admin/search", {
-
-  });
-
-  alert(JSON.stringify(data))
-}
-
-const validateEmail = (email) => {
-  const str = String(email)
-  .toLowerCase()
-  .match(
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  );
-  
-  return str !== null; /* praying this works also */
-};
 
 function setUserDeleteId(id) {
   userDeleteId = id;
@@ -120,7 +96,26 @@ function handleDelete() {
     .then((data) => {
       if (!data.success) return alert("Failed to delete user");
       window.location = window.location.href;
+    });
+}
+
+function setBillDeleteId(id) {
+  billDeleteId = id;
+}
+
+function handleBillDelete() {
+  fetch("/api/admin/bills/delete", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id: billDeleteId }),
   })
+    .then((response) => response.json())
+    .then((data) => {
+      if (!data.success) return alert("Failed to delete bill");
+      window.location = window.location.href;
+    });
 }
 
 // change event listener for each admin select
@@ -151,6 +146,35 @@ function handleDelete() {
         .then((response) => response.json())
         .then((data) => {
           if (!data.success) return alert("Failed to update role");
+        });
+    });
+  }
+
+  const billSelects = document.getElementsByClassName("admin-bill-select");
+  for (const select of billSelects) {
+    select.addEventListener("change", () => {
+      const value = select.value;
+      const id = select.id.substring(
+        0,
+        select.id.length - 18 /* 18 is length of '-admin-bill-select'*/
+      );
+
+      const data = {
+        id,
+        status: value === "paid",
+      };
+      console.log(data);
+
+      fetch("/api/admin/invoices/status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.success) return alert("Failed to update invoice status");
         });
     });
   }

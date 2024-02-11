@@ -230,8 +230,11 @@
         delete this user?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger rounded-pill" 
-        onclick="handleDelete()">
+        <button
+          type="button"
+          class="btn btn-danger rounded-pill"
+          onclick="handleDelete()"
+        >
           Delete
         </button>
       </div>
@@ -321,7 +324,7 @@
                     </li>
                     <li>
                       <a
-                        href="#"
+                        href="{{ url_for('admin_bills') }}"
                         class="link-body-emphasis d-inline-flex text-decoration-none rounded"
                         >Invoices</a
                       >
@@ -426,7 +429,7 @@
           >Create User</a
         >
         <a
-          href="{{ url_for('admin_users', _anchor='invoices') }}"
+          href="{{ url_for('admin_bills') }}"
           class="btn btn-dark rounded-pill mx-1"
           >View Invoices</a
         >
