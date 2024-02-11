@@ -184,7 +184,7 @@ def insurance():
         insureprice = getprice(data, price)
         bill = Bill({
             "customer_id": current_user.get_id(),
-            "bill_id": str(uuid4()),
+            "bill_id": current_user.get_id()+"BILL",
             "price": insureprice.item(),
             "status": False
         })
@@ -529,6 +529,7 @@ def get_data():
     ret_code, promo = db.promos.find(promo_id=promocode)
     if ret_code == "SUCCESS":
         shoppingcart['promo'] = ['1', promo.get_value()]
+        db.promos.delete(promocode)
         return jsonify({'value': promo.get_value()})
     else:
         return jsonify({'value': 0})
@@ -572,6 +573,7 @@ def api_execute():
         print('Execute success!')
         hook.send(
             f"A user has made a purchase of {makecart(shoppingcart)}!")
+        paid(shoppingcart)
         success = True
     else:
         print(payment.error)
@@ -602,6 +604,12 @@ def makecart(shopping):
         item = {}
     total = "{:.2f}".format(total)
     return checkout, total
+
+def paid(cart):
+    items, total = makecart(cart)
+    db.bills.update(current_user.get_id()+"BILL", {"status": True})
+    
+    return 
     
 if __name__ == "__main__":
     app.run(debug=True)
