@@ -2,12 +2,12 @@ var passwordResetId;
 var userDeleteId;
 var billDeleteId;
 
-function copy(id) {
+function copy(id, ctx) {
   // copy to clipboard
   navigator.clipboard.writeText(id);
 
   // show feedback to user
-  const button = document.getElementById(id + "-copy");
+  const button = ctx ? ctx : document.getElementById(id + "-copy"); // hack to allow for the correct button to have the feedback, should have just done this for all buttons but too late now
   button.innerHTML = "Copied";
   button.classList.remove("btn-light", "border-2");
   button.classList.add("btn-success", "border-0");

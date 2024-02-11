@@ -495,6 +495,62 @@ def admin_users():
     return render_template("admin_user.html", users=users, ip_addr=request.remote_addr)
 
 @login_required
+@app.route("/admin/invoices", methods=["POST"])
+def admin_search_bills():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return abort(401)
+    
+    id = request.form.get("search")
+    print(f'"{id}"')
+
+    if not id:
+        ret_code, bills = db.bills.find()
+        if ret_code == "BILLNOTFOUND":
+            return abort(500)
+        
+        pairs = []
+        for bill in bills:
+            ret_code, user = db.users.find(user_id=bill.get_customer_id())
+            if ret_code == "USERNOTFOUND":
+                db.bills.delete(bill.get_bill_id())
+                continue
+
+            pairs.append((bill, user))
+
+        return render_template("admin_bill.html", bills=pairs, ip_addr=request.remote_addr)
+        
+    # try bill id
+    ret_code, bill = db.bills.find(bill_id=id)
+    if ret_code == "SUCCESS":
+        ret_code, user = db.users.find(user_id=bill.get_customer_id())
+        if ret_code == "USERNOTFOUND":
+            db.bills.delete(bill.get_bill_id())
+            return render_template("admin_bill.html", ip_addr=request.remote_addr, error="USER_NOT_FOUND", search=id)
+        
+        return render_template("admin_bill.html", bills=[(bill, user)], ip_addr=request.remote_addr)
+    else:
+        # try owner id
+        ret_code, bills = db.bills.find(owner_id=id)
+        if ret_code == "OWNERBILLS":
+            pairs = []
+
+            for bill in bills:
+                ret_code, user = db.users.find(user_id=bill.get_customer_id())
+                if ret_code == "USERNOTFOUND":
+                    db.bills.delete(bill.get_bill_id())
+                    continue
+
+                pairs.append((bill, user))
+            
+            return render_template("admin_bill.html", bills=pairs, ip_addr=request.remote_addr)
+        else:
+            return render_template("admin_bill.html", ip_addr=request.remote_addr, error="BILL_NOT_FOUND", search=id)
+
+
+@login_required
 @app.route("/admin/invoices")
 def admin_bills():
     if isinstance(current_user, AnonymousUserMixin):
@@ -512,7 +568,8 @@ def admin_bills():
         ret_code, user = db.users.find(user_id=bill.get_customer_id())  # why are we using customer instead of owner
         if ret_code == "USERNOTFOUND":
             db.bills.delete(bill.get_bill_id())
-        
+            continue 
+
         pairs.append((bill, user))
 
     return render_template("admin_bill.html", bills=pairs, ip_addr=request.remote_addr)

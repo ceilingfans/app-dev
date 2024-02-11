@@ -376,6 +376,25 @@
           name="search"
         />
       </form>
+      {% if error %}
+      <div class="bg-body-tertiary p-5 rounded">
+        <h1>No bill found</h1>
+        {% if error == "USER_NOT_FOUND" %}
+        <p class="lead">
+          You searched for <code>{{ search }}</code> which is a valid bill Id
+          but the user has been deleted, the bill has been deleted.
+        </p>
+        {% elif error == "BILL_NOT_FOUND" %}
+        <p class="lead">
+          You searched for <code>{{ search }}</code>, however no bill could be
+          found.
+        </p>
+        {% endif %}
+        <p class="lead">
+          Make sure you have typed in the correct bill or owner Id.
+        </p>
+      </div>
+      {% else %}
       <div class="table-responsive">
         <table class="table table-striped">
           <thead>
@@ -413,7 +432,7 @@
                   type="button"
                   id="{{ user.get_id() }}-copy"
                   class="btn btn-light border-2 border-dark rounded-pill"
-                  onclick="copy('{{ user.get_id()}}')"
+                  onclick="copy('{{ user.get_id()}}', this)"
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
                   data-bs-title="{{ user.get_id() }}"
@@ -465,6 +484,7 @@
           </tbody>
         </table>
       </div>
+      {% endif %}
 
       <footer
         class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
