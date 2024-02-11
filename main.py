@@ -28,6 +28,7 @@ from api.structures.Bill import Bill
 from api.structures.datavalidation import *
 from api.chatbot.adminchat import AdminChat
 from api.chatbot.customerchat import UserChat
+from api.db.driver import generate_id
 #from api.chatbot.bardchat import bardchat
 
 db = Driver()
@@ -185,7 +186,7 @@ def insurance():
         insureprice = getprice(data, price)
         bill = Bill({
             "customer_id": current_user.get_id(),
-            "bill_id": current_user.get_id()+"BILL",
+            "bill_id": str(uuid4()),
             "price": insureprice.item(),
             "status": False,
             "plan": insuranceform.user_plan.data
@@ -610,16 +611,20 @@ def makecart(shopping):
 
 def paid(cart):
     items, total = makecart(cart)
-    ret , bill = db.bills.update(current_user.get_id()+"BILL", {"status": True})
-    if ret == "SUCCESS":
-        plan_type = bill.get_plan()
-        if plan_type == "1":
-            plan_type = "Bronze"
-        elif plan_type == "2":
-            plan_type = "Silver"
-        elif plan_type == "3":
-            plan_type = "Gold"
-        db.users.update({"id": current_user.get_id()}, {"currentplan": f"{plan_type},Started on {datetime.now().date()}"})
+    ret_code, bill = db.bills.find(owner_id=current_user.get_id())
+    plans = []
+    if ret_code == "OWNERBILLS":
+        for item in bill:
+            plan_type = item.get_plan()
+            if plan_type == "1":
+                plan_type = "Bronze"
+            elif plan_type == "2":
+                plan_type = "Silver"
+            elif plan_type == "3":
+                plan_type = "Gold"
+            db.bills.update(item.get_bill_id(), {"status": True})
+            plans.append(plan_type)
+    db.users.update({"id": current_user.get_id()}, {"currentplan": f"{plans},Bought on {datetime.now().date()}"})
     db.users.update({"id": current_user.get_id()}, {"products": items})
         
     return 
