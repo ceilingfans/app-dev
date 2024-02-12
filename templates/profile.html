@@ -77,18 +77,215 @@
 <div class="container col-xl-10 col-xxl-8 px-4 py-5">
   {% if current_user.get_currentplan() != "" %}
   <h2 class="text-center fw-bold pb-2">Your Subscription</h2>
-      <p class="text-success text-center font-weight-bold">
-        {{ plan }}
-      </p>
+        <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+        {% for plan1 in plan %}
+        {% if plan1 == "Silver"%}
+        <div class="col-lg text-center">
+          <img
+            src="/static/images/plat.jpeg"
+            alt="Silver"
+            class="rounded"
+            height="140px"
+            width="140"
+          />
+          <h2 class="fw-normal mt-1">Silver</h2>
+        </div>
+        {% elif plan1 == "Gold"%}
+        <div class="col-lg text-center">
+          <img
+            src="/static/images/diamond.jpeg"
+            alt="Gold"
+            class="rounded"
+            height="140px"
+            width="140"
+          />
+          <h2 class="fw-normal mt-1 ">Gold</h2>
+        </div>
+        {% elif plan1 == "Bronze"%}
+        <div class="col-lg text-center">
+          <img
+            src="/static/images/gold.jpeg"
+            alt="Bronze"
+            class="rounded"
+            height="140px"
+            width="140"
+          />
+          <h2 class="fw-normal mt-1">Bronze</h2>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <div class="d-flex justify-content-center align-items-center" style="height: 100px;">
+    <a href="{{ url_for('contact') }}" class="btn btn-primary">Contact Us to Ensure An Item using purchased Subscriptions</a>
+    </div>
   {% endif %}
 </div>
 <div class="container col-xl-10 col-xxl-8 px-4 py-5">
   {% if current_user.get_products() is not none %}
-  <h2 class="text-center fw-bold pb-2">Your Purchases.</h2>
+  <h2 class="text-center fw-bold pb-2">Your Purchases</h2>
       <p class="text-primary text-center font-weight-bold">
-        {% for product in current_user.get_products() %}
-        {{ product }}<br>
-        {% endfor %}
+        <div class="d-flex justify-content-center align-items-center">
+          <div class="row row-cols-1 row-cols-md-2 g-4">
+          {% for product in current_user.get_products()%}
+          {% if product['name'] == "iPhone X" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/iphonex.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+                {% elif product['name'] == "iPhone 13" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/iphone13.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+                {% elif product['name'] == "iPhone 12" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/iphone12.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+                {% elif product['name'] == "iPhone 11" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/iphone11.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+                {% elif product['name'] == "Samsung S23" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/samsungs23.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+                {% elif product['name'] == "Samsung S22" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/samsungs22.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+                {% elif product['name'] == "Samsung S20" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/samsungs20.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+                {% elif product['name'] == "Samsung A14" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/samsunga14.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+                {% elif product['name'] == "Redmi 13" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/xiaominote13.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+                {% elif product['name'] == "Xiaomi 13T" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/xiaomi13t.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+                {% elif product['name'] == "Xiaomi 13 Pro" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/xiaomi13pro.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+                {% elif product['name'] == "POCO M6 Pro" %}
+                  <div class="col-lg-3 text-center">
+                    <div class="card">
+                      <img
+                        src="/static/images/xiaomim6pro.jpg"
+                        alt="{{product['name']}}"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h2 class="card-title fw-normal mt-1">{{product['name']}}</h2>
+                      </div>
+                    </div>
+                  </div>
+          {%endif%}
+          {% endfor %}
+      </div>
       </p>
   {% endif %}
 </div>

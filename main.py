@@ -14,6 +14,8 @@ import json
 import requests
 import paypalrestsdk
 from datetime import datetime
+import re
+import ast
 
 
 from flask_uploads import UploadSet, configure_uploads, IMAGES
@@ -325,7 +327,6 @@ def wheelspin():
     db.users.update({"id": current_user.get_id()}, {"newuser": False})
     return jsonify(number=number, section=section, spun=False, coupon=coupon, value=value)
 
-
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if current_user.is_authenticated:
@@ -365,14 +366,22 @@ def signup():
                 return render_template(html, form=form, result=f"Internal server error, {user}")
     return render_template(html, form=form)
 
-
 @app.route("/profile", methods=["POST", "GET"])
 @login_required
 def profile():
     html = "profile.html"
     form = UserUpdateForm()
     imageform = UserProfile()
-    plan = current_user.get_currentplan()
+    plans = current_user.get_currentplan()
+    try:
+        array_match = re.search(r'\[.*?\]', plans)
+    except:
+        array_match = False
+    if array_match:
+        array_str = array_match.group(0)  # Extract the array string
+        plan = ast.literal_eval(array_str)  # Convert the array string to an actual array
+    else: 
+        plan = "None"
     if imageform.submit_profile.data and imageform.validate():
         print(imageform.errors)
         file = imageform.image.data
@@ -587,7 +596,7 @@ def api_execute():
 
     return jsonify({'success' : success})
 
-@app.route('/payment/success')
+@app.route('/success')
 def purchased():
     return render_template('purchased.html')
 
@@ -615,6 +624,9 @@ def makecart(shopping):
 def paid(cart):
     items, total = makecart(cart)
     ret_code, bill = db.bills.find(owner_id=current_user.get_id())
+    ret_code2, user = db.users.find(current_user.get_id())
+    products = user.get_products() + items
+    
     plans = []
     if ret_code == "OWNERBILLS":
         for item in bill:
@@ -628,7 +640,7 @@ def paid(cart):
             db.bills.update(item.get_bill_id(), {"status": True})
             plans.append(plan_type)
     db.users.update({"id": current_user.get_id()}, {"currentplan": f"{plans},Bought on {datetime.now().date()}"})
-    db.users.update({"id": current_user.get_id()}, {"products": items})
+    db.users.update({"id": current_user.get_id()}, {"products": products})
     return 
     
 if __name__ == "__main__":
