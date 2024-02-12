@@ -587,7 +587,7 @@ def api_execute():
 
     return jsonify({'success' : success})
 
-@app.route('/payment/success')
+@app.route('/success')
 def purchased():
     return render_template('purchased.html')
 
