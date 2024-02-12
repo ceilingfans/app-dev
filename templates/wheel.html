@@ -3,6 +3,7 @@
   href="{{ url_for('static', filename='css/wheel.css') }}"
   rel="stylesheet"
 />
+
 {% endblock %} {% block title %} Wheel {% endblock %}
 
 {% block top_level_body %}
@@ -20,7 +21,9 @@
 </div>
 {% endblock %}
 
+
 {% block content %}
+<div class="container-text">
 <div class="container">
   <div class="row">
     <div class="titlewheel text-center">
@@ -29,6 +32,8 @@
     </div>
   </div>
 </div>
+</div>
+<div class="wheel-container">
 <!-- WHEEL -->
 <div class="wheel">
   <div class="containerwheel container-xl">
@@ -42,6 +47,7 @@
   <span class="mid"></span>
   <button id="spin">Spin</button>
   <div class="stoper"></div>
+</div>
 </div>
 <!-- END WHEEL -->
 {% endblock %}
