@@ -12,6 +12,9 @@ class User(UserMixin):
     __address: str = None
     __newuser: bool = True
     __picture:  str = None
+    __currentplan: str = None
+    __products: list = None
+    
 
     def __init__(self, data):
         self.__name = data.get("name", None)
@@ -21,7 +24,8 @@ class User(UserMixin):
         self.__address = data.get("address", None)
         self.__newuser = data.get("newuser", None)
         self.__picture = data.get("picture", None)
-
+        self.__currentplan = data.get("currentplan", None)
+        self.__products = data.get("products", None)
     # use dict(<User>) to get the JSON
     def __iter__(self):
         yield 'name', self.__name
@@ -31,6 +35,8 @@ class User(UserMixin):
         yield 'address', self.__address
         yield 'newuser', self.__newuser
         yield 'picture', self.__picture
+        yield 'currentplan', self.__currentplan
+        yield 'products', self.__products
 
     def get_name(self):
         return self.__name
@@ -52,6 +58,12 @@ class User(UserMixin):
     
     def get_picture(self):
         return self.__picture
+    
+    def get_currentplan(self):
+        return self.__currentplan
+    
+    def get_products(self):
+        return self.__products
     
 
 
