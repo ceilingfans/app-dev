@@ -1,0 +1,111 @@
+{% extends "base.html" %} {% block head %}
+<link
+  href="{{ url_for('static', filename='css/wheel.css') }}"
+  rel="stylesheet"
+/>
+{% endblock %} {% block title %} Wheel {% endblock %}
+
+{% block top_level_body %}
+<!-- The Modal -->
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content text-center">
+    <span class="close">&times;</span>
+    <img src="" alt="coupon" />
+    <h1>Congratulations!</h1>
+    <div class="coupon">
+      <p>amogus</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="titlewheel text-center">
+      <h1>Bonus Wheel</h1>
+      <p>Spin and Win!</p>
+    </div>
+  </div>
+</div>
+<!-- WHEEL -->
+<div class="wheel">
+  <div class="containerwheel container-xl">
+    <div class="one">$5</div>
+    <div class="two">$5</div>
+    <div class="three">$10</div>
+    <div class="four">$20</div>
+    <div class="five">$10</div>
+    <div class="six">$5</div>
+  </div>
+  <span class="mid"></span>
+  <button id="spin">Spin</button>
+  <div class="stoper"></div>
+</div>
+<!-- END WHEEL -->
+{% endblock %}
+
+{% block user_scripts %}
+<!-- JS -->
+<script>
+  let wheel = document.querySelector(".containerwheel");
+  let btn = document.getElementById("spin");
+  let number = 360;
+  var span = document.getElementsByClassName("close")[0];
+  let modal = document.getElementById("myModal");
+  let flash = document.querySelector(".containerwheel div");
+  let modalcoupon = document.querySelector(".modal-content .coupon p");
+  let modaltext = document.querySelector(".modal-content h1");
+  let modalimg = document.querySelector(".modal-content img");
+  const spinning = new Audio();
+  spinning.src = "{{ url_for('static', filename='audio/spinner-sound.mp3') }}";
+  const yay = new Audio();
+  yay.src =
+    "{{ url_for('static', filename='audio/yt1s.com - Children Yay   Sound Effect.mp3') }}";
+  const ding = new Audio();
+  ding.src = "{{ url_for('static', filename='audio/ding.mp3') }}";
+  const scream = new Audio();
+  scream.src = "{{ url_for('static', filename='audio/scream.mp3') }}";
+
+  span.onclick = function () {
+    modal.style.display = "none";
+  };
+
+  btn.onclick = function () {
+    fetch("/wheelspin")
+      .then((response) => response.json())
+      .then((data) => {
+        let spun = data.spun;
+        if (spun == true) {
+          scream.play();
+          modal.style.display = "block";
+          modaltext.innerHTML = "Sorry, you already spun the wheel.";
+          modalcoupon.parentNode.remove();
+          modalimg.src = "https://cdn3.emoji.gg/emojis/5721_NYOOO.png";
+          return;
+        }
+        spinning.play();
+        let number = data.number;
+        setTimeout(function () {
+          spinning.pause();
+          ding.play();
+          yay.play();
+          spinning.pause();
+        }, 3000);
+        let section = data.section;
+        let coupon = data.coupon;
+        let value = data.value;
+        wheel.style.transform = "rotate(" + number + "deg)";
+        setTimeout(function () {
+          modal.style.display = "block";
+          modaltext.innerHTML =
+            "Congratulations! You won a coupon worth $" + value;
+          modalcoupon.innerHTML = coupon;
+          modalimg.src =
+            "https://i.pinimg.com/originals/bb/eb/43/bbeb43706a6d7bd081723c11aceede89.jpg";
+        }, 4000);
+      });
+  };
+</script>
+{% endblock %}

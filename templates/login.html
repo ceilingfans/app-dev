@@ -1,0 +1,66 @@
+{% from "includes/_forms.html" import render_field with context %}
+
+{% extends "base.html" %} {% block title %}Login{% endblock %} {% block content
+%}
+<div class="cotainer d-flex align-items-center justify-content-center">
+  <div class="col-lg-4 col-md-4 p-3 shadow border border-grey rounded">
+    <form class="row p-3" method="post" action="">
+      <h5 class="mb-3 fw-bold">Sign in to Phony Insurance</h5>
+
+      <!-- EMAIL, cannot use macro due to special error -->
+      {% if not form.email_signin.errors %}
+        <div class="col-12 p-2">
+          {{ form.email_signin(class="form-control p-2", placeholder="Email") }}
+        </div>
+      {% else %}
+        <div class="col-12 p-2">
+          {{ form.email_signin(class="form-control p-2 border border-danger",
+          placeholder="Email") }}
+        </div>
+
+        {% if result != "Email already in use"%}
+          <div>
+            <p class="text-danger">
+              {% for error in form.email_signin.errors %} {{ error }} <br />
+              {% endfor %}
+            </p>
+          </div>
+        {% endif %}
+      {% endif %}
+
+
+      <!-- PASSWORD -->
+      {{ render_field(form.password_signin, "Password") }}
+
+
+      <div class="col-12 p-2">
+        <div class="form-check">
+          {{ form.remember_me(class="form-check-input") }}
+          <label class="form-check-label" for="{{ form.remember_me.id }}"
+            >Keep me signed in</label
+          >
+        </div>
+      </div>
+
+      <div class="col-12 p-2">
+        {{ form.submit_user_signin(class="w-50 btn btn-lg btn-light border-2
+        border-dark rounded-pill") }} {{ form.hidden_tag() }}
+      </div>
+      
+
+      <p class="text-danger">{{ login_result }}</p>
+
+      <hr class="my-4" />
+
+      <h5 class="mb-3 fw-bold">New to Phony Insurance?</h5>
+      <div class="col-12 p-2">
+        <a
+          href="{{ url_for('signup') }}"
+          class="col-12 p-2 w-50 btn btn-lg btn-dark rounded-pill"
+          >Sign Up</a
+        >
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

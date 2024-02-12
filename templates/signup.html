@@ -1,0 +1,56 @@
+{% from "includes/_forms.html" import render_field with context %} {% extends
+"base.html" %} {% block title %}Signup{% endblock %} {% block content %}
+<div class="container">
+  <div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-7 col-lg-8 p-3 shadow border border-grey rounded">
+      <form class="row p-3" method="post">
+        <h5 class="mb-3 fw-bold">Sign up to Phony Insurance</h5>
+
+        {{ form.csrf_token }}
+        <!-- FIRST NAME -->
+        <div class="col-sm-6 p-2">
+          {{ form.name_create(class="form-control p-2", placeholder="First Name") }}
+        </div>
+
+        <!-- LAST NAME -->
+        <div class="col-sm-6 p-2">
+          {{ form.name_last_create(class="form-control p-2", placeholder="Last Name") }}
+        </div>
+
+        <!-- EMAIL -->
+        {{ render_field(form.email_create, "your@email.com") }}
+
+        <!-- ADDRESS -->
+        {{ render_field(form.address_create, "28 Pork Street, Singapore 212128") }}
+
+        <!-- PASSWORD -->
+        {{ render_field(form.password_create, "Password", "col-sm-6 p-2") }}
+        
+        <!-- CONFIRM -->
+        {{ render_field(form.password_confirm, "Confirm", "col-sm-6 p-2") }}
+        <p class="m-0 ms-1 mt-1 px-2 pb-2 text-body-tertiary">
+          Use 8 or more characters with a mix of letters numbers and symbols.
+        </p>
+
+        <div class="col-12 py-4">
+          {{ form.submit_user_create(class="w-50 btn btn-lg btn-light border-2
+          border-dark rounded-pill") }}
+        </div>
+        <p class="text-danger">{{ result }}</p>
+
+        <hr class="my-4" />
+
+        <h5 class="pt-3 mb-3 fw-bold">Already have an account?</h5>
+        <div class="col-12 p-2">
+          <a
+            href="{{ url_for('login') }}"
+            class="col-12 p-2 w-50 btn btn-lg btn-dark rounded-pill"
+            >Login</a
+          >
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

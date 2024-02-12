@@ -9,7 +9,12 @@ from uuid import uuid4
 from werkzeug.utils import secure_filename
 from dhooks import Webhook
 from PIL import Image
+import threading
 import json
+import requests
+import paypalrestsdk
+from datetime import datetime
+
 
 from flask_uploads import UploadSet, configure_uploads, IMAGES
 
@@ -21,15 +26,28 @@ from api.structures.Promo import Promo
 from api.Insuranceprice.getprice import getprice
 from api.structures.Bill import Bill
 from api.structures.datavalidation import *
+from api.chatbot.adminchat import AdminChat
+from api.chatbot.customerchat import UserChat
+from api.db.driver import generate_id
+#from api.chatbot.bardchat import bardchat
 
 db = Driver()
-app = Flask(__name__, static_url_path="/static")
+app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
+hook = Webhook("https://discord.com/api/webhooks/1198939240235532358/Gu5Dw7cmkupwqo9yg-PgdSKXlj1toWbCHsSqQUabIJc-A3dOlHfDdVkkqwurh34wXdaR")
 app.config["UPLOADED_PHOTOS_DEST"] = os.path.join(app.root_path, "static", "images", "userprofileimg")
 login_manager = LoginManager()
 login_manager.init_app(app)
 profile_pics = UploadSet("photos", IMAGES)
 configure_uploads(app, profile_pics)
+PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID')
+PAYPAL_CLIENT_SECRET = os.getenv('PAYPAL_CLIENT_SECRET')
+paypalrestsdk.configure({
+  "mode": "sandbox", # sandbox or live
+  "client_id": PAYPAL_CLIENT_ID,
+  "client_secret": PAYPAL_CLIENT_SECRET})
+chats = {}
+shoppingcart = {}
 
 
 @app.context_processor
@@ -103,8 +121,6 @@ def search():
 
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
-    hook = Webhook(
-        "https://discord.com/api/webhooks/1198939240235532358/Gu5Dw7cmkupwqo9yg-PgdSKXlj1toWbCHsSqQUabIJc-A3dOlHfDdVkkqwurh34wXdaR")
     contactform = ContactUs()
     if contactform.submit_contact.data and contactform.validate():
         print("info: contact form submitted")
@@ -118,15 +134,17 @@ def contact():
 def shop():
     return render_template("shop.html")
 
-
 @app.route("/payment", methods=["GET", "POST"])
 @login_required
 def payment():
+    global shoppingcart
+    form = PromoForm()
     try:
         cart = request.args.get('cart')
         cart = json.loads(cart)
+        shoppingcart = cart
     except:
-        abort(404)
+        cart = {}
 
     userid = current_user.get_id()
     ret_code, bills = db.bills.find(owner_id=userid)
@@ -141,8 +159,9 @@ def payment():
                 total += bill_price
                 cnt += 1
                 cart[f"Plan Quote {cnt}"] = ['1', bill_price]
-
-    return render_template("payment.html", cart=cart, total=round(total, 2))
+                shoppingcart[f"Plan Quote {cnt}"] = ['1', bill_price]
+    total = "{:.2f}".format(total)
+    return render_template("payment.html", cart=cart, total=total, form = form)
 
 
 @app.route("/insurance", methods=["GET", "POST"])
@@ -169,7 +188,8 @@ def insurance():
             "customer_id": current_user.get_id(),
             "bill_id": str(uuid4()),
             "price": insureprice.item(),
-            "status": False
+            "status": False,
+            "plan": insuranceform.user_plan.data
         })
         db.bills.create(bill)
         return redirect(url_for('shop'))
@@ -352,6 +372,7 @@ def profile():
     html = "profile.html"
     form = UserUpdateForm()
     imageform = UserProfile()
+    plan = current_user.get_currentplan()
     if imageform.submit_profile.data and imageform.validate():
         print(imageform.errors)
         file = imageform.image.data
@@ -369,7 +390,7 @@ def profile():
         db.users.update({"id": current_user.get_id()}, {"picture": new_filename})
 
         return render_template(html, form=form, imageform=imageform, result2="Profile picture updated", image=(
-            url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+            url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
     if form.submit_user_update.data and form.validate():
 
@@ -387,13 +408,13 @@ def profile():
         if not any(bool(i) for i in items):
             return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out",
                                    image=(url_for('static',
-                                                  filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                                                  filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
         try:
             check_hash(password, current_user.get_password())
         except VerifyMismatchError:
             return render_template(html, form=form, imageform=imageform, result="Incorrect password", image=(
-                url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
         new = {}
         if first_name != "":
@@ -407,7 +428,7 @@ def profile():
             ret_code, _ = db.users.find(email=email)
             if ret_code == "SUCCESS":
                 return render_template(html, form=form, imageform=imageform, result="Email already in use", image=(
-                    url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                    url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
             new["email"] = email
 
         if address != "":
@@ -419,7 +440,7 @@ def profile():
         if len(new) == 0:
             return render_template(html, form=form, imageform=imageform, result="You need at least 1 field filled out",
                                    image=(url_for('static',
-                                                  filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                                                  filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
         ret_code, user = db.users.update({"id": current_user.get_id()}, new)
         match ret_code:
@@ -427,20 +448,186 @@ def profile():
                 login_user(user)
                 print("info: logged in user at profile, ", user.get_name(), current_user.get_name())
                 return render_template(html, form=form, imageform=imageform, result="Profile updated", image=(
-                    url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                    url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
             case _:
                 return render_template(html, form=form, imageform=imageform, result=f"Internal server error, {user}",
                                        image=(url_for('static',
-                                                      filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                                                      filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
     return render_template(html, form=form, imageform=imageform,
-                           image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')))
+                           image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
+    
+@app.route("/chat", methods=["POST", "GET"])
+def chat():
+    form = Chatform()
+    #This cannot be done like below, it requires a AJAX request to the server to get the response instead of reloading the whole html everytime.
+    if form.submit_chat.data and form.validate():
+        text = bardchat(form.message.data)
+        return render_template("examplechat.html", form=form, result=text)
+    return render_template("examplechat.html", form=form)
+
+# This is the AJAX request to the server to get the response from the chatbot
+@app.route("/get_bard")
+def get_bard(text):
+    return bardchat(text)
+
+@app.route("/staffchat", methods=["POST", "GET"])
+def staffchat():
+    form = Chatform()
+    # MAKE THIS INTO OWN SITE OR AJAX TO RUN 
+    admin = AdminChat(55555,"admin","chatlog.txt")
+    chats["admin"] = admin
+    admin_thread = threading.Thread(target=admin.connect, args=())
+    admin_thread.start()
+    
+    return render_template("examplechat.html", form=form)
+        
+        
+@app.route("/userchat", methods=["POST", "GET"])
+def userchat():
+    form = Chatform()
+    # MAKE THIS INTO OWN SITE OR AJAX TO RUN
+    # Randomly generate the port for the user to connect to make the txt file the port number and obtain the username's name.
+    user = UserChat(55555,"user","chatlog.txt")
+    chats["user"] = user
+    user_thread = threading.Thread(target=user.connect, args=())
+    user_thread.start()
+    
+    return render_template("examplechat.html", form=form)
+
+#TODO LINK TO JS @JUNWEI GO DO 
+@app.route('/api/sentstaffchat', methods=['GET'])
+def sent_staff_chat():
+    admin = chats["admin"]
+    message = "burgerboyadmin" #Set to grab the json that JS sends.
+    admin.set_text(message)
+    return render_template("home.html")
+
+@app.route('/api/sentuserchat', methods=['GET'])
+def sent_user_chat():
+    user = chats["user"]
+    message = "burgerboyuser" #Set to grab the json that JS sends.
+    user.set_text(message)
+    return render_template("home.html")
+
+# Should probably return a json to the JS front end.
+@app.route('/api/getstaffreply', methods=['GET'])
+def get_staff_reply():
+    admin = chats["admin"]
+    return admin.get_reply()
+
+@app.route('/api/getuserreply', methods=['GET'])
+def get_user_reply():
+    user = chats["user"]
+    return user.get_reply()
 
 
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
 
+@app.route('/api/promo', methods=['GET','POST'])
+def get_data():
+    global shoppingcart
+    promocode = request.form.get('promocode')
+    ret_code, promo = db.promos.find(promo_id=promocode)
+    if ret_code == "SUCCESS":
+        shoppingcart['promo'] = ['1', promo.get_value()]
+        db.promos.delete(promocode)
+        return jsonify({'value': promo.get_value()})
+    else:
+        return jsonify({'value': 0})
+    
 
+@app.route('/api/payment', methods=['POST'])
+def api_payment():
+    global shoppingcart
+    items, total = makecart(shoppingcart)
+    payment = paypalrestsdk.Payment({
+        "intent": "sale",
+        "payer": {
+            "payment_method": "paypal"},
+        "redirect_urls": {
+            "return_url": "http://localhost:5000/",
+            "cancel_url": "http://localhost:5000/"},
+        "transactions": [{
+            "item_list": {
+                "items": items
+                          },
+            "amount": {
+                "total": total,
+                "currency": "SGD"},
+            "description": "Your items."}]})
+
+    if payment.create():
+        print('Payment made!')
+    else:
+        print(payment.error)
+
+    return jsonify({'paymentID' : payment.id})
+
+@app.route('/api/execute', methods=['POST'])
+def api_execute():
+    global shoppingcart
+    success = False
+
+    payment = paypalrestsdk.Payment.find(request.form['paymentID'])
+
+    if payment.execute({'payer_id' : request.form['payerID']}):
+        print('Execute success!')
+        hook.send(
+            f"A user has made a purchase of {makecart(shoppingcart)}!")
+        paid(shoppingcart)
+        success = True
+    else:
+        print(payment.error)
+
+    return jsonify({'success' : success})
+
+@app.route('/payment/success')
+def purchased():
+    return render_template('purchased.html')
+
+def makecart(shopping):
+    shoppingcartlocal = shopping
+    checkout = []
+    total = 0
+    item = {}
+    for key in shoppingcartlocal:
+        if key == "promo":
+            checkout[0]["price"] = checkout[0]["price"] - shoppingcartlocal[key][1]
+            total -= shoppingcartlocal[key][1]
+            continue
+        item["name"] = key
+        item["price"] = shoppingcartlocal[key][1]
+        item["quantity"] = shoppingcartlocal[key][0]
+        item["sku"] = "12345"
+        item["currency"] = "SGD"
+        total += shoppingcartlocal[key][1]
+        checkout.append(item)
+        item = {}
+    total = "{:.2f}".format(total)
+    return checkout, total
+
+def paid(cart):
+    items, total = makecart(cart)
+    ret_code, bill = db.bills.find(owner_id=current_user.get_id())
+    plans = []
+    if ret_code == "OWNERBILLS":
+        for item in bill:
+            plan_type = item.get_plan()
+            if plan_type == "1":
+                plan_type = "Bronze"
+            elif plan_type == "2":
+                plan_type = "Silver"
+            elif plan_type == "3":
+                plan_type = "Gold"
+            db.bills.update(item.get_bill_id(), {"status": True})
+            plans.append(plan_type)
+    db.users.update({"id": current_user.get_id()}, {"currentplan": f"{plans},Bought on {datetime.now().date()}"})
+    db.users.update({"id": current_user.get_id()}, {"products": items})
+        
+    return 
+    
 if __name__ == "__main__":
     app.run(debug=True)

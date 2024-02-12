@@ -1,0 +1,76 @@
+{% extends "base.html" %} {% block head %}
+
+<style>
+  /* Removes Marker from ul and adds the little arrow next to dropdrops */
+  form ul {
+    list-style: none;
+    margin: 0;
+  }
+  .dropdownbtn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    z-index: 10000;
+    width: 8px;
+    height: 8px;
+    border: 2px solid #333;
+    border-right: 2px solid #fff;
+    border-top: 2px solid #fff;
+    rotate: -45deg;
+  }
+  .dropdowncontainer {
+    position: relative;
+  }
+</style>
+{% endblock %} {% block title %}Insurance{% endblock %} {% block content %}
+<div class="container">
+  <section>
+    <h2>Get a Quote</h2>
+    <p>Fill out the form below to get a personalized insurance quote.</p>
+
+    <form method="post">
+      {{ form.csrf_token }}
+      <label class="form-label">Age:</label>
+      {{ form.user_age(placeholder="Age", class="form-control")}}
+      <label class="form-label">Gender:</label>
+      {{ form.user_gender(class="form-control")}}
+      <label class="form-label">What kind of job do you have?</label>
+      <div class="dropdowncontainer">
+        {{ form.user_job(class="form-control") }}
+        <div class="dropdownbtn"></div>
+      </div>
+      <label class="form-label"
+        >Are you Active?(ex:Cycles more then 3 times a week)</label
+      >
+      {{ form.user_sports(class="form-control")}}
+      <label class="form-label">Education level:</label>
+      <div class="dropdowncontainer">
+        {{ form.user_education(class="form-control")}}
+        <div class="dropdownbtn"></div>
+      </div>
+      <label class="form-label">How many Vacations on average per year</label>
+      {{ form.user_vacations(class="form-control", placeholder="Vacations")}}
+
+      <label class="form-label">Phone price:</label>
+      {{ form.user_phone_price(class="form-control", placeholder="Phone
+      Price")}}
+      <label class="form-label">Plan of choice</label>
+      <div class="dropdowncontainer">
+        {{ form.user_plan(class="form-control")}}
+        <div class="dropdownbtn"></div>
+      </div>
+      <div class="d-grid gap-2 mt-3">
+        {{ form.submit_insure(class="btn btn-primary") }}
+      </div>
+    </form>
+    {{ payment }} {% if form.errors %}
+    <ul class="errors">
+      {% for field in form %} {% for error in field.errors %}
+      <li>{{field.label}}: {{ error }}</li>
+      {% endfor %} {% endfor %}
+    </ul>
+    {% endif %} {{ result }}
+  </section>
+</div>
+
+{% endblock %}

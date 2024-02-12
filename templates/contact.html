@@ -1,0 +1,107 @@
+{% extends "base.html" %} {% block head %}
+<style>
+  p {
+    color: #555555;
+  }
+
+  form {
+    margin-top: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  .form-control {
+    margin-bottom: 15px;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+
+  .errors {
+    color: #dc3545;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .table {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .table td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+  }
+</style>
+{% endblock %} {% block title %}Contact{% endblock %} {% block content %}
+
+<div class="container mt-5">
+  <h1>Contact Us</h1>
+  <p>Please drop us a note if you have any feedback or questions.</p>
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Sent Your Request</h3>
+      <form method="POST">
+        {{ form.csrf_token }}
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="name">Name</label>
+            {{ form.name(class="form-control", placeholder="Name") }}
+          </div>
+          <div class="form-group col-md-6">
+            <label for="phone_number">Phone Number</label>
+            {{ form.phone_number(class="form-control", placeholder="XXXXXXXX")
+            }}
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-12">
+            <label for="email">Email</label>
+            {{ form.email(class="form-control", placeholder="your@email.com")
+            }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message">Enter your feedback and inquiries here</label>
+          {{ form.message(class="form-control", placeholder="Enter your message") }}
+        </div>
+
+        {{ form.submit_contact(class="btn btn-primary") }} {% if form.errors %}
+        <ul class="errors">
+          {% for field in form %} {% for error in field.errors %}
+          <li>{{field.label}}: {{ error }}</li>
+          {% endfor %} {% endfor %}
+        </ul>
+        {% endif %} {{ result }}
+      </form>
+    </div>
+    <div class="col-md-6">
+      <h3>Reach Us</h3>
+      <table class="table">
+        <tr>
+          <td>Email</td>
+          <td>phonyin@gmail.com</td>
+        </tr>
+        <tr>
+          <td>Phone</td>
+          <td>+65 8436 9837</td>
+        </tr>
+        <tr>
+          <td>Address</td>
+          <td>934734 Ang Mo Kio Singapore</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

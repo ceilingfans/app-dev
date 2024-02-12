@@ -1,0 +1,129 @@
+<style>
+  .search-drop-down-button {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    z-index: 10000;
+    width: 8px;
+    height: 8px;
+    border: 2px solid #333;
+    rotate: -45deg;
+  }
+  .search-drop-down-container {
+    position: relative;
+  }
+</style>
+
+<nav class="py-2 bg-body-tertiary border-bottom">
+  <div class="container d-flex flex-wrap">
+    <ul class="nav me-auto">
+      <li class="nav-item">
+        <a
+          href="/"
+          class="nav-link link-body-emphasis px-2 active"
+          aria-current="page"
+          >Home</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('repair') }}"
+          class="nav-link link-body-emphasis px-2"
+          >Repair</a
+        >
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('shop') }}" class="nav-link link-body-emphasis px-2"
+          >Shop</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('insurance') }}"
+          class="nav-link link-body-emphasis px-2"
+          >Services</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('contact') }}"
+          class="nav-link link-body-emphasis px-2"
+          >Contact Us</a
+        >
+      </li>
+    </ul>
+    <ul class="nav">
+      <li class="nav-item">
+        <a
+          href="{{ url_for('payment', cart={} ) }}"
+          class="nav-link link-body-emphasis px-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-bag"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"
+            />
+          </svg>
+        </a>
+      </li>
+      {% if not current_user.is_authenticated %}
+      <li class="nav-item">
+        <a
+          href="{{ url_for('login') }}"
+          class="nav-link link-body-emphasis px-2"
+          >Login</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('signup') }}"
+          class="nav-link link-body-emphasis px-2"
+          >Sign up</a
+        >
+      </li>
+      {% endif %} {% if current_user.is_authenticated %}
+      <li class="nav-item">
+        <a
+          href="{{ url_for('profile') }}"
+          class="nav-link link-body-emphasis px-2"
+          >Profile</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('logout') }}"
+          class="nav-link link-body-emphasis px-2"
+          >Logout</a
+        >
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+<header class="py-3 mb-4 border-bottom">
+  <div class="container d-flex flex-wrap justify-content-center">
+    <a
+      href="/"
+      class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto link-body-emphasis text-decoration-none"
+    >
+      <img src="/static/images/phonylogo.png" alt="logo" />
+    </a>
+    <form
+      class="col-12 col-lg-auto mb-3 mb-lg-0"
+      role="search"
+      action="{{ url_for('search')}}"
+    >
+      {{ searchform.hidden_tag() }}
+      <div class="search-drop-down-container">
+        {{ searchform.search(class="form-control") }} {{
+        searchform.submit_search(class=" search-drop-down-button") }}
+      </div>
+    </form>
+  </div>
+</header>

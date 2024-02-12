@@ -1,0 +1,123 @@
+{% extends "base.html" %} {% block title %}Payment{% endblock %} {% block
+content %}
+
+<script src="https://www.paypalobjects.com/api/checkout.js"></script>
+
+<style>
+  #paypal-button-label-container {
+    width: 50%; margin: auto;
+  }
+</style>
+
+
+<div class="container">
+    <div class="py-5 text-center">
+      <h2>Checkout form</h2>
+    </div>
+
+    <div class="row g-5">
+      <div>
+        <h4 class="d-flex justify-content-between align-items-center">
+          <span class="text-primary">Your cart</span>
+          <span class="badge bg-primary rounded-pill"></span>
+        </h4>
+        <ul class="list-group mb-3">
+          {% for key, item in cart.items() %}
+          <li class="list-group-item d-flex justify-content-between lh-sm">
+            <div>
+              <h6 class="my-0">{{ key }}</h6>
+            </div>
+            <span class="text-body-secondary">${{ item[1] }}</span>
+          </li>
+          {% endfor %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Total (SGD)</span>
+            <strong id="totalPrice">${{ total }}</strong>
+          </li>
+        </ul>
+
+        <form id="promoform" class="card p-2">
+          <div class="input-group">
+            <input type="text" id="promocode" name="promocode" class="form-control" placeholder="Promo code" />
+            <button type="submit" id="Promobutton" class="btn btn-secondary">Redeem</button>
+          </div>
+        </form>
+        <div>DO NOT RELOAD PAGE OR PROMO CODE DISAPPEARS</div>
+        <br>
+        <div class="alert alert-success" role="alert" id="promoSuccess" style="display: none;">
+          Promo code applied successfully! 
+        </div>
+        <div class="alert alert-danger" role="alert" id="promoError" style="display: none;">
+          Invalid promo code!
+        </div>
+      </div>
+      <div> 
+      <div class="d-flex justify-content-center align-items-center">
+      <div id="paypal-button"></div>
+      </div>
+      <script>
+        var CREATE_PAYMENT_URL  = 'api/payment';
+        var EXECUTE_PAYMENT_URL = 'api/execute';
+    
+        paypal.Button.render({
+    
+            env: 'sandbox', // Or 'sandbox'
+    
+            commit: true,
+    
+            payment: function() {
+                return paypal.request.post(CREATE_PAYMENT_URL).then(function(data) {
+                    return data.paymentID;
+                });
+            },
+    
+            onAuthorize: function(data) {
+                return paypal.request.post(EXECUTE_PAYMENT_URL, {
+                    paymentID: data.paymentID,
+                    payerID:   data.payerID
+                }).then(function(res) {
+                    if (res.success == true) {
+                      window.location.href = '/payment/success';
+                    } else {
+                      window.location.href = '/payment/failure';
+                    }
+                });
+            }
+    
+        }, '#paypal-button');
+    </script>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  document.getElementById('promoform').addEventListener('submit', function(event) {
+
+    event.preventDefault();
+
+    var formData = new FormData(document.getElementById('promoform'));
+    var currentprice = document.getElementById('totalPrice').textContent.replace('$', '');
+    
+    fetch('/api/promo',{
+      method: 'POST',
+      body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+          if (data.value == 0) {
+            document.getElementById('promoError').style.display = 'block';
+            document.getElementById('promoSuccess').style.display = 'none';
+          } else {
+            document.getElementById('promoError').style.display = 'none';
+            document.getElementById('promoSuccess').style.display = 'block';
+            document.getElementById('Promobutton').style.display = 'none';
+          }
+          var finalprice = currentprice - data.value;
+          document.getElementById('totalPrice').textContent = '$' + finalprice;})
+        .catch((error) => console.error('Error:', error));
+});
+</script>
+
+{% endblock %} {% block user_scripts %}
+{% endblock %}
