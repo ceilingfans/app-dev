@@ -1,0 +1,579 @@
+{% extends 'base.html' %} {% block navbar %}
+<header
+  class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow"
+  data-bs-theme="dark"
+>
+  <a
+    class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white"
+    href="{{ url_for('home') }}"
+    >RNW Insurance</a
+  >
+
+  <ul class="navbar-nav flex-row d-md-none">
+    <li class="nav-item text-nowrap">
+      <button
+        class="nav-link px-3 text-white"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#sidebarMenu"
+        aria-controls="sidebarMenu"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          class="bi bi-list"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+          />
+        </svg>
+      </button>
+    </li>
+  </ul>
+</header>
+{% endblock %}{% block head %}
+<style>
+  .bi {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /*
+   * Sidebar
+   */
+
+  @media (min-width: 768px) {
+    .sidebar .offcanvas-lg {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 48px;
+    }
+    .navbar-search {
+      display: block;
+    }
+  }
+
+  .sidebar .nav-link {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .sidebar .nav-link.active {
+    color: #2470dc;
+  }
+
+  .sidebar-heading {
+    font-size: 0.75rem;
+  }
+
+  /*
+   * Navbar
+   */
+
+  .navbar-brand {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.25);
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.25);
+  }
+
+  .navbar .form-control {
+    padding: 0.75rem 1rem;
+  }
+
+  .dropdown-toggle {
+    outline: 0;
+  }
+
+  .btn-toggle {
+    padding: 0.25rem 0.5rem;
+    font-weight: 600;
+    color: var(--bs-emphasis-color);
+    background-color: transparent;
+  }
+  .btn-toggle:hover,
+  .btn-toggle:focus {
+    color: rgba(var(--bs-emphasis-color-rgb), 0.85);
+    background-color: var(--bs-tertiary-bg);
+  }
+
+  .btn-toggle::before {
+    width: 1.25em;
+    line-height: 0;
+    content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%280,0,0,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
+    transition: transform 0.35s ease;
+    transform-origin: 0.5em 50%;
+  }
+
+  [data-bs-theme="dark"] .btn-toggle::before {
+    content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%28255,255,255,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
+  }
+
+  .btn-toggle[aria-expanded="true"] {
+    color: rgba(var(--bs-emphasis-color-rgb), 0.85);
+  }
+  .btn-toggle[aria-expanded="true"]::before {
+    transform: rotate(90deg);
+  }
+
+  .btn-toggle-nav a {
+    padding: 0.1875rem 0.5rem;
+    margin-top: 0.125rem;
+    margin-left: 1.25rem;
+  }
+  .btn-toggle-nav a:hover,
+  .btn-toggle-nav a:focus {
+    background-color: var(--bs-tertiary-bg);
+  }
+</style>
+{% endblock %} {% block top_level_body %}
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="password-modal"
+  tabindex="-1"
+  aria-labelledby="password-modal-label"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="password-modal-label">
+          Reset Password
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form
+          action="javascript:handlePasswordReset(floatingPassword.value, floatingConfirm.value)"
+        >
+          <div class="form-floating mb-3">
+            <input
+              type="password"
+              class="form-control rounded-3"
+              id="floatingPassword"
+              placeholder="Password"
+              required
+            />
+            <label for="floatingInput">Password</label>
+            <p id="password-feedback"></p>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="password"
+              class="form-control rounded-3"
+              id="floatingConfirm"
+              placeholder="Confirm"
+              required
+            />
+            <label for="floatingPassword">Confirm</label>
+            <p id="confirm-feedback"></p>
+          </div>
+          <button
+            class="w-50 mb-2 btn btn-lg btn-light border-2 border-dark rounded-pill"
+            type="submit"
+          >
+            Reset
+          </button>
+          <hr />
+          <small class="text-muted"
+            >The page will refresh when the password is successfully
+            updated.</small
+          >
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="delete-user-modal"
+  tabindex="-1"
+  aria-labelledby="delete-user-label"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="delete-user-label">
+          Confirm Deletion
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        This action is <strong>irreversible</strong>. Are you sure you want to
+        delete this user?
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-danger rounded-pill"
+          onclick="handleDelete()"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div
+      class="sidebar border border-right col-md-3 col-lg-2 p-0 bg-body-tertiary"
+    >
+      <div
+        class="offcanvas-md offcanvas-end bg-body-tertiary"
+        tabindex="-1"
+        id="sidebarMenu"
+        aria-labelledby="sidebarMenuLabel"
+      >
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="sidebarMenuLabel">
+            <a href="{{ url_for('home' )}}"></a>RNW Insurance
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            data-bs-target="#sidebarMenu"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div
+          class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto"
+        >
+          <div class="flex-shrink-0 p-3" style="width: 280px">
+            <h5
+              class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom fs-5 fw-semibold"
+            >
+              Admin Panel
+            </h5>
+            <ul class="list-unstyled ps-0">
+              <li class="mb-1">
+                <button
+                  class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#home-collapse"
+                  aria-expanded="false"
+                >
+                  Home
+                </button>
+                <div class="collapse" id="home-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                      <a
+                        href="{{ url_for('admin_home') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Dashboard</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="{{ url_for('admin_home', _anchor='plans') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Plans</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="mb-1">
+                <button
+                  class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#dashboard-collapse"
+                  aria-expanded="false"
+                >
+                  Users
+                </button>
+                <div class="collapse" id="dashboard-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                      <a
+                        href="{{ url_for('admin_users') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Accounts</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="{{ url_for('admin_bills') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Invoices</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Chats</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="mb-1">
+                <button
+                  class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#orders-collapse"
+                  aria-expanded="false"
+                >
+                  Items
+                </button>
+                <div class="collapse" id="orders-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                      <a
+                        href="{{ url_for('admin_items') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Manage</a
+                      >
+                    </li>
+
+                  </ul>
+                </div>
+              </li>
+              <li class="border-top my-3"></li>
+              <li class="mb-1">
+                <button
+                  class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#account-collapse"
+                  aria-expanded="false"
+                >
+                  Account
+                </button>
+                <div class="collapse" id="account-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                      <a
+                        href="{{ url_for('profile') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Profile</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="{{ url_for('logout') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Sign out</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+      >
+        <h1 class="h2">Users</h1>
+      </div>
+      <div class="pb-3 mb-2 border-bottom">
+        <a
+          href="{{ url_for('create_user')}}"
+          class="btn btn-dark rounded-pill mx-1"
+          >Create User</a
+        >
+        <a
+          href="{{ url_for('admin_bills') }}"
+          class="btn btn-dark rounded-pill mx-1"
+          >View Invoices</a
+        >
+        <a href="#" class="btn btn-dark rounded-pill mx-1">View Chats</a>
+      </div>
+
+      <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+      >
+        <h1 class="h2">Manage Users</h1>
+      </div>
+      <form class="w-100 me-3 mb-3" role="search" action="" method="post">
+        <input
+          type="search"
+          class="form-control border-2"
+          placeholder="Search by email or Id..."
+          aria-label="Search"
+          id="search"
+          name="search"
+        />
+      </form>
+      {% if error %}
+      <div class="bg-body-tertiary p-5 rounded">
+        <h1>No User found</h1>
+        <p class="lead">
+          Your searched for <code>{{ search }}</code>, but no user was found.
+          Maybe you typed in the wrong Id or email? Try again after checking the
+          spelling.
+        </p>
+        <p class="lead">
+          If you are searching via Id, make sure the Id looks like this:
+          <code>75db9252-3db1-405f-9440-e0b52602d728</code>
+        </p>
+        <p class="lead">
+          If you are searching via email address, make sure the email has both
+          the username and domain.
+        </p>
+        <p class="lead">
+          You can see all users again by searching for nothing.
+        </p>
+      </div>
+      {% else %}
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">User</th>
+              <th scope="col">Email</th>
+              <th scope="col">Address</th>
+              <th scope="col">Id</th>
+              <th scope="col">Password</th>
+              <th scope="col">Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td scope="row">
+                <img
+                  src="{{ url_for('static', filename='images/userprofileimg/' + ( user.get_picture() or 'avatar.png')) }}"
+                  alt="pfp"
+                  height="32"
+                  width="32"
+                  class="img-fluid border border-primary rounded-circle"
+                />
+                <span class="ms-1">{{ user.get_name() }}</span>
+                <span class="text-muted"
+                  >{% if user.get_id() == current_user.get_id() %} (You) {%
+                  endif %}
+                </span>
+                <span class="text-success" id="feedback"></span>
+              </td>
+              <td>{{ user.get_email() }}</td>
+              <td>{{ user.get_address() }}</td>
+
+              <td>
+                <button
+                  type="button"
+                  id="{{ user.get_id() }}-copy"
+                  class="btn btn-light border-2 border-dark rounded-pill"
+                  onclick="copy('{{ user.get_id()}}')"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="{{ user.get_id() }}"
+                >
+                  Copy
+                </button>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  id="{{ user.get_id() }}-password-reset"
+                  class="btn btn-light border-2 border-dark rounded-pill"
+                  onclick="setPasswordResetId('{{ user.get_id() }}')"
+                  data-bs-toggle="modal"
+                  data-bs-target="#password-modal"
+                >
+                  Reset
+                </button>
+              </td>
+              <td>
+                <select
+                  class="form-select border-2 border-dark admin-select"
+                  style="width: fit-content"
+                  id="{{ user.get_id() }}-admin-select"
+                  {%
+                  if
+                  user.get_admin()
+                  %}
+                  disabled
+                  {%
+                  endif
+                  %}
+                >
+                  {% if user.get_admin() and user.get_admin() != None %}
+                  <option value="admin" selected>Admin</option>
+                  <option value="user">User</option>
+                  {% else %}
+                  <option value="admin">Admin</option>
+                  <option value="user" selected>User</option>
+                  {% endif %}
+                </select>
+              </td>
+              <td>
+                <button
+                  class="btn btn-danger rounded-pill"
+                  onclick="setUserDeleteId('{{ user.get_id() }}')"
+                  data-bs-toggle="modal"
+                  data-bs-target="#delete-user-modal"
+                  {%
+                  if
+                  user.get_admin()
+                  %}
+                  disabled
+                  {%
+                  endif
+                  %}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      <footer
+        class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
+      >
+        <p class="col-md-4 mb-0 text-body-secondary">
+          &copy; RNW Insurance • v1.0.0a • IP: {{ ip_addr }}
+        </p>
+      </footer>
+    </main>
+  </div>
+</div>
+{% endblock %}{% block footer %}{% endblock %}{% block user_scripts %}
+<script
+  src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
+  integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
+  crossorigin="anonymous"
+></script>
+<script src="{{ url_for('static', filename='js/tooltips.js')}}"></script>
+<script src="{{ url_for('static', filename='js/userManagement.js')}}"></script>
+{% endblock %}

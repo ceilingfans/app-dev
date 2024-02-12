@@ -88,6 +88,14 @@
         >
       </li>
       {% endif %} {% if current_user.is_authenticated %}
+      {% if current_user.get_admin() %}
+      <li class="nav-item">
+        <a
+          href="{{ url_for('admin_home') }}"
+          class="nav-link link-body-emphasis px-2"
+          >Admin</a>
+      </li>
+      {% endif %}
       <li class="nav-item">
         <a
           href="{{ url_for('profile') }}"

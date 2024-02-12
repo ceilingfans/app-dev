@@ -1,0 +1,508 @@
+{% extends 'base.html' %} {% block navbar %}
+<header
+  class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow"
+  data-bs-theme="dark"
+>
+  <a
+    class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white"
+    href="{{ url_for('home') }}"
+    >RNW Insurance</a
+  >
+
+  <ul class="navbar-nav flex-row d-md-none">
+    <li class="nav-item text-nowrap">
+      <button
+        class="nav-link px-3 text-white"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#sidebarMenu"
+        aria-controls="sidebarMenu"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          class="bi bi-list"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+          />
+        </svg>
+      </button>
+    </li>
+  </ul>
+</header>
+{% endblock %}{% block head %}
+<style>
+  .bi {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /*
+   * Sidebar
+   */
+
+  @media (min-width: 768px) {
+    .sidebar .offcanvas-lg {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 48px;
+    }
+    .navbar-search {
+      display: block;
+    }
+  }
+
+  .sidebar .nav-link {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .sidebar .nav-link.active {
+    color: #2470dc;
+  }
+
+  .sidebar-heading {
+    font-size: 0.75rem;
+  }
+
+  /*
+   * Navbar
+   */
+
+  .navbar-brand {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.25);
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.25);
+  }
+
+  .navbar .form-control {
+    padding: 0.75rem 1rem;
+  }
+
+  .dropdown-toggle {
+    outline: 0;
+  }
+
+  .btn-toggle {
+    padding: 0.25rem 0.5rem;
+    font-weight: 600;
+    color: var(--bs-emphasis-color);
+    background-color: transparent;
+  }
+  .btn-toggle:hover,
+  .btn-toggle:focus {
+    color: rgba(var(--bs-emphasis-color-rgb), 0.85);
+    background-color: var(--bs-tertiary-bg);
+  }
+
+  .btn-toggle::before {
+    width: 1.25em;
+    line-height: 0;
+    content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%280,0,0,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
+    transition: transform 0.35s ease;
+    transform-origin: 0.5em 50%;
+  }
+
+  [data-bs-theme="dark"] .btn-toggle::before {
+    content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%28255,255,255,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
+  }
+
+  .btn-toggle[aria-expanded="true"] {
+    color: rgba(var(--bs-emphasis-color-rgb), 0.85);
+  }
+  .btn-toggle[aria-expanded="true"]::before {
+    transform: rotate(90deg);
+  }
+
+  .btn-toggle-nav a {
+    padding: 0.1875rem 0.5rem;
+    margin-top: 0.125rem;
+    margin-left: 1.25rem;
+  }
+  .btn-toggle-nav a:hover,
+  .btn-toggle-nav a:focus {
+    background-color: var(--bs-tertiary-bg);
+  }
+</style>
+{% endblock %} {% block top_level_body %} {% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div
+      class="sidebar border border-right col-md-3 col-lg-2 p-0 bg-body-tertiary"
+    >
+      <div
+        class="offcanvas-md offcanvas-end bg-body-tertiary"
+        tabindex="-1"
+        id="sidebarMenu"
+        aria-labelledby="sidebarMenuLabel"
+      >
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="sidebarMenuLabel">
+            <a href="{{ url_for('home' )}}"></a>RNW Insurance
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            data-bs-target="#sidebarMenu"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div
+          class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto"
+        >
+          <div class="flex-shrink-0 p-3" style="width: 280px">
+            <h5
+              class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom fs-5 fw-semibold"
+            >
+              Admin Panel
+            </h5>
+            <ul class="list-unstyled ps-0">
+              <li class="mb-1">
+                <button
+                  class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#home-collapse"
+                  aria-expanded="false"
+                >
+                  Home
+                </button>
+                <div class="collapse" id="home-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                      <a
+                        href="#"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Dashboard</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#plans"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Plans</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="mb-1">
+                <button
+                  class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#dashboard-collapse"
+                  aria-expanded="false"
+                >
+                  Users
+                </button>
+                <div class="collapse" id="dashboard-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                      <a
+                        href="{{ url_for('admin_users') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Accounts</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="{{ url_for('admin_bills') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Invoices</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Chats</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="mb-1">
+                <button
+                  class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#orders-collapse"
+                  aria-expanded="false"
+                >
+                  Items
+                </button>
+                <div class="collapse" id="orders-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                      <a
+                        href="{{ url_for('admin_items') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Manage</a
+                      >
+                    </li>
+
+                  </ul>
+                </div>
+              </li>
+              <li class="border-top my-3"></li>
+              <li class="mb-1">
+                <button
+                  class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#account-collapse"
+                  aria-expanded="false"
+                >
+                  Account
+                </button>
+                <div class="collapse" id="account-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                      <a
+                        href="{{ url_for('profile') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Profile</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="{{ url_for('logout') }}"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded"
+                        >Sign out</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+      >
+        <h1 class="h2">Dashboard</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <select
+            class="form-select border border-secondary"
+            style="width: fit-content"
+            id="dashboard-filter"
+          >
+            <option selected value="overview">Overview</option>
+            <option value="quarterly">Quarter</option>
+            <option value="weekly">This Week</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row pb-3">
+        <div class="col-md-4 py-1">
+          <div class="card">
+            <div class="card-header">Site Traffic</div>
+            <div class="card-body">
+              <canvas
+                class="my-4"
+                id="traffic-graph"
+                width="1552"
+                height="655"
+                style="
+                  display: block;
+                  box-sizing: border-box;
+                  height: 655px;
+                  width: 1552px;
+                "
+              ></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 py-1">
+          <div class="card">
+            <div class="card-header">Transactions</div>
+            <div class="card-body">
+              <canvas
+                class="my-4"
+                id="transaction-graph"
+                width="1552"
+                height="655"
+                style="
+                  display: block;
+                  box-sizing: border-box;
+                  height: 655px;
+                  width: 1552px;
+                "
+              ></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 py-1">
+          <div class="card">
+            <div class="card-header">Customers</div>
+            <div class="card-body">
+              <canvas
+                class="my-4"
+                id="customer-graph"
+                width="1552"
+                height="655"
+                style="
+                  display: block;
+                  box-sizing: border-box;
+                  height: 655px;
+                  width: 1552px;
+                "
+              ></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 py-1">
+          <div class="card">
+            <div class="card-header">Plan Proportion Percentage</div>
+            <div class="card-body d-flex justify-content-center">
+              <div class="w-50 h-50">
+                <canvas
+                  class="my-4"
+                  id="plan-graph"
+                  width="1552"
+                  height="655"
+                  style="
+                    display: block;
+                    box-sizing: border-box;
+                    height: 655px;
+                    width: 1552px;
+                  "
+                ></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 py-1">
+          <div class="card">
+            <div class="card-header">Top Customers</div>
+            <div class="card-body d-flex justify-content-center">
+              <canvas
+                class="my-4"
+                id="top-customer-graph"
+                width="1552"
+                height="655"
+                style="
+                  display: block;
+                  box-sizing: border-box;
+                  height: 655px;
+                  width: 1552px;
+                "
+              ></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+      >
+        <h1 class="h2" id="plans">Plans</h1>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <div
+            class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative"
+          >
+            <div class="col p-4 d-flex flex-column position-static">
+              <h3 class="mb-0">Bronze</h3>
+              <div class="mb-1 text-body-secondary">60% Customer Base</div>
+              <p class="card-text mb-auto pb-2">
+                Limited coverage on any subscribed device, we will only cover
+                certain situations.
+              </p>
+            </div>
+            <div class="col-auto d-none d-lg-block">
+              <img
+                src="{{ url_for('static', filename='images/val_ranks/Bronze_3_Rank.png') }}"
+                width="150"
+                height="150"
+                alt="bronze"
+                class="my-5 me-2"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div
+            class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative"
+          >
+            <div class="col p-4 d-flex flex-column position-static">
+              <h3 class="mb-0">Silver</h3>
+              <div class="mb-1 text-body-secondary">37% Customer Base</div>
+              <p class="card-text mb-auto pb-2">
+                Partial coverage on any subscribed device, you can still rest
+                assured we will have you covered.
+              </p>
+            </div>
+            <div class="col-auto d-none d-lg-block">
+              <img
+                src="{{ url_for('static', filename='images/val_ranks/Silver_3_Rank.png') }}"
+                width="150"
+                height="150"
+                alt="silver"
+                class="my-5 me-2"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div
+            class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative"
+          >
+            <div class="col p-4 d-flex flex-column position-static">
+              <h3 class="mb-0">Gold</h3>
+              <div class="mb-1 text-body-secondary">13% Customer Base</div>
+              <p class="card-text mb-auto pb-2">
+                Full coverage on any subscribed device, whether you run the
+                battery out or it gets stolen, you can rest assured we will have
+                you covered.
+              </p>
+            </div>
+            <div class="col-auto d-none d-lg-block">
+              <img
+                src="{{ url_for('static', filename='images/val_ranks/Gold_3_Rank.png') }}"
+                width="150"
+                height="150"
+                alt="Gold"
+                class="my-5 me-2"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer
+        class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
+      >
+        <p class="col-md-4 mb-0 text-body-secondary">
+          &copy; RNW Insurance • v1.0.0a • IP: {{ ip_addr }}
+        </p>
+      </footer>
+    </main>
+  </div>
+</div>
+{% endblock %}{% block footer %}{% endblock %}{% block user_scripts %}
+<script
+  src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
+  integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
+  crossorigin="anonymous"
+></script>
+<script src="{{ url_for('static', filename='js/dashboard.js')}}"></script>
+{% endblock %}
