@@ -77,9 +77,9 @@ content %}
                     payerID:   data.payerID
                 }).then(function(res) {
                     if (res.success == true) {
-                      window.location.href = '/payment/success';
+                      window.location.href = '/success';
                     } else {
-                      window.location.href = '/payment/failure';
+                      window.location.href = '/failure';
                     }
                 });
             }

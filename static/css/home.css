@@ -1,6 +1,5 @@
 nav ul li{
     display: inline;
-    padding: 15px;
 }
 
 nav ul li a {
@@ -78,4 +77,9 @@ nav ul {
 .bottom {
     padding-top: 150px;
     text-align: center;
+}
+
+#sub-button {
+    position: relative;
+    z-index: 0; 
 }
