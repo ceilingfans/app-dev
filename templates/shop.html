@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block head %}
-<!----External CSS----->
+
 <link
   rel="stylesheet"
   type="text/css"
@@ -7,8 +7,6 @@
 />
 {% endblock %} {% block title %}Shop{% endblock %} {% block content %}
 
-<!----------------------------------------------------------------------------------->
-<!--Filter Button-->
 <div class="filter-btns">
   <button type="button" class="filter-btn" id="all">All</button>
   <button type="button" class="filter-btn" id="iphone">Iphone</button>
@@ -298,7 +296,7 @@
       <tr>
         <th>Item</th>
         <th>Price</th>
-        <th>Quantity</th>
+        <th>Quantity(Max 1)</th>
       </tr>
     </thead>
     <tbody class="cart-items"></tbody>
@@ -316,14 +314,9 @@
   </div>
 </section>
 
-<!--External JS-->
-<script src="{{ url_for('static', filename='js/shop.js') }}"></script>
-<script>
-  btn.onclick = function () {
-    fetch();
-  };
-</script>
-{% endblock %} {% block user_scripts %}
+
+{% endblock %} 
+{% block user_scripts %}
 <!--External JS-->
 <script src="{{ url_for('static', filename='js/shop.js') }}"></script>
 <script>
