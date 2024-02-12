@@ -1,6 +1,7 @@
 var passwordResetId;
 var userDeleteId;
 var billDeleteId;
+var itemDeleteId;
 
 function copy(id, ctx) {
   // copy to clipboard
@@ -114,6 +115,138 @@ function handleBillDelete() {
     .then((response) => response.json())
     .then((data) => {
       if (!data.success) return alert("Failed to delete bill");
+      window.location = window.location.href;
+    });
+}
+
+function handleItemCreate(data) {
+  Object.keys(data).forEach(function (key) {
+    data[key] = data[key].value;
+  });
+
+  let {
+    ownerId,
+    itemDescription,
+    address,
+    damageDescription,
+    damageDate,
+    repairDescription,
+    repairDate,
+    subscriptionType,
+    subscriptionStartDate,
+    subscriptionDuration,
+  } = data;
+
+  damageDate &&= new Date(damageDate).getTime();
+  repairDate &&= new Date(repairDate).getTime();
+  subscriptionStartDate &&= new Date(subscriptionStartDate).getTime();
+
+  fetch("/api/admin/items/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ownerId,
+      itemDescription,
+      address,
+      damageDescription,
+      damageDate,
+      repairDescription,
+      repairDate,
+      subscriptionType,
+      subscriptionStartDate,
+      subscriptionDuration,
+    }),
+  })
+    .then((response) => response.json())
+    .then(handleCreateItemData);
+}
+
+const errorToId = {
+  NO_ID: {  // should never happen
+    ids: ["ownerId"],
+  },
+  USER_NOT_FOUND: {
+    ids: ["ownerId"],
+  },
+  NO_ITEM_DESCRIPTION: { // should never happen
+    ids: ["itemDescription"],
+  },
+  DAMAGE_INCOMPLETE: {
+    ids: ["damageDescription", "damageDate"],
+  },
+  REPAIR_INCOMPLETE: {
+    ids: ["repairDescription", "repairDate"],
+  },
+  NO_SUBSCRIPTION_TYPE: {
+    ids: ["subscriptionType"],
+  },
+  NO_SUBSCRIPTION_DATE: {
+    ids: ["subscriptionStartDate"],
+  },
+};
+
+const validationIds = [
+  "ownerId",
+  "itemDescription",
+  "damageDescription",
+  "damageDate",
+  "repairDescription",
+  "repairDate",
+  "subscriptionType",
+  "subscriptionStartDate",
+  "subscriptionDuration",
+];
+
+function handleCreateItemData(d) {
+  // clear validation
+  for (const id of validationIds) {
+    document.getElementById(id).classList.remove("is-invalid", "is-valid");
+  }
+
+  let temp = validationIds;
+
+  const { errors } = d;
+  if (errors && errors.length) {
+    for (const error of errors) {
+      const index = temp.indexOf(error);
+      if (index > -1) {
+        // only splice array when item is found
+        temp.splice(index, 1); // 2nd parameter means remove one item only
+      }
+
+      const { feedback, ids } = errorToId[error];
+      for (const id of ids) {
+        document.getElementById(id).classList.add("is-invalid");
+      }
+    }
+
+    for (const valid of temp) {
+      document.getElementById(valid).classList.add("is-valid")
+    }
+
+    return false;
+  }
+
+  window.location = window.location.href;
+}
+
+function setItemDeleteId(id) {
+  itemDeleteId = id;
+}
+
+function handleItemDelete() {
+  fetch("/api/admin/items/delete", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id: itemDeleteId }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (!data.success) return alert("Failed to delete item");
       window.location = window.location.href;
     });
 }

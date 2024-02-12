@@ -134,21 +134,18 @@
   }
 </style>
 {% endblock %} {% block top_level_body %}
-
 <!-- Modal -->
 <div
   class="modal fade"
-  id="password-modal"
+  id="create-item-modal"
   tabindex="-1"
-  aria-labelledby="password-modal-label"
+  aria-labelledby="item-modal-label"
   aria-hidden="true"
 >
-  <div class="modal-dialog">
+  <div class="modal-lg modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="password-modal-label">
-          Reset Password
-        </h1>
+        <h1 class="modal-title fs-5" id="item-modal-label">Add Insured Item</h1>
         <button
           type="button"
           class="btn-close"
@@ -158,64 +155,188 @@
       </div>
       <div class="modal-body">
         <form
-          action="javascript:handlePasswordReset(floatingPassword.value, floatingConfirm.value)"
+          action="javascript:handleItemCreate({ ownerId, itemDescription, damageDescription, damageDate, address, repairDescription, repairDate, subscriptionType, subscriptionStartDate, subscriptionDuration })"
+          id="create-item-form"
         >
-          <div class="form-floating mb-3">
-            <input
-              type="password"
-              class="form-control rounded-3"
-              id="floatingPassword"
-              placeholder="Password"
-              required
-            />
-            <label for="floatingInput">Password</label>
-            <p id="password-feedback"></p>
+          <div class="row">
+            <h4>Item</h4>
+            <div class="col-12">
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="ownerId"
+                  placeholder="Enter your Id here"
+                  required
+                />
+                <label for="ownerId">Owner Id</label>
+                <div class="invalid-feedback">
+                  The owner Id entered does not exist.
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-floating mb-3">
+                <textarea
+                  class="form-control"
+                  placeholder="Leave a comment here"
+                  id="itemDescription"
+                  style="height: 100px"
+                  required
+                ></textarea>
+                <label for="itemDescription">Description</label>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+            <h4>Details</h4>
+            <div class="col-md-12">
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="address"
+                  placeholder="Enter your item address"
+                  required
+                />
+                <label for="address">Address</label>
+              </div>
+            </div>
+            <h5 class="lead">Damage</h5>
+            <div class="col-md-8">
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="damageDescription"
+                  placeholder="Enter your damage description"
+                />
+                <label for="damageDescription">Description</label>
+                <div class="invalid-feedback">
+                  Both fields are required if there is damage
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-floating mb-3">
+                <input
+                  type="date"
+                  class="form-control"
+                  id="damageDate"
+                  placeholder="Enter your damage description"
+                />
+                <label for="damageDate">Date</label>
+              </div>
+            </div>
+
+            <h5 class="lead">Repair Status</h5>
+            <div class="col-md-8">
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="repairDescription"
+                  placeholder="Enter your repair description"
+                />
+                <label for="repairDescription">Description</label>
+                <div class="invalid-feedback">
+                  Both fields are required if there is an ongoing repair
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-floating mb-3">
+                <input
+                  type="date"
+                  class="form-control"
+                  id="repairDate"
+                  placeholder="Enter your repair description"
+                />
+                <label for="repairDate">Start Date</label>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+            <h4>Subscription</h4>
+            <div class="col-md-4">
+              <div class="form-floating mb-3">
+                <select
+                  class="form-select"
+                  id="subscriptionType"
+                  aria-label="Floating label select example"
+                  required
+                >
+                  <option value="bronze" selected>Bronze</option>
+                  <option value="silver">Silver</option>
+                  <option value="gold">Gold</option>
+                </select>
+                <label for="subscriptionType">Plan Type</label>
+                <div class="invalid-feedback">The plan type is required</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-floating mb-3">
+                <input
+                  type="date"
+                  class="form-control"
+                  id="subscriptionStartDate"
+                  placeholder="Enter your start date"
+                  required
+                />
+                <label for="subscriptionStartDate">Start Date</label>
+                <div class="invalid-feedback">The start date is required</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-floating mb-3">
+                <select
+                  class="form-select"
+                  id="subscriptionDuration"
+                  aria-label="Floating label select example"
+                  required
+                >
+                  <option value="month" selected>Monthly</option>
+                  <option value="quarter">Quarterly</option>
+                  <option value="year">Yearly</option>
+                </select>
+                <label for="subscriptionDuration">Duration</label>
+              </div>
+            </div>
           </div>
-          <div class="form-floating mb-3">
-            <input
-              type="password"
-              class="form-control rounded-3"
-              id="floatingConfirm"
-              placeholder="Confirm"
-              required
-            />
-            <label for="floatingPassword">Confirm</label>
-            <p id="confirm-feedback"></p>
-          </div>
-          <button
-            class="w-50 mb-2 btn btn-lg btn-light border-2 border-dark rounded-pill"
-            type="submit"
-          >
-            Reset
-          </button>
-          <hr />
-          <small class="text-muted"
-            >The page will refresh when the password is successfully
-            updated.</small
-          >
         </form>
+        <p class="text-muted">
+          Please ensure that you have checked all entered information is
+          correct. <br />
+          If any mistakes were made, you may still update the information in the
+          table.
+        </p>
       </div>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
+        <button
+          class="btn btn-light border-2 border-dark rounded-pill"
+          type="submit"
+          form="create-item-form"
+        >
+          Confirm
         </button>
       </div>
     </div>
   </div>
 </div>
-
 <!-- Modal -->
 <div
   class="modal fade"
-  id="delete-user-modal"
+  id="delete-item-modal"
   tabindex="-1"
-  aria-labelledby="delete-user-label"
+  aria-labelledby="delete-item-label"
   aria-hidden="true"
 >
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="delete-user-label">
+        <h1 class="modal-title fs-5" id="delete-item-label">
           Confirm Deletion
         </h1>
         <button
@@ -227,13 +348,13 @@
       </div>
       <div class="modal-body">
         This action is <strong>irreversible</strong>. Are you sure you want to
-        delete this user?
+        delete this item?
       </div>
       <div class="modal-footer">
         <button
           type="button"
           class="btn btn-danger rounded-pill"
-          onclick="handleDelete()"
+          onclick="handleItemDelete()"
         >
           Delete
         </button>
@@ -241,7 +362,6 @@
     </div>
   </div>
 </div>
-
 {% endblock %} {% block content %}
 <div class="container-fluid">
   <div class="row">
@@ -289,14 +409,14 @@
                   <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                     <li>
                       <a
-                        href="{{ url_for('admin_home') }}"
+                        href="#"
                         class="link-body-emphasis d-inline-flex text-decoration-none rounded"
                         >Dashboard</a
                       >
                     </li>
                     <li>
                       <a
-                        href="{{ url_for('admin_home', _anchor='plans') }}"
+                        href="#plans"
                         class="link-body-emphasis d-inline-flex text-decoration-none rounded"
                         >Plans</a
                       >
@@ -357,7 +477,6 @@
                         >Manage</a
                       >
                     </li>
-
                   </ul>
                 </div>
               </li>
@@ -400,32 +519,25 @@
       <div
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
       >
-        <h1 class="h2">Users</h1>
+        <h1 class="h2" id="new">Items</h1>
       </div>
-      <div class="pb-3 mb-2 border-bottom">
-        <a
-          href="{{ url_for('create_user')}}"
-          class="btn btn-dark rounded-pill mx-1"
-          >Create User</a
-        >
-        <a
-          href="{{ url_for('admin_bills') }}"
-          class="btn btn-dark rounded-pill mx-1"
-          >View Invoices</a
-        >
-        <a href="#" class="btn btn-dark rounded-pill mx-1">View Chats</a>
-      </div>
-
+      <button
+        class="btn btn-dark rounded-pill"
+        data-bs-toggle="modal"
+        data-bs-target="#create-item-modal"
+      >
+        Create Item
+      </button>
       <div
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
       >
-        <h1 class="h2">Manage Users</h1>
+        <h1 class="h2">Manage Items</h1>
       </div>
       <form class="w-100 me-3 mb-3" role="search" action="" method="post">
         <input
           type="search"
           class="form-control border-2"
-          placeholder="Search by email or Id..."
+          placeholder="Search by owner or item Id..."
           aria-label="Search"
           id="search"
           name="search"
@@ -433,23 +545,17 @@
       </form>
       {% if error %}
       <div class="bg-body-tertiary p-5 rounded">
-        <h1>No User found</h1>
+        {% if error == "USER_NOT_FOUND" %}
         <p class="lead">
-          Your searched for <code>{{ search }}</code>, but no user was found.
-          Maybe you typed in the wrong Id or email? Try again after checking the
-          spelling.
+          You searched for <code>{{ search }}</code> which is a valid item Id
+          but the user has been deleted, the bill has been deleted.
         </p>
+        {% elif error == "ITEM_NOT_FOUND" %}
         <p class="lead">
-          If you are searching via Id, make sure the Id looks like this:
-          <code>75db9252-3db1-405f-9440-e0b52602d728</code>
+          You searched for <code>{{ search }}</code>, however no item could be
+          found.
         </p>
-        <p class="lead">
-          If you are searching via email address, make sure the email has both
-          the username and domain.
-        </p>
-        <p class="lead">
-          You can see all users again by searching for nothing.
-        </p>
+        {% endif %}
       </div>
       {% else %}
       <div class="table-responsive">
@@ -459,13 +565,16 @@
               <th scope="col">User</th>
               <th scope="col">Email</th>
               <th scope="col">Address</th>
+              <th scope="col">Description</th>
               <th scope="col">Id</th>
-              <th scope="col">Password</th>
-              <th scope="col">Role</th>
+              <th scope="col">Item Id</th>
+              <th scope="col">Damage</th>
+              <th scope="col">Repairs</th>
+              <th scope="col">Subscription</th>
             </tr>
           </thead>
           <tbody>
-            {% for user in users %}
+            {% for item, user in items %}
             <tr>
               <td scope="row">
                 <img
@@ -483,14 +592,14 @@
                 <span class="text-success" id="feedback"></span>
               </td>
               <td>{{ user.get_email() }}</td>
-              <td>{{ user.get_address() }}</td>
-
+              <td>{{ item.get_status().get_address() }}</td>
+              <td>{{ item.get_description() }}</td>
               <td>
                 <button
                   type="button"
                   id="{{ user.get_id() }}-copy"
                   class="btn btn-light border-2 border-dark rounded-pill"
-                  onclick="copy('{{ user.get_id()}}')"
+                  onclick="copy('{{ user.get_id()}}', this)"
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
                   data-bs-title="{{ user.get_id() }}"
@@ -501,52 +610,46 @@
               <td>
                 <button
                   type="button"
-                  id="{{ user.get_id() }}-password-reset"
+                  id="{{ item.get_item_id() }}-copy"
                   class="btn btn-light border-2 border-dark rounded-pill"
-                  onclick="setPasswordResetId('{{ user.get_id() }}')"
-                  data-bs-toggle="modal"
-                  data-bs-target="#password-modal"
+                  onclick="copy('{{ item.get_item_id()}}', this)"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="{{ item.get_item_id() }}"
                 >
-                  Reset
+                  Copy
                 </button>
               </td>
               <td>
-                <select
-                  class="form-select border-2 border-dark admin-select"
-                  style="width: fit-content"
-                  id="{{ user.get_id() }}-admin-select"
-                  {%
-                  if
-                  user.get_admin()
-                  %}
-                  disabled
-                  {%
-                  endif
-                  %}
+                <a
+                  class="btn btn-light border-2 border-dark rounded-pill"
+                  href="{{ url_for('admin_update_items', id=item.get_item_id(), _anchor='anchor-damage') }}"
                 >
-                  {% if user.get_admin() and user.get_admin() != None %}
-                  <option value="admin" selected>Admin</option>
-                  <option value="user">User</option>
-                  {% else %}
-                  <option value="admin">Admin</option>
-                  <option value="user" selected>User</option>
-                  {% endif %}
-                </select>
+                  Edit
+                </a>
+              </td>
+              <td>
+                <a
+                  class="btn btn-light border-2 border-dark rounded-pill"
+                  href="{{ url_for('admin_update_items', id=item.get_item_id(), _anchor='anchor-repairs') }}"
+                >
+                  Edit
+                </a>
+              </td>
+              <td>
+                <a
+                  class="btn btn-light border-2 border-dark rounded-pill"
+                  href="{{ url_for('admin_update_items', id=item.get_item_id(), _anchor='anchor-subscription') }}"
+                >
+                  Edit
+                </a>
               </td>
               <td>
                 <button
                   class="btn btn-danger rounded-pill"
-                  onclick="setUserDeleteId('{{ user.get_id() }}')"
+                  onclick="setItemDeleteId('{{ item.get_item_id() }}')"
                   data-bs-toggle="modal"
-                  data-bs-target="#delete-user-modal"
-                  {%
-                  if
-                  user.get_admin()
-                  %}
-                  disabled
-                  {%
-                  endif
-                  %}
+                  data-bs-target="#delete-item-modal"
                 >
                   Delete
                 </button>
@@ -557,7 +660,6 @@
         </table>
       </div>
       {% endif %}
-
       <footer
         class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
       >
@@ -569,11 +671,6 @@
   </div>
 </div>
 {% endblock %}{% block footer %}{% endblock %}{% block user_scripts %}
-<script
-  src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
-  integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
-  crossorigin="anonymous"
-></script>
 <script src="{{ url_for('static', filename='js/tooltips.js')}}"></script>
 <script src="{{ url_for('static', filename='js/userManagement.js')}}"></script>
 {% endblock %}

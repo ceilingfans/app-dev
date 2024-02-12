@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 from dhooks import Webhook
 from PIL import Image
 import json
+import datetime
 
 from flask_uploads import UploadSet, configure_uploads, IMAGES
 from flask_login import AnonymousUserMixin
@@ -22,6 +23,7 @@ from api.structures.Promo import Promo
 from api.Insuranceprice.getprice import getprice
 from api.structures.Bill import Bill
 from api.structures.datavalidation import *
+from api.structures.InsuredItem import InsuredItem
 
 db = Driver()
 app = Flask(__name__)
@@ -32,6 +34,26 @@ login_manager.init_app(app)
 profile_pics = UploadSet("photos", IMAGES)
 configure_uploads(app, profile_pics)
 
+
+@app.template_filter("datetime")
+def timestamp_to_date(timestamp):
+    if timestamp is None or (not timestamp and timestamp != 0):
+        return "None"
+    if type(timestamp) != int:
+        timestamp = int(timestamp)
+    return datetime.datetime.utcfromtimestamp(timestamp//1000).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+@app.template_filter("timestamp_to_duration")
+def timestamp_to_duration(timestamp):
+    if type(timestamp) != str:
+        timestamp = str(timestamp)
+
+    lengths = {
+        "2629800000": "month",
+        "7889400000": "quarter",
+        "31557600000": "year"
+    }
+    return lengths.get(timestamp, timestamp)
 
 @app.context_processor
 def base():
@@ -735,6 +757,371 @@ def delete_bill():
     
     return jsonify({"success": "Bill deleted"}), 200
 
+@login_required
+@app.route("/admin/items")
+def admin_items():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return abort(401)
+    
+    ret_code, items = db.items.find()
+    if ret_code == "ITEMNOTFOUND":
+        return abort(500)
+    
+    pairs = []
+    for item in items:
+        ret_code, user = db.users.find(user_id=item.get_owner_id())  # why are we using customer instead of owner
+        if ret_code == "USERNOTFOUND":
+            db.bills.delete(item.get_item_id())
+            continue 
+
+        pairs.append((item, user))
+
+    return render_template("admin_items.html", items=pairs, ip_addr=request.remote_addr)
+
+@login_required
+@app.route("/admin/items", methods=["POST"])
+def admin_search_items():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+
+    if not current_user.get_admin():
+        return abort(401)
+
+    id = request.form.get("search")
+    print(f'"{id}"')
+
+    if not id:
+        ret_code, items = db.items.find()
+        if ret_code == "ITEMNOTFOUND":
+            return abort(500)
+        
+        pairs = []
+        for item in items:
+            print(dict(item))
+            ret_code, user = db.users.find(user_id=item.get_owner_id())
+            if ret_code == "USERNOTFOUND":
+                db.items.delete(item.get_item_id())
+                continue
+
+            pairs.append((item, user))
+
+        return render_template("admin_items.html", items=pairs, ip_addr=request.remote_addr)
+        
+    # try bill id
+    ret_code, item = db.items.find(item_id=id)
+    if ret_code == "SUCCESS":
+        ret_code, user = db.users.find(user_id=item.get_owner_id())
+        if ret_code == "USERNOTFOUND":
+            db.items.delete(item.get_item_id())
+            return render_template("admin_items.html", ip_addr=request.remote_addr, error="USER_NOT_FOUND", search=id)
+        
+        return render_template("admin_items.html", items=[(item, user)], ip_addr=request.remote_addr)
+    else:
+        # try owner id
+        ret_code, items = db.items.find(owner_id=id)
+        if ret_code == "OWNERITEMS":
+            pairs = []
+
+            for item in items:
+                ret_code, user = db.users.find(user_id=item.get_owner_id())
+                if ret_code == "USERNOTFOUND":
+                    db.items.delete(item.get_item_id())
+                    continue
+
+                pairs.append((item, user))
+            
+            return render_template("admin_items.html", items=pairs, ip_addr=request.remote_addr)
+        else:
+            return render_template("admin_items.html", ip_addr=request.remote_addr, error="ITEM_NOT_FOUND", search=id)
+
+@login_required
+@app.route("/admin/items/update/<id>")
+def admin_update_items(id):
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return abort(401)
+    
+    ret_code, item = db.items.find(item_id=id)
+    if ret_code == "ITEMNOTFOUND":
+        return abort(404)
+    
+    ret_code, user = db.users.find(user_id=item.get_owner_id())
+    if ret_code == "USERNOTFOUND":
+        return abort(500)
+    
+    return render_template("admin_update_items.html", item=item, user=user, ip_addr=request.remote_addr)
+
+@login_required
+@app.route("/api/admin/items/create", methods=["POST"])
+def create_item_admin():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+    errors = []
+    if not data.get("ownerId"):
+        errors.append("NO_ID") # should never happen
+    else:
+        ret_code, _ = db.users.find(user_id=data.get("ownerId"))
+        if ret_code == "USERNOTFOUND":
+            errors.append("USER_NOT_FOUND")
+
+    if not data.get("itemDescription"): # should never happen
+        errors.append("NO_ITEM_DESCRIPTION")
+
+    if (not data.get("damageDescription") and data.get("damageDate")) or (data.get("damageDescription") and not data.get("damageDate")):
+        errors.append("DAMAGE_INCOMPLETE")
+
+    if (not data.get("repairDescription") and data.get("repairDate")) or (data.get("repairDescription") and not data.get("repairDate")):
+        errors.append("REPAIR_INCOMPLETE")
+
+    if not data.get("subscriptionType"):
+        errors.append("NO_SUBSCRIPTION_TYPE")
+
+    if not data.get("subscriptionStartDate"):
+        errors.append("NO_SUBSCRIPTION_DATE")
+    
+    if len(errors) != 0:
+        return jsonify({"errors": errors}), 401
+
+    lengths = {
+        "month": 2629800000,
+        "quarter": 7889400000,
+        "year": 31557600000
+    }
+
+    l = lengths[data.get("subscriptionDuration")]
+
+    i = InsuredItem({
+        "owner_id": data.get("ownerId"),
+        "item_id": str(uuid4()),
+        "description": data.get("itemDescription"),
+        "status": {
+            "damage": {
+                "description": data.get("damageDescription"),
+                "date": data.get("damageDate"),
+            },
+            "repair_status": {
+                "past_repairs": [],
+                "current": {
+                    "description": data.get("repairDescription"),
+                    "start_date": data.get("repairDate"),
+                    "end_date": None
+                }
+            },
+            "address": data.get("address"),
+        },
+        "subscription": {
+            "plan": data.get("subscriptionType").capitalize(),
+            "duration": {
+                "start": data.get("subscriptionStartDate"),
+                "end": data.get("subscriptionStartDate") + l,
+                "length": l
+            }
+        }
+    })
+
+    ret_code, _ = db.items.create(i)
+    if ret_code != "SUCCESS":
+        return abort(500)
+    
+    return jsonify({"success": True}), 200
+    
+@login_required
+@app.route("/api/admin/items/delete", methods=["POST"])
+def delete_item():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    if not data.get("id"):
+        return jsonify({"error": "Missing id"}), 400
+    
+    ret_code, item = db.items.delete(data.get('id'))
+    if ret_code == "ITEMNOTFOUND":
+        return jsonify({"error": "Item not found"}), 404
+    elif ret_code == "ERROR":
+        return jsonify({"error": "Internal server error", "message": str(item)}), 500
+    
+    return jsonify({"success": "Item deleted"}), 200
+
+@login_required
+@app.route("/api/admin/items/update/damage", methods=["POST"])
+def update_damage():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+    print(data)
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    if not data.get("id"):
+        return jsonify({"error": "Missing id"}), 400
+    
+    if not data.get("date") and not data.get("description"):
+        return jsonify({"error": "Missing both"}), 400
+    
+    ret_code, item = db.items.find(item_id=data.get('id'))
+    if ret_code == "ITEMNOTFOUND":
+        return jsonify({"error": "Item not found"}), 404
+    
+    updated = {}
+    if data.get("description"):
+        updated["status.damage.description"] = data.get("description")
+
+    if data.get("date"):
+        updated["status.damage.date"] = data.get("date")
+
+    ret_code, db.items.update({"item_id": data.get("id")}, updated)
+    if ret_code != "SUCCESS":
+        return jsonify({"error": "Internal server error", "message": str(item)}), 500
+    
+    return jsonify({"success": "Damage updated"}), 200
+
+@login_required
+@app.route("/api/admin/items/update/repair", methods=["POST"])
+def update_repair():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+    print(data)
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    if not data.get("id"):
+        return jsonify({"error": "Missing id"}), 400
+    
+    if not data.get("startDate") and not data.get("endDate") and not data.get("description"):
+        return jsonify({"error": "Missing all"}), 400
+    
+    ret_code, item = db.items.find(item_id=data.get('id'))
+    if ret_code == "ITEMNOTFOUND":
+        return jsonify({"error": "Item not found"}), 404
+    
+    if data.get("endDate"):
+        # end date is provided, so we are ending the current repair, moving it to past
+        # and creating a new empty repair
+        current = {}
+        current["description"] = item.get_status().get_repair_status().get_current().get_description() or data.get("description")
+        current["start_date"] = item.get_status().get_repair_status().get_current().get_start_date() or data.get("startDate")
+        current["end_date"] = data.get("endDate")
+
+        past = [dict(i) for i in item.get_status().get_repair_status().get_past_repairs()]
+        past.append(current)
+
+        updated = {
+            "status.repair_status.past_repairs": past,
+            "status.repair_status.current": {
+                "description": "",
+                "start_date": "",
+                "end_date": ""
+            }
+        }
+
+        ret_code, e = db.items.update({"item_id": data.get("id")}, updated)
+        if ret_code != "SUCCESS":
+            return jsonify({"error": "Internal server error", "message": str(e)}), 500
+        
+        return jsonify({"success": "Repair ended"}), 200
+    
+    updated = {}
+    if data.get("description"):
+        updated["status.repair_status.current.description"] = data.get("description")
+
+    if data.get("startDate"):
+        updated["status.repair_status.current.start_date"] = data.get("startDate")
+
+    ret_code, db.items.update({"item_id": data.get("id")}, updated)
+    if ret_code != "SUCCESS":
+        return jsonify({"error": "Internal server error", "message": str(item)}), 500
+    
+    return jsonify({"success": "Repair updated"}), 200
+
+@login_required
+@app.route("/api/admin/items/update/subscription", methods=["POST"])
+def update_subscription():
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
+    
+    if not current_user.get_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+    print(data)
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    if not data.get("id"):
+        return jsonify({"error": "Missing id"}), 400
+    
+    if not data.get("startDate") and not data.get("type") and not data.get("duration"):
+        return jsonify({"error": "Missing all"}), 400
+    
+    ret_code, item = db.items.find(item_id=data.get('id'))
+    if ret_code == "ITEMNOTFOUND":
+        return jsonify({"error": "Item not found"}), 404
+    
+    lengths = {
+        "month": 2629800000,
+        "quarter": 7889400000,
+        "year": 31557600000
+    }
+
+    rev_lengths = {
+        "2629800000": "month",
+        "7889400000": "quarter",
+        "31557600000": "year"
+    }
+
+    # if start date or duration is edited, we need to update end date
+    if data.get("startDate") or (data.get("duration") != rev_lengths.get(str(item.get_subscription().get_duration().get_length()))):
+        l = lengths.get(data.get("duration")) or item.get_subscription().get_duration()
+        start = data.get("startDate") or item.get_subscription().get_duration().get_start()
+
+        end = start + l
+        updated = {
+            "subscription.duration.start": start,
+            "subscription.duration.end": end,
+            "subscription.duration.length": l
+        }
+
+        ret_code, e = db.items.update({"item_id": data.get("id")}, updated)
+        if ret_code != "SUCCESS":
+            return jsonify({"error": "Internal server error", "message": str(e)}), 500
+
+        return jsonify({"success": "Subscription updated"}), 200
+    
+    ret_code, e = db.items.update({"item_id": data.get("id")}, {"subscription.plan": data.get("type").capitalize()})
+    if ret_code != "SUCCESS":
+        return jsonify({"error": "Internal server error", "message": str(e)}), 500
+    
+    return jsonify({"success": "Subscription updated"}), 200
 
 @app.errorhandler(404)
 def page_not_found(e):

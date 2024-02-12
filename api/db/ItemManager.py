@@ -45,7 +45,7 @@ class ItemManager:
         """
         try:
             if owner_id is None and item_id is None:
-                return "ALL", self.col.find()
+                return "ALL", [InsuredItem(i) for i in self.col.find()]
 
             query = {}
             owner_flag = False
