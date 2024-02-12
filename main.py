@@ -347,7 +347,6 @@ def wheelspin():
     db.users.update({"id": current_user.get_id()}, {"newuser": False})
     return jsonify(number=number, section=section, spun=False, coupon=coupon, value=value)
 
-
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if current_user.is_authenticated:
@@ -387,7 +386,6 @@ def signup():
             case _:
                 return render_template(html, form=form, result=f"Internal server error, {user}")
     return render_template(html, form=form)
-
 
 @app.route("/profile", methods=["POST", "GET"])
 @login_required
