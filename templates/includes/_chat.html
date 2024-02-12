@@ -1,6 +1,5 @@
 
-<link rel="stylesheet" href="static/css/chat.css">
-    <link rel="stylesheet" href="static/css/home.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <div class="chat-bar-collapsible">
@@ -45,5 +44,5 @@
 
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="static/js/responses.js"></script>
-<script src="static/js/chat.js"></script>
+<script src="{{ url_for('static', filename='js/responses.js')}}"></script>
+<script src="{{ url_for('static', filename='js/chat.js')}}"></script>

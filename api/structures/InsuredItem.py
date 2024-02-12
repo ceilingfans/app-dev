@@ -147,18 +147,21 @@ class ItemStatus:
 class InsuredItem:
     __owner_id: str = None
     __item_id: str = None
+    __description: str = None
     __status: ItemStatus = None
     __subscription: Subscription = None
 
     def __init__(self, data):
         self.__owner_id = data.get("owner_id", None)
         self.__item_id = data.get("item_id", None)
+        self.__description = data.get("description", None)
         self.__status = ItemStatus(data.get("status", None))
         self.__subscription = Subscription(data.get("subscription", None))
 
     def __iter__(self):
         yield 'owner_id', self.__owner_id
         yield 'item_id', self.__item_id
+        yield 'description', self.__description
         yield 'status', dict(self.__status)
         yield 'subscription', dict(self.__subscription)
 
@@ -167,6 +170,9 @@ class InsuredItem:
 
     def get_item_id(self):
         return self.__item_id
+    
+    def get_description(self):
+        return self.__description
 
     def get_status(self):
         return self.__status
