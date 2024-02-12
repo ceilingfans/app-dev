@@ -160,18 +160,6 @@ document.querySelectorAll("pre code").forEach(block => {
     }
   });
 
-  const ws = new WebSocket("ws://localhost:8080/chat");
-
-  ws.onmessage = (event) => {
-    // Update chat interface based on received data
-  };
-
-  ws.onerror = (error) => {
-    // Handle errors
-  };
-
-  // Sending messages similar to Socket.IO
-
 </script>
 
 {% endblock %}
