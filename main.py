@@ -19,7 +19,6 @@ from flask_uploads import UploadSet, configure_uploads, IMAGES
 from flask_login import AnonymousUserMixin
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from api.db.driver import Driver
 from api.structures.User import check_hash, User, get_hash
 from api.structures.Promo import Promo
@@ -1309,7 +1308,10 @@ def paid(cart):
     items, total = makecart(cart)
     ret_code, bill = db.bills.find(owner_id=current_user.get_id())
     ret_code2, user = db.users.find(current_user.get_id())
-    products = user.get_products() + items
+    try:
+        products = user.get_products() + items
+    except:
+        products = items
     plans = []
     if ret_code == "OWNERBILLS":
         for item in bill:

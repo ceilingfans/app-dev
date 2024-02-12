@@ -1,116 +1,203 @@
-{% extends "base.html" %} {% block title %}Home{% endblock %} {% block
-content %}
-<div class="container">
-  <div class="px-4 py-5 my-5 text-center">
-    <h1 class="display-5 fw-bold text-body-emphasis">ONE-OF-A-KIND</h1>
-    <h1 class="display-5 fw-bold text-body-emphasis">INSURANCE</h1>
-  </div>
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content %}
+<style>
+/* leaf animations */
 
-  <div class="row">
-    <div class="col-lg-4 text-center">
-      <img
-        src="/static/images/diamond.jpeg"
-        alt="gold"
-        class="rounded"
-        height="140px"
-        width="140px"
-      />
-      <h2 class="fw-normal mt-1">Gold</h2>
-      <p>
-        Full coverage on any subscribed device, whether you run the battery out
-        or it gets stolen, you can rest assured we will have you covered.
-      </p>
-    </div>
-    <!-- /.col-lg-4 -->
-    <div class="col-lg-4 text-center">
-      <img
-        src="/static/images/plat.jpeg"
-        alt="silver"
-        class="rounded"
-        height="140px"
-        width="140px"
-      />
-      <h2 class="fw-normal mt-1">Silver</h2>
-      <p>
-        Partial coverage on any subscribed device, you can still rest assured we
-        will have you covered.
-      </p>
-    </div>
-    <!-- /.col-lg-4 -->
-    <div class="col-lg-4 text-center">
-      <img
-        src="/static/images/gold.jpeg"
-        alt="bronze"
-        class="rounded"
-        height="140px"
-        width="140px"
-      />
+#leaves {position:relative;top:-50px;width:100%;text-align: right;}
 
-      <h2 class="fw-normal mt-1">Bronze</h2>
-      <p>
-        Limited coverage on any subscribed device, we will only cover certain
-        situations.
-      </p>
-    </div>
-    <!-- /.col-lg-4 -->
+#leaves i {
+    display: inline-block;
+    width: 200px;
+    height: 150px;
+    background: linear-gradient(to bottom right, #309900, #005600);
+    transform: skew(20deg);
+    border-radius: 5% 40% 70%;
+    box-shadow: inset 0px 0px 1px #222;
+    border: 1px solid #333;
+    z-index: 1;
+    -webkit-animation: falling 5s 0s infinite;
+}
 
-    <div class="text-center">
+#leaves i:nth-of-type(2n) { -webkit-animation: falling2 5s 0s infinite; }
+#leaves i:nth-of-type(3n) { -webkit-animation: falling3 5s 0s infinite; }
+
+#leaves i:before {
+  position: absolute;
+  content: '';
+  top: 117px;
+  right: 9px;
+  height: 27px;
+  width: 32px;
+  transform: rotate(49deg);
+  border-radius: 0% 15% 15% 0%;
+  border-top: 1px solid #222;
+  border-bottom: 1px solid #222;
+  border-left: 0px solid #222;
+  border-right: 1px solid #222;
+  background: linear-gradient(to right, rgba(0,100,0,1), #005600);
+  z-index: 1;
+}
+
+#leaves i:after {
+  content: '';
+  height: 125px;
+  width: 10px;
+  background: linear-gradient(to right, rgba(0,0,0,.15), rgba(0,0,0,0));
+  display: block;
+  transform: rotate(125deg);
+  position: absolute;
+  left: 85px;
+  border-radius:50%;
+}
+
+
+#leaves i:nth-of-type(n)    { height:23px; width:30px; }
+#leaves i:nth-of-type(n):before { width:7px; height:5px; top:17px; right:1px; }
+#leaves i:nth-of-type(n):after { width:2px; height:17px; left: 12px; top:0px; }
+
+#leaves i:nth-of-type(2n+1)    { height:11px; width:16px; }
+#leaves i:nth-of-type(2n+1):before { width:4px; height:3px; top:7px; right:0px; }
+#leaves i:nth-of-type(2n+1):after { width:2px; height:6px; left: 5px; top:1px; }
+
+#leaves i:nth-of-type(3n+2)  { height:17px; width:23px; }
+#leaves i:nth-of-type(3n+2):before  { height:4px; width:4px; top:12px; right:1px; }
+#leaves i:nth-of-type(3n+2):after  { height:10px; width:2px; top:1px; left:8px; }
+
+#leaves i:nth-of-type(n)   { -webkit-animation-delay: 1.9s;}
+#leaves i:nth-of-type(2n)  { -webkit-animation-delay: 3.9s;}
+#leaves i:nth-of-type(3n)  { -webkit-animation-delay: 2.3s;}
+#leaves i:nth-of-type(4n)  { -webkit-animation-delay: 4.4s;}
+#leaves i:nth-of-type(5n)  { -webkit-animation-delay: 5s;  }
+#leaves i:nth-of-type(6n)  { -webkit-animation-delay: 3.5s;}
+#leaves i:nth-of-type(7n)  { -webkit-animation-delay: 2.8s;}
+#leaves i:nth-of-type(8n)  { -webkit-animation-delay: 1.5s;}
+#leaves i:nth-of-type(9n)  { -webkit-animation-delay: 3.3s;}
+#leaves i:nth-of-type(10n) { -webkit-animation-delay: 2.5s;}
+#leaves i:nth-of-type(11n) { -webkit-animation-delay: 1.2s;}
+#leaves i:nth-of-type(12n) { -webkit-animation-delay: 4.1s;}
+#leaves i:nth-of-type(13n) { -webkit-animation-delay: 1s;  }
+#leaves i:nth-of-type(14n) { -webkit-animation-delay: 4.7s;}
+#leaves i:nth-of-type(15n) { -webkit-animation-delay: 3s;  }
+
+#leaves i:nth-of-type(n)    { background: linear-gradient(to bottom right, #309900, #005600); }
+#leaves i:nth-of-type(2n+2)  { background: linear-gradient(to bottom right, #5e9900, #2b5600); }
+#leaves i:nth-of-type(4n+1)  { background: linear-gradient(to bottom right, #990, #564500); }
+
+#leaves i:nth-of-type(n)    { opacity: .7;}
+#leaves i:nth-of-type(3n+1)  { opacity: .5;}
+#leaves i:nth-of-type(3n+2)  { opacity: .3;}
+
+#leaves i:nth-of-type(n)    {transform: rotate(180deg);}
+
+
+#leaves i:nth-of-type(n) { -webkit-animation-timing-function:ease-in-out;}
+
+@-webkit-keyframes falling {
+    
+    0% {
+        -webkit-transform:
+            translate3d(300,0,0)
+            rotate(0deg);
+    }
+    
+    100% {
+        -webkit-transform:
+            translate3d(-350px,700px,0)
+            rotate(90deg);
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes falling3 {
+     0% {
+        -webkit-transform:
+            translate3d(0,0,0)
+            rotate(-20deg);
+    }
+    
+    100% {
+        -webkit-transform:
+            translate3d(-230px,640px,0)
+            rotate(-70deg);
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes falling2 {
+     0% {
+        -webkit-transform:
+            translate3d(0,0,0)
+            rotate(90deg);
+    }
+    
+    100% {
+        -webkit-transform:
+            translate3d(-400px,680px,0)
+            rotate(0deg);
+        opacity: 0;
+    }
+}
+</style>
+    <div class="carousel slide" data-bs-ride="false" id="carousel-1">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img class="w-100 d-block" src="static\images\686816_Recycle technology, Phone, Forest _xl-1024-v1-0.png" alt="Slide Image" height="700" style="object-fit: cover;">
+            </div>
+            <div class="carousel-item">
+                <img class="w-100 d-block" src="static\images\968351_Recycle technology, Phone, Forest _xl-1024-v1-0.png" alt="Slide Image" height="700" style="object-fit: cover;">
+            </div>
+            <div class="carousel-item">
+                <img class="w-100 d-block" src="static\images\25668_phone repair,table top, high quality, 4k , HD_ _xl-1024-v1-0.png" alt="Slide Image" height="700" style="object-fit: cover;">
+            </div>
+        </div>
+        <div><a class="carousel-control-prev" href="#carousel-1" role="button" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span><span class="visually-hidden">Previous</span></a><a class="carousel-control-next" href="#carousel-1" role="button" data-bs-slide="next"><span class="carousel-control-next-icon"></span><span class="visually-hidden">Next</span></a></div>
+        <div class="carousel-indicators"><button type="button" data-bs-target="#carousel-1" data-bs-slide-to="0" class="active"></button> <button type="button" data-bs-target="#carousel-1" data-bs-slide-to="1"></button> <button type="button" data-bs-target="#carousel-1" data-bs-slide-to="2"></button></div>
+    </div>
+    <div id="leaves"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="container">
+        <div class="text-center px-4 py-5 my-5">
+            <h1 class="display-5 fw-bold text-body-emphasis">ONE-OF-A-KIND</h1>
+            <h1 class="display-5 fw-bold text-body-emphasis">INSURANCE</h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 text-center"><img class="rounded" src="/static/images/diamond.jpeg" alt="gold" height="140px" width="140px">
+                <h2 class="fw-normal mt-1">Gold</h2>
+                <p> Full coverage on any subscribed device, whether you run the battery out or it gets stolen, you can rest assured we will have you covered. </p>
+            </div>
+            <div class="col-lg-4 text-center"><img class="rounded" src="/static/images/plat.jpeg" alt="silver" height="140px" width="140px">
+                <h2 class="fw-normal mt-1">Silver</h2>
+                <p> Partial coverage on any subscribed device, you can still rest assured we will have you covered. </p>
+            </div>
+            <div class="col-lg-4 text-center"><img class="rounded" src="/static/images/gold.jpeg" alt="bronze" height="140px" width="140px">
+                <h2 class="fw-normal mt-1">Bronze</h2>
+                <p> Limited coverage on any subscribed device, we will only cover certain situations. </p>
+            </div><div class="text-center">
       <p><a class="btn btn-secondary" href="#">Get Covered Today</a></p>
     </div>
-  </div>
-
-  <div class="px-4 py-5 my-5 text-center">
-    <h1 class="display-5 fw-bold text-body-emphasis">What We Are About</h1>
-    <h5 class="display-7 fw-bold text-body-emphasis">Made for Everyone</h5>
-    <p class="lead mb-4">
-      We founded Renew Insurance with one goal in mind: providing high-quality
-      insurance for your electronics. Our passion for excellence has driven us
-      from the beginning and continues to propel us going forward. We know that
-      every device counts, and strive to make your insurance plan as
-      comprehensive as it can be. Don't settle for anything but the best—check
-      us out for yourself.
-    </p>
-  </div>
-
-  <div class="row">
-    <div class="col-lg-4">
-      <img src="/static/images/guy.png" alt="some guy" class="rounded" />
-    </div>
-
-    <div class="col-lg-6 offset-lg-2">
-      <h1 class="display-5 fw-bold text-body-emphasis">Award Winning</h1>
-      <h5 class="display-7 fw-bold text-body-emphasis">Outstanding Quality</h5>
-      <p class="lead mb-4">
-        Renew Insurance won the Singapore Best Insurance Company 2023 Award,
-        clear of strong competitors like FWD Singapore, AIA, and HSBC Insurance.
-        We are proud to serve over a million customers in Singapore and millions
-        more globally, protecting your valuable devices with our excellent plans
-        & policies.
-      </p>
-    </div>
-  </div>
-
-  <div class="row align-items-center g-lg-5 py-5">
-    <div class="col-lg-7 text-center text-lg-start">
-        <h1 class="display-5 fw-bold text-body-emphasis">Subscribe to our Newsletter</h1>
-
-      <p class="col-lg-10 fs-4">
-        Get the latest news and promotions from Renew Insurance straight to your
-        email inbox.
-      </p>
-    </div>
-    <div class="col-md-10 mx-auto col-lg-5">
-      <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary">
-        <div class="input-group">
-          <input type="text" class="form-control" placeholder="example@gmail.com" />
-          <button type="submit" class="btn btn-secondary" id ="sub-button">Subscribe</button>
         </div>
-        <hr class="my-4" />
-        <small class="text-body-secondary"
-          >By subscribing, you agree to our terms of use.</small>
-      </form>
+        <div class="text-center px-4 py-5 my-5">
+            <h1 class="display-5 fw-bold text-body-emphasis">What We Are About</h1>
+            <h5 class="fw-bold text-body-emphasis display-7">Made for Everyone</h5>
+            <p class="lead mb-4"> We founded Renew Insurance with one goal in mind: providing high-quality insurance for your electronics. Our passion for excellence has driven us from the beginning and continues to propel us going forward. We know that every device counts, and strive to make your insurance plan as comprehensive as it can be. Don't settle for anything but the best—check us out for yourself. </p>
+        </div>
+        <div class="row">
+            <div class="col-lg-4"><img class="rounded" src="/static/images/guy.png" alt="some guy"></div>
+            <div class="col-lg-6 offset-lg-2">
+                <h1 class="display-5 fw-bold text-body-emphasis">Award Winning</h1>
+                <h5 class="fw-bold text-body-emphasis display-7">Outstanding Quality</h5>
+                <p class="lead mb-4"> Renew Insurance won the Singapore Best Insurance Company 2023 Award, clear of strong competitors like FWD Singapore, AIA, and HSBC Insurance. We are proud to serve over a million customers in Singapore and millions more globally, protecting your valuable devices with our excellent plans &amp; policies. </p>
+            </div>
+        </div>
+        <div class="row align-items-center g-lg-5 py-5">
+            <div class="col-lg-7 text-center text-lg-start">
+                <h1 class="display-5 fw-bold text-body-emphasis">Subscribe to our Newsletter</h1>
+                <p class="fs-4 col-lg-10"> Get the latest news and promotions from Renew Insurance straight to your email inbox. </p>
+            </div>
+            <div class="col-md-10 col-lg-5 mx-auto">
+                <form class="bg-body-tertiary p-4 p-md-5 border rounded-3">
+                    <div class="input-group"><input class="form-control form-control" type="text" placeholder="example@gmail.com"><button class="btn btn-secondary" type="submit" id="sub-button">Subscribe</button></div>
+                    <hr class="my-4"><small class="text-body-secondary">By subscribing, you agree to our terms of use.</small>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-
-{% endblock %}
+        {% endblock %}
