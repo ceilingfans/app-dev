@@ -20,7 +20,4 @@ threading
 socket
 flask[async]
 paypalrestsdk
-browser_cookie3
-requests
-openai
 

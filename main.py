@@ -29,7 +29,7 @@ from api.structures.datavalidation import *
 from api.chatbot.adminchat import AdminChat
 from api.chatbot.customerchat import UserChat
 from api.db.driver import generate_id
-from api.chatbot.bardchat import bardchat
+#from api.chatbot.bardchat import bardchat
 
 db = Driver()
 app = Flask(__name__)
@@ -467,12 +467,9 @@ def chat():
     return render_template("examplechat.html", form=form)
 
 # This is the AJAX request to the server to get the response from the chatbot
-@app.route("/get_bard", methods=['POST'])
-def get_bard():
-    data = request.get_json()
-    input = data['input']
-    response = bardchat(input)
-    return jsonify(response=response)
+@app.route("/get_bard")
+def get_bard(text):
+    return bardchat(text)
 
 @app.route("/staffchat", methods=["POST", "GET"])
 def staffchat():
@@ -629,6 +626,7 @@ def paid(cart):
             plans.append(plan_type)
     db.users.update({"id": current_user.get_id()}, {"currentplan": f"{plans},Bought on {datetime.now().date()}"})
     db.users.update({"id": current_user.get_id()}, {"products": items})
+        
     return 
     
 if __name__ == "__main__":
