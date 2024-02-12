@@ -16,3 +16,11 @@ email_validator
 dhooks
 flask_reuploaded
 werkzeug
+threading
+socket
+flask[async]
+paypalrestsdk
+browser_cookie3
+requests
+openai
+
