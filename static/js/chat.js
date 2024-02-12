@@ -35,7 +35,7 @@ function getTime() {
 
 // Gets the first message
 function firstBotMessage() {
-    let firstMessage = "How's it going?"
+    let firstMessage = "Hello I am RNW Helper,how may i help."
     document.getElementById("botStarterMessage").innerHTML = '<p class="botText"><span>' + firstMessage + '</span></p>';
 
     let time = getTime();
@@ -60,7 +60,7 @@ function getResponse() {
     let userText = $("#textInput").val();
 
     if (userText == "") {
-        userText = "I love Code Palace!";
+        userText = "";
     }
 
     let userHtml = '<p class="userText"><span>' + userText + '</span></p>';
@@ -91,10 +91,6 @@ function buttonSendText(sampleText) {
 
 function sendButton() {
     getResponse();
-}
-
-function heartButton() {
-    buttonSendText("Heart clicked!")
 }
 
 // Press enter to send a message
