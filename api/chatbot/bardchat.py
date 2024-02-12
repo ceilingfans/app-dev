@@ -1,13 +1,22 @@
-from bardapi import BardCookies
-import os 
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
+load_dotenv()
+client = OpenAI()
+os.environ['OPENAI_API_KEY']
 
-cookie_dict = {
-    "__Secure-1PSID": os.environ.get("Secure-1PSID"),
-    "__Secure-1PSIDTS": os.environ.get("secure-1PSIDTS"),
-    "__Secure-1PSIDCC": os.environ.get("secure-1PSIDCC")
-}
-
-bard = BardCookies(cookie_dict=cookie_dict)
 
 def bardchat(message):
-    return bard.get_answer(message)['content']
+    completion = client.chat.completions.create(
+  model="gpt-3.5-turbo",
+  messages=[
+    {"role": "system", "content": "You are a technical assistant, skilled in explaining phones and phone insurance."},
+    {"role": "user", "content": message}
+  ]
+)
+
+    response = completion.choices[0].message.content
+    
+    data = str(response).replace("*", "")
+    return data
+

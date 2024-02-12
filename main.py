@@ -469,7 +469,7 @@ def chat():
 # This is the AJAX request to the server to get the response from the chatbot
 @app.route("/get_bard", methods=['POST'])
 def get_bard():
-    data = request.get_json
+    data = request.get_json()
     input = data['input']
     response = bardchat(input)
     return jsonify(response=response)

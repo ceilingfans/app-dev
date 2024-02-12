@@ -47,12 +47,16 @@ function firstBotMessage() {
 firstBotMessage();
 
 // Retrieves the response
-function getHardResponse(userText) {
-    let botResponse = getBotResponse(userText);
-    let botHtml = '<p class="botText"><span>' + botResponse + '</span></p>';
-    $("#chatbox").append(botHtml);
-
-    document.getElementById("chat-bar-bottom").scrollIntoView(true);
+async function getHardResponse(userText) {
+    getBotResponse(userText).then(response => {
+        console.log(response);
+        let botResponse = response
+        let botHtml = '<p class="botText"><span>' + botResponse + '</span></p>';
+        $("#chatbox").append(botHtml);
+        document.getElementById("chat-bar-bottom").scrollIntoView(true);
+    }).catch(error => {
+        console.error(error);
+    });
 }
 
 //Gets the text text from the input box and processes it
