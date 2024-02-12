@@ -1,5 +1,18 @@
 {% extends "base.html" %} {% block title %}Profile | {{ current_user.get_name()
 }}{% endblock %} {% block content %}
+
+<style>
+  #wavebox{
+    background: rgb(230, 255, 230);
+  --mask:
+    radial-gradient(105.15px at 50% 142.50px,#000 99%,#0000 101%) calc(50% - 100px) 0/200px 51% repeat-x,
+    radial-gradient(105.15px at 50% -92.5px,#0000 99%,#000 101%) 50% 50px/200px calc(51% - 50px) repeat-x,
+    radial-gradient(105.15px at 50% calc(100% - 142.50px),#000 99%,#0000 101%) calc(50% - 100px) 100%/200px 51% repeat-x,
+    radial-gradient(105.15px at 50% calc(100% + 92.50px),#0000 99%,#000 101%) 50% calc(100% - 50px)/200px calc(51% - 50px) repeat-x;
+  -webkit-mask: var(--mask);
+          mask: var(--mask);
+}
+</style>
 <div class="container px-4 py-5">
   <h2 class="text-center fw-bold pb-2">Your Profile</h2>
 
@@ -120,10 +133,11 @@
     </div>
   {% endif %}
 </div>
+<div id="wavebox">
 <div class="container col-xl-10 col-xxl-8 px-4 py-5">
-  {% if current_user.get_products() is not none %}
+  <br>
   <h2 class="text-center fw-bold pb-2">Your Purchases</h2>
-      <p class="text-primary text-center font-weight-bold">
+  {% if current_user.get_products() is not none %}
         <div class="d-flex justify-content-center align-items-center">
           <div class="row row-cols-1 row-cols-md-2 g-4">
           {% for product in current_user.get_products()%}
@@ -285,11 +299,30 @@
                   </div>
           {%endif%}
           {% endfor %}
+          {% if current_user.get_products()|length <2  %}
+          <div class="col-lg text-center">
+            <div class="card">
+              <img
+                src="/static/images/renewlogo.svg"
+                alt="hello"
+                class="card-img-top"
+              />
+              <div class="card-body">
+                <h2 class="card-title fw-normal mt-1">Make A Purchase!</h2>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          
       </div>
-      </p>
   {% endif %}
 </div>
+<br>
+<br>
+</div>
+</div>
 
+<div style="background-color:white;">
 <div class="container col-xl-10 col-xxl-8 px-4 py-5">
   <div class="row g-lg-5 py-5">
     <div class="col-lg-7 text-center text-lg-start">
@@ -376,6 +409,7 @@
       {% endif %}
     </div>
   </div>
+</div>
 </div>
 
 {% endblock %}
