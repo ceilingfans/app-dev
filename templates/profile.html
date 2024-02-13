@@ -127,6 +127,30 @@
         </div>
         {% endif %}
         {% endfor %}
+        {% if plan == "None" %}
+        <div class="col-lg text-center">
+          <img
+            src="static\images\val_ranks\Bronze_1_Rank.png"
+            alt="free"
+            class="rounded"
+            height="140px"
+            width="140"
+          />
+          <h2 class="fw-normal mt-1">Free</h2>
+        </div>
+        {% endif %}
+        {% if plan == [] %}
+        <div class="col-lg text-center">
+          <img
+            src="static\images\val_ranks\Bronze_1_Rank.png"
+            alt="free"
+            class="rounded"
+            height="140px"
+            width="140"
+          />
+          <h2 class="fw-normal mt-1">Free</h2>
+        </div>
+        {% endif %}
     </div>
     <div class="d-flex justify-content-center align-items-center" style="height: 100px;">
     <a href="{{ url_for('contact') }}" class="btn btn-primary">Contact Us to Ensure An Item using purchased Subscriptions</a>
@@ -299,7 +323,6 @@
                   </div>
           {%endif%}
           {% endfor %}
-          {% if current_user.get_products()|length <2  %}
           <div class="col-lg text-center">
             <div class="card">
               <img
@@ -308,11 +331,16 @@
                 class="card-img-top"
               />
               <div class="card-body">
-                <h2 class="card-title fw-normal mt-1">Make A Purchase!</h2>
+                <h2 class="card-title fw-normal mt-1">
+                  {% if current_user.get_products()|length < 1 %}
+                  Make A Purchase!
+                  {% else %}
+                  Make More Purchases!
+                  {% endif %}
+          </h2>
               </div>
             </div>
           </div>
-          {% endif %}
           
       </div>
   {% endif %}

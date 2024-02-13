@@ -11,17 +11,14 @@ from dhooks import Webhook
 from PIL import Image
 import threading
 import json
-import requests
 import paypalrestsdk
 from datetime import datetime
 import re
 import ast
-
 from flask_uploads import UploadSet, configure_uploads, IMAGES
 from flask_login import AnonymousUserMixin
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from api.db.driver import Driver
 from api.structures.User import check_hash, User, get_hash
 from api.structures.Promo import Promo
@@ -488,15 +485,6 @@ def profile():
                            image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
 
-@app.route("/chat", methods=["POST", "GET"])
-def chat():
-    form = Chatform()
-    #This cannot be done like below, it requires a AJAX request to the server to get the response instead of reloading the whole html everytime.
-    if form.submit_chat.data and form.validate():
-        text = bardchat(form.message.data)
-        return render_template("examplechat.html", form=form, result=text)
-    return render_template("examplechat.html", form=form)
-
 # This is the AJAX request to the server to get the response from the chatbot
 @app.route("/get_bard", methods=['POST'])
 def get_bard():
@@ -505,55 +493,6 @@ def get_bard():
     response = bardchat(input)
     return jsonify(response=response)
 
-@app.route("/staffchat", methods=["POST", "GET"])
-def staffchat():
-    form = Chatform()
-    # MAKE THIS INTO OWN SITE OR AJAX TO RUN 
-    admin = AdminChat(55555,"admin","chatlog.txt")
-    chats["admin"] = admin
-    admin_thread = threading.Thread(target=admin.connect, args=())
-    admin_thread.start()
-    
-    return render_template("examplechat.html", form=form)
-        
-        
-@app.route("/userchat", methods=["POST", "GET"])
-def userchat():
-    form = Chatform()
-    # MAKE THIS INTO OWN SITE OR AJAX TO RUN
-    # Randomly generate the port for the user to connect to make the txt file the port number and obtain the username's name.
-    user = UserChat(55555,"user","chatlog.txt")
-    chats["user"] = user
-    user_thread = threading.Thread(target=user.connect, args=())
-    user_thread.start()
-    
-    return render_template("examplechat.html", form=form)
-
-#TODO LINK TO JS @JUNWEI GO DO 
-@app.route('/api/sentstaffchat', methods=['GET'])
-def sent_staff_chat():
-    admin = chats["admin"]
-    message = "burgerboyadmin" #Set to grab the json that JS sends.
-    admin.set_text(message)
-    return render_template("home.html")
-
-@app.route('/api/sentuserchat', methods=['GET'])
-def sent_user_chat():
-    user = chats["user"]
-    message = "burgerboyuser" #Set to grab the json that JS sends.
-    user.set_text(message)
-    return render_template("home.html")
-
-# Should probably return a json to the JS front end.
-@app.route('/api/getstaffreply', methods=['GET'])
-def get_staff_reply():
-    admin = chats["admin"]
-    return admin.get_reply()
-
-@app.route('/api/getuserreply', methods=['GET'])
-def get_user_reply():
-    user = chats["user"]
-    return user.get_reply()
 
 @login_required
 @app.route("/admin")
@@ -1311,8 +1250,10 @@ def paid(cart):
     items, total = makecart(cart)
     ret_code, bill = db.bills.find(owner_id=current_user.get_id())
     ret_code2, user = db.users.find(current_user.get_id())
-    products = user.get_products() + items
-
+    try:
+        products = user.get_products() + items
+    except:
+        products = items
     plans = []
     if ret_code == "OWNERBILLS":
         for item in bill:
@@ -1325,9 +1266,41 @@ def paid(cart):
                 plan_type = "Gold"
             db.bills.update(item.get_bill_id(), {"status": True})
             plans.append(plan_type)
+    user = UserChat(55555)
+    user.receive(f" The User:{current_user.get_id()} Just purchased {items}! His total Was ${total}.")
     db.users.update({"id": current_user.get_id()}, {"currentplan": f"{plans},Bought on {datetime.now().date()}"})
     db.users.update({"id": current_user.get_id()}, {"products": products})
-    return
+    return 
+
+
+@login_required
+@app.route("/livepayment" , methods=['GET','POST'])
+def admin_livepayment():
+    global chats
+    if isinstance(current_user, AnonymousUserMixin):
+        return abort(401)
     
+    if not current_user.get_admin():
+        return abort(401)
+    try:
+        admin = AdminChat(55555)
+        threading.Thread(target=admin.receive, args=()).start()
+        chats["admin"] = admin
+    except:
+        pass
+    return render_template('livepayment.html',ip_addr=request.remote_addr)
+
+@app.route('/should_reload', methods=['GET'])
+def check_reload():
+    global chats
+    print(chats)
+    admin = chats["admin"]
+    if admin.should_reload:
+        admin.should_reload = False # Reset the flag after sending the response
+        print("info: reloading")
+        return jsonify({'reload': True, 'messages': admin.text})
+    else:
+        return jsonify({'reload': False})
+
 if __name__ == "__main__":
     app.run(debug=True)
