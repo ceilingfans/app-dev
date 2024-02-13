@@ -1305,7 +1305,7 @@ def admin_livepayment():
     admin = AdminChat(55555)
     threading.Thread(target=admin.receive, args=()).start()
     chats["admin"] = admin
-    return render_template('livepayment.html')
+    return render_template('livepayment.html',ip_addr=request.remote_addr)
 
 @app.route('/should_reload', methods=['GET'])
 def check_reload():

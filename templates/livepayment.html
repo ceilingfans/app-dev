@@ -175,6 +175,7 @@
             if (parsedData.reload == true) {
               const element = document.getElementById('chatlines');
               let notification = document.createElement('div');
+              notification.classList.add('border');
               console.log(parsedData)
               notification.textContent =("Server: " + parsedData.messages);
               element.appendChild(notification);
