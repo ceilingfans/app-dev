@@ -485,15 +485,6 @@ def profile():
                            image=(url_for('static', filename=f'images/userprofileimg/{current_user.get_picture()}')), plan=plan)
 
 
-@app.route("/chat", methods=["POST", "GET"])
-def chat():
-    form = Chatform()
-    #This cannot be done like below, it requires a AJAX request to the server to get the response instead of reloading the whole html everytime.
-    if form.submit_chat.data and form.validate():
-        text = bardchat(form.message.data)
-        return render_template("examplechat.html", form=form, result=text)
-    return render_template("examplechat.html", form=form)
-
 # This is the AJAX request to the server to get the response from the chatbot
 @app.route("/get_bard", methods=['POST'])
 def get_bard():
@@ -502,16 +493,6 @@ def get_bard():
     response = bardchat(input)
     return jsonify(response=response)
 
-@app.route("/staffchat", methods=["POST", "GET"])
-def staffchat():
-    form = Chatform()
-    admin = AdminChat(55555,"admin","chatlog.txt")
-    chats["admin"] = admin
-    admin_thread = threading.Thread(target=admin.connect, args=())
-    admin_thread.start()
-    return render_template("examplechat.html", form=form)
-        
-        
 
 @login_required
 @app.route("/admin")
@@ -1301,10 +1282,12 @@ def admin_livepayment():
     
     if not current_user.get_admin():
         return abort(401)
-    
-    admin = AdminChat(55555)
-    threading.Thread(target=admin.receive, args=()).start()
-    chats["admin"] = admin
+    try:
+        admin = AdminChat(55555)
+        threading.Thread(target=admin.receive, args=()).start()
+        chats["admin"] = admin
+    except:
+        pass
     return render_template('livepayment.html',ip_addr=request.remote_addr)
 
 @app.route('/should_reload', methods=['GET'])
@@ -1318,7 +1301,6 @@ def check_reload():
         return jsonify({'reload': True, 'messages': admin.text})
     else:
         return jsonify({'reload': False})
-
 
 if __name__ == "__main__":
     app.run(debug=True)
